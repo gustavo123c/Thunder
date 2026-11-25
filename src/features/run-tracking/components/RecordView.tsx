@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
-import { useMemo } from 'react';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { useEffect, useMemo } from 'react';
 import { Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,6 +8,7 @@ import { RouteMap } from '@/components/map/RouteMap';
 import { FormMessage } from '@/components/ui/FormMessage';
 import { samplesToMultiLineString } from '@/domain/geo/geojson';
 import { isActive } from '@/domain/run-session/run-session';
+import { isExpoGo } from '@/lib/runtime';
 
 import { useLiveMetrics } from '../hooks/useLiveMetrics';
 import { useLocationPermission, useRunControls } from '../hooks/useRunTracking';
@@ -34,6 +36,16 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
   const route = useMemo(() => samplesToMultiLineString(samples), [samples]);
   const active = isActive(run?.session);
   const status = run?.session.status ?? null;
+
+  // Expo Go records only while the app is open: keep the screen on during a run.
+  useEffect(() => {
+    if (!isExpoGo || !active) return;
+    const tag = 'thunder-run';
+    void activateKeepAwakeAsync(tag);
+    return () => {
+      void deactivateKeepAwake(tag);
+    };
+  }, [active]);
 
   async function handleStart() {
     const current = permission === 'denied' || permission === null ? await request() : permission;
@@ -90,6 +102,12 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
         {active ? <LiveStats metrics={metrics} paused={status === 'paused'} /> : null}
         {!active ? (
           <PermissionNotice permission={permission} onRequest={() => void request()} />
+        ) : null}
+        {isExpoGo ? (
+          <FormMessage
+            tone="info"
+            message="Modo de teste (Expo Go): mantenha o app aberto na tela durante a corrida. A tela não vai apagar."
+          />
         ) : null}
         <FormMessage message={controls.error} />
         <RunControls

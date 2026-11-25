@@ -161,6 +161,16 @@ corrida concorrente, tratando `unique_violation`).
 - Telas: Feed (cards com autor e barra social), comentários (`run/[id]/comments`), busca de pessoas
   (`people`, modal), perfil de atleta (`user/[id]`) e contadores sociais na aba Perfil.
 
+## Modo Expo Go (teste sem build)
+
+`lib/runtime.ts#isExpoGo` detecta o app Expo Go. Nele:
+
+- `@rnmapbox/maps` **nunca é importado** (ele lança erro no import sem código nativo):
+  `components/map/RouteMap` carrega `MapboxRouteMap` com `require` só fora do Expo Go e usa
+  `RouteSketch` (SVG) no Expo Go. `initMapbox()` vira no-op. Coberto por teste que simula o erro de import.
+- GPS: `createForegroundLocationTracker` (`watchPositionAsync`) no lugar da task em segundo plano;
+  a tela de corrida mantém o display ligado (`expo-keep-awake`) e mostra o aviso de modo de teste.
+
 ## Próximos passos sugeridos
 
 1. Confirmação de e-mail por deep link e recuperação de senha.

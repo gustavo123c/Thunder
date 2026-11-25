@@ -6,10 +6,9 @@ import { AppState } from 'react-native';
 import { syncPendingRuns, uploadStoredRun } from '../api/run-upload.api';
 import { supabaseRunUploader } from '../api/supabase-run-uploader';
 import { defaultRunTitle } from '../run-title';
-import { runRecorder, runRepository } from '../services/recorder';
+import { locationTracker, runRecorder, runRepository } from '../services/recorder';
 import { useRunSessionStore } from '../store/run-session.store';
 import type { LocationPermission } from '../types';
-import { expoLocationTracker } from '../services/expo-location-tracker';
 
 /** Query key prefix invalidated whenever runs are uploaded. */
 export const RUNS_QUERY_KEY = ['runs'] as const;
@@ -55,11 +54,11 @@ export function useLocationPermission() {
   const [permission, setPermission] = useState<LocationPermission | null>(null);
 
   useEffect(() => {
-    void expoLocationTracker.getPermission().then(setPermission);
+    void locationTracker.getPermission().then(setPermission);
   }, []);
 
   const request = useCallback(async () => {
-    const result = await expoLocationTracker.requestPermission();
+    const result = await locationTracker.requestPermission();
     setPermission(result);
     return result;
   }, []);

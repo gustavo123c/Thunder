@@ -2,16 +2,28 @@ import { randomUUID } from 'expo-crypto';
 import type { LocationObject } from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 
+import { isExpoGo } from '@/lib/runtime';
+
+import type { LocationTracker } from '../types';
 import { expoLocationTracker, LOCATION_TASK_NAME } from './expo-location-tracker';
+import { createForegroundLocationTracker } from './foreground-location-tracker';
 import { RunRecorder } from './run-recorder';
 import { createSqliteRunRepository } from './sqlite-run.repository';
 
 export const runRepository = createSqliteRunRepository();
 
+/**
+ * Background GPS in development/production builds; foreground-only in Expo Go
+ * (no background location there on iOS).
+ */
+export const locationTracker: LocationTracker = isExpoGo
+  ? createForegroundLocationTracker((locations) => void runRecorder.ingest(locations))
+  : expoLocationTracker;
+
 /** App-wide recorder instance (one per JS runtime). */
 export const runRecorder = new RunRecorder({
   repository: runRepository,
-  tracker: expoLocationTracker,
+  tracker: locationTracker,
   now: () => Date.now(),
   createId: randomUUID,
 });

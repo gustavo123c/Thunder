@@ -57,7 +57,19 @@ npm run db:start   # Postgres + Auth + Studio, aplica as migrations
 npm run db:types   # (opcional) regenera src/services/supabase/database.types.ts
 ```
 
-### 3. App no celular (development build)
+### 3a. Testar rápido no iPhone/Android com o Expo Go (grátis)
+
+Instale o **Expo Go** (App Store / Play Store), depois no computador:
+
+```bash
+npx expo start
+```
+
+e escaneie o QR code com a câmera do iPhone (ou pelo Expo Go no Android).
+No Expo Go o app roda em **modo de teste**: a rota aparece desenhada (sem o mapa do Mapbox) e o
+GPS grava só com o app aberto — a tela fica ligada durante a corrida.
+
+### 3b. App completo no celular (development build)
 
 O app usa módulos nativos (Mapbox, GPS em segundo plano) e **não roda no Expo Go**.
 

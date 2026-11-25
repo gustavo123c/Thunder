@@ -10,7 +10,7 @@ Arquitetura completa: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | ----- | ------------------------------------------------------- | ------ |
 | 0     | Setup do projeto, tooling, schema do banco              | ✅     |
 | 1     | Autenticação e perfil (onboarding)                      | ✅     |
-| 2     | Domínio de métricas (distância, pace, splits, calorias) | ⏳     |
+| 2     | Domínio de métricas (distância, pace, splits, calorias) | ✅     |
 | 3     | Rastreamento GPS ao vivo                                | ⏳     |
 | 4     | Histórico e análise pós-treino                          | ⏳     |
 | 5     | Feed social                                             | ⏳     |

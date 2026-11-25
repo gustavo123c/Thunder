@@ -67,6 +67,36 @@ AuthProvider (sessão Supabase persistida em AsyncStorage)
 **Pendente:** confirmação de e-mail por deep link (o stack local tem confirmação desligada; em produção,
 o usuário confirma pelo link e entra com a senha), recuperação de senha e foto de perfil.
 
+## Métricas (Etapa 2)
+
+Tudo em `src/domain/` (TS puro, garantido por regra de ESLint). Limites ajustáveis em
+`domain/metrics/config.ts`.
+
+```
+amostras GPS ─► applyGpsFilter ─► buildIntervals ─► distância · tempo em movimento · splits · calorias
+                (geo/gps-filter)   (metrics/intervals)        └► elevationGainM (altitudes suavizadas)
+```
+
+| Métrica            | Definição                                                                                                         |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Distância          | Soma haversine entre pontos aceitos **do mesmo segmento** (nunca atravessa uma pausa).                            |
+| Tempo ativo        | Soma dos períodos iniciar/retomar → pausar/finalizar. É o cronômetro ao vivo.                                     |
+| Tempo decorrido    | Do primeiro início ao fim, com pausas.                                                                            |
+| Tempo em movimento | Intervalos com velocidade ≥ 0,5 m/s (parado no semáforo não conta).                                               |
+| Pace médio         | Tempo em movimento ÷ distância (s/km); `null` abaixo de 50 m.                                                     |
+| Pace atual         | Janela móvel dos últimos 30 s do segmento atual; `null` com menos de 20 m.                                        |
+| Melhor pace        | Split completo (1 km) mais rápido.                                                                                |
+| Splits             | A cada 1000 m, com a fronteira interpolada dentro do intervalo; último split parcial ≥ 10 m.                      |
+| Elevação           | Média móvel (11 amostras) + histerese de 3 m.                                                                     |
+| Calorias           | MET (Compendium 2011, interpolado pela velocidade) × peso × horas, por intervalo em movimento. Sem peso → `null`. |
+
+**Filtro de GPS** (`applyGpsFilter`, função pura com estado explícito): descarta coordenadas inválidas,
+pontos fora de ordem, precisão > 30 m, saltos > 12 m/s (com margem da precisão; após 5 saltos seguidos
+reancora) e jitter < 3 m (mas aceita um ponto a cada 10 s parado). A distância é medida sempre a partir
+do último ponto aceito, então descartar jitter não perde distância — no máximo os últimos < 3 m de um segmento.
+
+`simplifyRoute` (Douglas–Peucker, tolerância 5 m) gera a polyline leve salva em `runs.route`.
+
 ## Fluxo de uma corrida
 
 ```

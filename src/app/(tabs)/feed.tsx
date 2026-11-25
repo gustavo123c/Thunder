@@ -1,10 +1,13 @@
-import { ComingSoon } from '@/components/ui/ComingSoon';
+import { Screen } from '@/components/ui/Screen';
+import { useUserId } from '@/features/auth';
+import { FeedList } from '@/features/social';
 
 export default function FeedScreen() {
+  const viewerId = useUserId();
+
   return (
-    <ComingSoon
-      title="Feed"
-      description="Atividades suas e de quem você segue chegam na Etapa 5."
-    />
+    <Screen className="px-0">
+      <FeedList viewerId={viewerId} />
+    </Screen>
   );
 }

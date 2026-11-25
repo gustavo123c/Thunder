@@ -13,7 +13,7 @@ Arquitetura completa: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | 2     | Domínio de métricas (distância, pace, splits, calorias) | ✅     |
 | 3     | Rastreamento GPS ao vivo                                | ✅     |
 | 4     | Histórico e análise pós-treino                          | ✅     |
-| 5     | Feed social                                             | ⏳     |
+| 5     | Feed social                                             | ✅     |
 
 ## Pré-requisitos
 
@@ -22,43 +22,67 @@ Arquitetura completa: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 - Conta **Mapbox** → token público (`pk.…`).
 - **Supabase**: local via Docker (`npm run db:start`) ou um projeto hospedado.
 
-## Configuração
+## Configuração (primeira vez)
+
+### 1. Dependências e variáveis
 
 ```bash
 npm install
-cp .env.example .env.local   # preencha as chaves
+cp .env.example .env.local
 ```
 
-### Banco local (Supabase CLI + Docker)
+Preencha `.env.local` com:
+
+| Variável                                                     | Onde obter                                                                                             |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API (ou a saída de `npm run db:start`)                                   |
+| `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN`                            | [account.mapbox.com/access-tokens](https://account.mapbox.com/access-tokens/) → token público (`pk.…`) |
+
+### 2. Banco de dados
+
+**Projeto hospedado (mais simples):** crie um projeto em [supabase.com](https://supabase.com), depois:
 
 ```bash
-npm run db:start   # sobe Postgres/Auth/Studio e aplica supabase/migrations
-npm run db:types   # gera src/services/supabase/database.types.ts
-npm run db:reset   # recria o banco do zero
+npx supabase login
+npx supabase link --project-ref <ref-do-projeto>
+npx supabase db push          # aplica supabase/migrations
 ```
 
-Para um projeto hospedado: `npx supabase link --project-ref <ref>` e `npx supabase db push`.
+Em Authentication → Providers → Email, defina o mínimo de senha em 8 caracteres (igual ao app).
 
-### Rodando o app
+**Local (Docker):**
 
 ```bash
+npm run db:start   # Postgres + Auth + Studio, aplica as migrations
+npm run db:types   # (opcional) regenera src/services/supabase/database.types.ts
+```
+
+### 3. App no celular (development build)
+
+O app usa módulos nativos (Mapbox, GPS em segundo plano) e **não roda no Expo Go**.
+
+```bash
+npx eas-cli@latest login
 npx eas-cli@latest build --profile development --platform android   # ou ios
-npm start                                                             # dev server
+# instale o build no aparelho e então:
+npm start
 ```
 
 Com Android Studio/Xcode locais: `npm run android` / `npm run ios`.
 
+> Teste a gravação **ao ar livre**: GPS em ambiente fechado gera pontos imprecisos que o filtro descarta.
+
 ## Scripts
 
-| Script              | O que faz                                    |
-| ------------------- | -------------------------------------------- |
-| `npm start`         | Dev server do Expo                           |
-| `npm run typecheck` | `tsc --noEmit`                               |
-| `npm run lint`      | ESLint (config Expo + Prettier)              |
-| `npm test`          | Jest                                         |
-| `npm run test:db`   | Testes SQL (RLS, RPCs) num Postgres+PostGIS  |
-| `npm run format`    | Prettier (com ordenação de classes Tailwind) |
-| `npm run db:*`      | Supabase local (start/stop/reset/types)      |
+| Script              | O que faz                                         |
+| ------------------- | ------------------------------------------------- |
+| `npm start`         | Dev server do Expo                                |
+| `npm run typecheck` | `tsc --noEmit`                                    |
+| `npm run lint`      | ESLint (config Expo + Prettier)                   |
+| `npm test`          | Jest                                              |
+| `npm run test:db`   | Testes SQL (RLS, RPCs) — ver `scripts/test-db.sh` |
+| `npm run format`    | Prettier (com ordenação de classes Tailwind)      |
+| `npm run db:*`      | Supabase local (start/stop/reset/types)           |
 
 ## Estrutura
 

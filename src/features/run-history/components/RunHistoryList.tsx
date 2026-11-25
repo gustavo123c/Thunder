@@ -12,11 +12,14 @@ import { WeekSummary } from './WeekSummary';
 
 type RunHistoryListProps = {
   userId: string;
-  /** Rendered above the list (e.g. pending uploads banner). */
+  /** Rendered above the list (e.g. pending uploads banner, athlete header). */
   header?: ReactElement | null;
+  /** Own history shows a title, the weekly summary and a call to action. */
+  variant?: 'own' | 'athlete';
 };
 
-export function RunHistoryList({ userId, header = null }: RunHistoryListProps) {
+export function RunHistoryList({ userId, header = null, variant = 'own' }: RunHistoryListProps) {
+  const isOwn = variant === 'own';
   const query = useUserRuns(userId);
   const runs = query.data?.pages.flat() ?? [];
 
@@ -45,18 +48,22 @@ export function RunHistoryList({ userId, header = null }: RunHistoryListProps) {
       contentContainerClassName="gap-4 px-4 pb-8 pt-4"
       ListHeaderComponent={
         <View className="gap-4">
-          <Text className="text-3xl font-black text-ink-900 dark:text-ink-50">Histórico</Text>
+          {isOwn ? (
+            <Text className="text-3xl font-black text-ink-900 dark:text-ink-50">Histórico</Text>
+          ) : null}
           {header}
-          {runs.length > 0 ? <WeekSummary runs={runs} /> : null}
+          {isOwn && runs.length > 0 ? <WeekSummary runs={runs} /> : null}
         </View>
       }
       ListEmptyComponent={
         <View className="items-center gap-4 py-16">
           <Text className="text-5xl">🏃</Text>
           <Text className="text-center text-base text-ink-500 dark:text-ink-300">
-            Nenhuma corrida ainda. Que tal a primeira hoje?
+            {isOwn ? 'Nenhuma corrida ainda. Que tal a primeira hoje?' : 'Nenhuma corrida visível.'}
           </Text>
-          <Button label="Começar a correr" onPress={() => router.navigate('/record')} />
+          {isOwn ? (
+            <Button label="Começar a correr" onPress={() => router.navigate('/record')} />
+          ) : null}
         </View>
       }
       renderItem={({ item }) => (

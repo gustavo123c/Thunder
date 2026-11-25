@@ -248,6 +248,10 @@ export type Database = {
         Returns: Json;
       };
       get_run_detail: { Args: { p_run_id: string; p_history_limit?: number }; Returns: Json };
+      get_feed: { Args: { p_before?: string; p_before_id?: string; p_limit?: number }; Returns: Json };
+      list_comments: { Args: { p_run_id: string; p_limit?: number }; Returns: Json };
+      search_profiles: { Args: { p_query: string; p_limit?: number }; Returns: Json };
+      get_profile_stats: { Args: { p_user_id: string }; Returns: Json };
       owns_run: { Args: { target_run_id: string }; Returns: boolean };
     };
     Enums: {

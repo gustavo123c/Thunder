@@ -146,6 +146,29 @@ corrida concorrente, tratando `unique_violation`).
 - Detalhe: mapa Mapbox ajustado à rota, métricas, parciais com barra proporcional à velocidade
   (melhor km destacado), "Sua evolução" e, para o dono, visibilidade e exclusão.
 
+## Feed social (Etapa 5)
+
+- RPCs em `20261125030000_social.sql` (todas `SECURITY INVOKER`):
+  - `get_feed(before, before_id, limit)` — suas corridas + as de quem você segue, já filtradas pelo RLS.
+  - `list_comments(run_id)` — comentários não apagados, com autor.
+  - `search_profiles(query)` — nome/@usuário, sem diferenciar maiúsculas, com `%`/`_` escapados,
+    mínimo de 2 caracteres, só perfis com onboarding concluído, com `is_following`.
+  - `get_profile_stats(user_id)` — perfil, seguidores, seguindo, corridas e km **visíveis para quem consulta**.
+- Escritas diretas nas tabelas (o RLS protege): `kudos` (Raio), `comments` (soft delete), `follows`.
+  Raio/seguir duplicado (`23505`) é tratado como sucesso.
+- Raio otimista (`useToggleKudo`): atualiza o feed e o detalhe na hora e desfaz se o servidor recusar.
+  Não é possível dar Raio na própria corrida.
+- Telas: Feed (cards com autor e barra social), comentários (`run/[id]/comments`), busca de pessoas
+  (`people`, modal), perfil de atleta (`user/[id]`) e contadores sociais na aba Perfil.
+
+## Próximos passos sugeridos
+
+1. Confirmação de e-mail por deep link e recuperação de senha.
+2. Foto de perfil (Supabase Storage).
+3. Notificações push (novo Raio/comentário/seguidor).
+4. Planos de treino por nível e meta (`features/training-plans`), usando `domain/insights`.
+5. Zonas de pace/frequência cardíaca e integração com relógios.
+
 ## Banco de dados
 
 Migration: `supabase/migrations/20261125000000_initial_schema.sql`.

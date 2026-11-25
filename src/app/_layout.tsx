@@ -56,8 +56,20 @@ function RootNavigator() {
       <Stack.Protected guard={gate === 'ready'}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
-          name="run/[id]"
+          name="run/[id]/index"
           options={{ headerShown: true, title: 'Corrida', headerBackTitle: 'Voltar' }}
+        />
+        <Stack.Screen
+          name="run/[id]/comments"
+          options={{ headerShown: true, title: 'Comentários', headerBackTitle: 'Voltar' }}
+        />
+        <Stack.Screen
+          name="user/[id]"
+          options={{ headerShown: true, title: 'Atleta', headerBackTitle: 'Voltar' }}
+        />
+        <Stack.Screen
+          name="people"
+          options={{ headerShown: true, title: 'Encontrar corredores', presentation: 'modal' }}
         />
         <Stack.Screen
           name="profile/edit"

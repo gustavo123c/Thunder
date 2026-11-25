@@ -21,16 +21,29 @@ export function formatDuration(totalSeconds: number): string {
   return h > 0 ? `${h}:${pad2(m)}:${pad2(s)}` : `${pad2(m)}:${pad2(s)}`;
 }
 
-/** Pace in seconds per km → "5:30 /km". */
-export function formatPace(secondsPerKm: number | null | undefined): string {
+/** Pace in seconds per km → "5:30" (also used to prefill pace inputs). */
+export function formatPaceValue(secondsPerKm: number | null | undefined): string {
   if (secondsPerKm == null || !Number.isFinite(secondsPerKm) || secondsPerKm <= 0) {
-    return `${PLACEHOLDER} /km`;
+    return PLACEHOLDER;
   }
 
   const rounded = Math.round(secondsPerKm);
   const m = Math.floor(rounded / 60);
   const s = rounded % 60;
-  return `${m}:${pad2(s)} /km`;
+  return `${m}:${pad2(s)}`;
+}
+
+/** Pace in seconds per km → "5:30 /km". */
+export function formatPace(secondsPerKm: number | null | undefined): string {
+  return `${formatPaceValue(secondsPerKm)} /km`;
+}
+
+/** 72.5 → "72,5 kg". */
+export function formatWeightKg(kg: number | null | undefined): string {
+  if (kg == null || !Number.isFinite(kg)) return PLACEHOLDER;
+  const rounded = Math.round(kg * 10) / 10;
+  const text = Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(1);
+  return `${text.replace('.', ',')} kg`;
 }
 
 /** Meters → "5,23 km" (pt-BR decimal separator, two decimals). */

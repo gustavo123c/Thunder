@@ -1,4 +1,10 @@
-import { formatDistanceKm, formatDuration, formatPace } from '../format';
+import {
+  formatDistanceKm,
+  formatDuration,
+  formatPace,
+  formatPaceValue,
+  formatWeightKg,
+} from '../format';
 
 describe('formatDuration', () => {
   it('formats minutes and seconds under an hour', () => {
@@ -48,5 +54,21 @@ describe('formatDistanceKm', () => {
 
   it('returns a placeholder for invalid input', () => {
     expect(formatDistanceKm(-10)).toBe('-- km');
+  });
+});
+
+describe('formatPaceValue', () => {
+  it('omits the unit (used to prefill inputs)', () => {
+    expect(formatPaceValue(330)).toBe('5:30');
+    expect(formatPaceValue(null)).toBe('--');
+  });
+});
+
+describe('formatWeightKg', () => {
+  it('uses a comma and at most one decimal', () => {
+    expect(formatWeightKg(72.5)).toBe('72,5 kg');
+    expect(formatWeightKg(80)).toBe('80 kg');
+    expect(formatWeightKg(72.46)).toBe('72,5 kg');
+    expect(formatWeightKg(null)).toBe('--');
   });
 });

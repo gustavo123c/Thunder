@@ -24,6 +24,7 @@ src/app/         Rotas (Expo Router). Telas finas: só compõem features.
 src/features/    Módulos verticais: auth, profile, run-tracking, run-history, social.
                  Cada um com components/, hooks/, api/ (e store/, services/ quando preciso).
 src/domain/      TypeScript puro — sem React/RN. Geo, pace, splits, calorias, comparações.
+src/navigation/  Composição entre features para navegação (ex.: useAppGate = auth + perfil).
 src/services/    Adaptadores de infraestrutura: Supabase, Mapbox, SQLite.
 src/components/  UI compartilhada (design system).
 src/lib/         Utilitários transversais: env, formatadores, query client.
@@ -35,8 +36,36 @@ supabase/        Migrations SQL versionadas e config do stack local.
 
 - `domain/` não importa nada de fora dele.
 - `features/*` podem importar `domain`, `services`, `components`, `lib`, `theme` — mas **não** outras features (comunicação via rotas ou via `domain` / tipos compartilhados).
-- `app/` só importa de `features/` e `components/`.
+- `app/` importa de `features/`, `components/` e `navigation/`.
+- `navigation/` é o único lugar que combina mais de uma feature.
 - Unidades SI em todo lugar (m, s, s/km). Conversão para exibição só em `lib/format.ts`.
+
+## Autenticação e onboarding (Etapa 1)
+
+```
+AuthProvider (sessão Supabase persistida em AsyncStorage)
+  → useProfile (React Query, chave ['profile', userId])
+  → resolveAppGate → loading | signed_out | onboarding | ready | error
+  → Stack.Protected no layout raiz libera só o grupo permitido
+```
+
+| Gate         | Rotas acessíveis                                        |
+| ------------ | ------------------------------------------------------- |
+| `loading`    | nenhuma — splash screen permanece                       |
+| `signed_out` | `(auth)/sign-in`, `(auth)/sign-up`                      |
+| `onboarding` | `onboarding` (4 passos: identidade, nível, corpo, meta) |
+| `ready`      | `(tabs)/*`, `profile/edit`                              |
+| `error`      | tela de erro com "Tentar novamente" / "Sair"            |
+
+- O perfil é criado vazio pelo trigger `handle_new_user`; `full_name` vem do cadastro.
+- Onboarding concluído = `profiles.onboarded_at` preenchido (mesma escrita que salva os dados).
+- Regras de validação ficam em `domain/profile/profile-rules.ts` (espelham os CHECKs do banco) e
+  retornam códigos; as mensagens em pt-BR ficam em `features/profile/profile-form.ts`.
+- Nome de usuário: checado antes de avançar do passo 1 e protegido pelo UNIQUE (`23505` → erro de campo).
+- Logout limpa todo o cache do React Query.
+
+**Pendente:** confirmação de e-mail por deep link (o stack local tem confirmação desligada; em produção,
+o usuário confirma pelo link e entra com a senha), recuperação de senha e foto de perfil.
 
 ## Fluxo de uma corrida
 

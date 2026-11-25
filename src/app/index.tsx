@@ -1,6 +1,19 @@
 import { Redirect } from 'expo-router';
 
-// Etapa 1 will route unauthenticated users to (auth)/sign-in here.
+import { useAppGate } from '@/navigation/useAppGate';
+
+/** Entry route: sends the user to the area the root guard allows. */
 export default function Index() {
-  return <Redirect href="/feed" />;
+  const { gate } = useAppGate();
+
+  switch (gate) {
+    case 'signed_out':
+      return <Redirect href="/sign-in" />;
+    case 'onboarding':
+      return <Redirect href="/onboarding" />;
+    case 'ready':
+      return <Redirect href="/feed" />;
+    default:
+      return null;
+  }
 }

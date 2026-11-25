@@ -9,7 +9,7 @@ Arquitetura completa: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | Etapa | Módulo                                                  | Status |
 | ----- | ------------------------------------------------------- | ------ |
 | 0     | Setup do projeto, tooling, schema do banco              | ✅     |
-| 1     | Autenticação e perfil (onboarding)                      | ⏳     |
+| 1     | Autenticação e perfil (onboarding)                      | ✅     |
 | 2     | Domínio de métricas (distância, pace, splits, calorias) | ⏳     |
 | 3     | Rastreamento GPS ao vivo                                | ⏳     |
 | 4     | Histórico e análise pós-treino                          | ⏳     |
@@ -66,6 +66,7 @@ src/
 ├── app/          # rotas (Expo Router)
 ├── features/     # auth, profile, run-tracking, run-history, social
 ├── domain/       # cálculos puros (geo, pace, splits, calorias)
+├── navigation/   # guard de navegação (auth + onboarding)
 ├── services/     # supabase, mapbox, sqlite
 ├── components/   # UI compartilhada
 ├── lib/          # env, formatadores, query client

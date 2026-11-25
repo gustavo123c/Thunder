@@ -59,10 +59,11 @@ npm run db:types   # (opcional) regenera src/services/supabase/database.types.ts
 
 ### 3a. Testar rápido no iPhone/Android com o Expo Go (grátis)
 
-Instale o **Expo Go** (App Store / Play Store), depois no computador:
+Instale o **Expo Go** (App Store / Play Store) e entre nele com sua conta Expo. No computador:
 
 ```bash
-npx expo start
+npx expo login   # mesma conta do Expo Go (uma vez só)
+npm run go       # = expo start --go
 ```
 
 e escaneie o QR code com a câmera do iPhone (ou pelo Expo Go no Android).

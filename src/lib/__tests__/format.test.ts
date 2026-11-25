@@ -3,6 +3,9 @@ import {
   formatDuration,
   formatPace,
   formatPaceValue,
+  formatPaceDelta,
+  formatRunDate,
+  formatShortDistance,
   formatWeightKg,
 } from '../format';
 
@@ -70,5 +73,37 @@ describe('formatWeightKg', () => {
     expect(formatWeightKg(80)).toBe('80 kg');
     expect(formatWeightKg(72.46)).toBe('72,5 kg');
     expect(formatWeightKg(null)).toBe('--');
+  });
+});
+
+describe('formatRunDate', () => {
+  const now = new Date(2026, 10, 25, 20, 0); // 25 Nov 2026, 20:00 local
+
+  it('uses Hoje / Ontem for recent runs', () => {
+    expect(formatRunDate(new Date(2026, 10, 25, 9, 5).toISOString(), now)).toBe('Hoje às 09:05');
+    expect(formatRunDate(new Date(2026, 10, 24, 18, 30).toISOString(), now)).toBe('Ontem às 18:30');
+  });
+
+  it('shows day and month this year, and the year otherwise', () => {
+    expect(formatRunDate(new Date(2026, 10, 2, 7, 0).toISOString(), now)).toBe(
+      '2 de nov. às 07:00',
+    );
+    expect(formatRunDate(new Date(2025, 0, 3, 7, 0).toISOString(), now)).toBe('3 de jan. de 2025');
+  });
+
+  it('handles invalid input', () => {
+    expect(formatRunDate('nope', now)).toBe('--');
+  });
+});
+
+describe('formatPaceDelta / formatShortDistance', () => {
+  it('describes pace differences', () => {
+    expect(formatPaceDelta(-15)).toBe('15 s/km mais rápido');
+    expect(formatPaceDelta(72)).toBe('1:12 /km mais lento');
+  });
+
+  it('switches units at 1 km', () => {
+    expect(formatShortDistance(850)).toBe('850 m');
+    expect(formatShortDistance(5230)).toBe('5,23 km');
   });
 });

@@ -56,6 +56,10 @@ function RootNavigator() {
       <Stack.Protected guard={gate === 'ready'}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
+          name="run/[id]"
+          options={{ headerShown: true, title: 'Corrida', headerBackTitle: 'Voltar' }}
+        />
+        <Stack.Screen
           name="profile/edit"
           options={{ headerShown: true, title: 'Editar perfil', presentation: 'modal' }}
         />

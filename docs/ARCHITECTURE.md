@@ -126,6 +126,26 @@ Finalizar:
 numa transação; se o `client_id` já existe para o usuário, devolve o id existente (inclusive em
 corrida concorrente, tratando `unique_violation`).
 
+## Histórico e análise (Etapa 4)
+
+- RPCs de leitura (`SECURITY INVOKER`, RLS decide a visibilidade), em
+  `20261125020000_run_queries.sql`:
+  - `list_user_runs(user, before, before_id, limit)` — paginação keyset por `(started_at, id)`, máx. 50.
+  - `get_run_detail(run_id)` — corrida + autor + `has_kudo` + splits + até 30 corridas anteriores
+    do mesmo atleta, numa ida ao servidor; `null` se não for visível.
+  - Rotas saem como GeoJSON (`ST_AsGeoJSON`, 6 casas decimais).
+- `services/supabase/run-json.ts` valida o JSON em tempo de execução (dados do servidor não são
+  confiáveis). O teste de contrato usa uma resposta real capturada do Postgres
+  (`services/supabase/__tests__/fixtures/run-detail.json`).
+- `domain/insights/comparison.ts` compara com o histórico:
+  corrida anterior (Δ distância, Δ pace), média de corridas de distância parecida (±20%, até 10;
+  diferença < 3 s/km = "mesmo pace") e recordes (mais longa, km mais rápido, melhor pace na distância).
+  `features/run-history/comparison-copy.ts` transforma isso em frases curtas e encorajadoras.
+- Lista: `RunCard` com miniatura SVG da rota (sem tiles de mapa por item), resumo "Esta semana",
+  corridas pendentes de envio no topo, scroll infinito e pull-to-refresh.
+- Detalhe: mapa Mapbox ajustado à rota, métricas, parciais com barra proporcional à velocidade
+  (melhor km destacado), "Sua evolução" e, para o dono, visibilidade e exclusão.
+
 ## Banco de dados
 
 Migration: `supabase/migrations/20261125000000_initial_schema.sql`.

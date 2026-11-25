@@ -53,3 +53,57 @@ export function formatDistanceKm(meters: number): string {
   const km = Math.floor(meters / 10) / 100; // truncate: never show more than was run
   return `${km.toFixed(2).replace('.', ',')} km`;
 }
+
+const MONTHS_SHORT = [
+  'jan.',
+  'fev.',
+  'mar.',
+  'abr.',
+  'mai.',
+  'jun.',
+  'jul.',
+  'ago.',
+  'set.',
+  'out.',
+  'nov.',
+  'dez.',
+];
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+/** "Hoje às 09:05", "Ontem às 18:30", "25 de nov. às 07:00", "3 de jan. de 2025". Local time. */
+export function formatRunDate(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return PLACEHOLDER;
+
+  const time = `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  if (isSameDay(date, now)) return `Hoje às ${time}`;
+  if (isSameDay(date, yesterday)) return `Ontem às ${time}`;
+
+  const day = `${date.getDate()} de ${MONTHS_SHORT[date.getMonth()]}`;
+  return date.getFullYear() === now.getFullYear()
+    ? `${day} às ${time}`
+    : `${day} de ${date.getFullYear()}`;
+}
+
+/** Signed pace difference: -15 → "15 s/km mais rápido"; 72 → "1:12 /km mais lento". */
+export function formatPaceDelta(deltaSPerKm: number): string {
+  const magnitude = Math.round(Math.abs(deltaSPerKm));
+  const amount = magnitude >= 60 ? `${formatPaceValue(magnitude)} /km` : `${magnitude} s/km`;
+  return `${amount} ${deltaSPerKm < 0 ? 'mais rápido' : 'mais lento'}`;
+}
+
+/** Meters → "850 m" below 1 km, otherwise "5,23 km". */
+export function formatShortDistance(meters: number): string {
+  if (!Number.isFinite(meters)) return PLACEHOLDER;
+  return Math.abs(meters) < 1000 ? `${Math.round(meters)} m` : formatDistanceKm(meters);
+}

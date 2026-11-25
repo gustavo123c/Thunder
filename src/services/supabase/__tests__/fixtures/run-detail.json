@@ -1,0 +1,59 @@
+{
+  "id": "run-fixture-1",
+  "route": {
+    "type": "LineString",
+    "coordinates": [
+      [-46.63, -23.55],
+      [-46.63, -23.54],
+      [-46.62, -23.54]
+    ]
+  },
+  "title": "Corrida matinal",
+  "author": {
+    "id": "aaaaaaaa-0000-0000-0000-000000000001",
+    "username": "ana.corre",
+    "full_name": "Ana Souza",
+    "avatar_url": null
+  },
+  "splits": [
+    {
+      "index": 0,
+      "distance_m": 1000,
+      "duration_s": 333,
+      "pace_s_per_km": 333.1,
+      "elevation_delta_m": 2
+    },
+    {
+      "index": 1,
+      "distance_m": 594.2,
+      "duration_s": 198,
+      "pace_s_per_km": 333.2,
+      "elevation_delta_m": null
+    }
+  ],
+  "user_id": "aaaaaaaa-0000-0000-0000-000000000001",
+  "ended_at": "2026-11-25T09:22:00+00:00",
+  "has_kudo": false,
+  "distance_m": 3594.2,
+  "started_at": "2026-11-25T09:00:00+00:00",
+  "visibility": "public",
+  "description": null,
+  "kudos_count": 0,
+  "calories_kcal": 214,
+  "moving_time_s": 1198,
+  "previous_runs": [
+    {
+      "id": "c5d3ea7e-8d4b-431b-9eae-14d2361cf140",
+      "distance_m": 5000,
+      "started_at": "2026-11-20T18:00:00+00:00",
+      "moving_time_s": 1750,
+      "avg_pace_s_per_km": 350,
+      "best_pace_s_per_km": 340
+    }
+  ],
+  "comments_count": 0,
+  "elapsed_time_s": 1320,
+  "elevation_gain_m": 12.5,
+  "avg_pace_s_per_km": 333.33,
+  "best_pace_s_per_km": 332.1
+}

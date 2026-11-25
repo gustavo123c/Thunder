@@ -243,6 +243,11 @@ export type Database = {
         Returns: boolean;
       };
       finish_run: { Args: { payload: Json }; Returns: string };
+      list_user_runs: {
+        Args: { p_user_id: string; p_before?: string; p_before_id?: string; p_limit?: number };
+        Returns: Json;
+      };
+      get_run_detail: { Args: { p_run_id: string; p_history_limit?: number }; Returns: Json };
       owns_run: { Args: { target_run_id: string }; Returns: boolean };
     };
     Enums: {

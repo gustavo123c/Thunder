@@ -49,3 +49,31 @@ export type RunSummary = {
   caloriesKcal: number | null;
   splits: Split[];
 };
+
+/** A run as stored on the server (history, detail, feed). Times are ISO strings. */
+export type RunRecord = {
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  startedAt: string;
+  endedAt: string;
+  elapsedTimeS: number;
+  movingTimeS: number;
+  distanceM: number;
+  avgPaceSPerKm: number | null;
+  bestPaceSPerKm: number | null;
+  elevationGainM: number | null;
+  caloriesKcal: number | null;
+  visibility: 'public' | 'followers' | 'private';
+  kudosCount: number;
+  commentsCount: number;
+  /** Simplified route as [lon, lat] positions; empty when the run had no GPS track. */
+  route: [number, number][];
+};
+
+/** Minimal fields needed to compare a run with earlier ones. */
+export type RunHistoryEntry = Pick<
+  RunRecord,
+  'id' | 'startedAt' | 'distanceM' | 'movingTimeS' | 'avgPaceSPerKm' | 'bestPaceSPerKm'
+>;

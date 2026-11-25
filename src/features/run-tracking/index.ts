@@ -1,6 +1,7 @@
 // Importing this module registers the background location task (global scope).
 import './services/recorder';
 
+export { PendingRunsBanner } from './components/PendingRunsBanner';
 export { RecordView } from './components/RecordView';
 export { RUNS_QUERY_KEY, useRunTrackingBootstrap } from './hooks/useRunTracking';
 export { runRepository } from './services/recorder';

@@ -1,5 +1,10 @@
-import { ComingSoon } from '@/components/ui/ComingSoon';
+import { useUserId } from '@/features/auth';
+import { useProfile } from '@/features/profile';
+import { RecordView } from '@/features/run-tracking';
 
 export default function RecordScreen() {
-  return <ComingSoon title="Correr" description="Rastreamento GPS ao vivo chega na Etapa 3." />;
+  const userId = useUserId();
+  const { data: profile } = useProfile(userId);
+
+  return <RecordView userId={userId} weightKg={profile?.weightKg ?? null} />;
 }

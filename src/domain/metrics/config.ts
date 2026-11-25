@@ -8,8 +8,11 @@ export const METRICS_CONFIG = {
     maxAccuracyM: 30,
     /** Faster than any human runner (~43 km/h): treated as a GPS jump. */
     maxSpeedMps: 12,
-    /** Moves shorter than this are jitter while standing still. */
-    minDistanceM: 3,
+    /**
+     * Moves shorter than this are jitter while standing still. Kept below the distance
+     * covered in 1 s at a slow running pace (2 m/s ≈ 8:20 /km) so 1 Hz tracks are not thinned.
+     */
+    minDistanceM: 2,
     /** Accept a fix after this long even without movement, to keep time accurate. */
     heartbeatS: 10,
     /** After this many consecutive "too fast" rejections, trust the new position. */

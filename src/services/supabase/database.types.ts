@@ -238,6 +238,11 @@ export type Database = {
     Views: { [_ in never]: never };
     Functions: {
       can_view_run: { Args: { target_run_id: string }; Returns: boolean };
+      can_view_run_row: {
+        Args: { owner_id: string; run_visibility: Database['public']['Enums']['run_visibility'] };
+        Returns: boolean;
+      };
+      finish_run: { Args: { payload: Json }; Returns: string };
       owns_run: { Args: { target_run_id: string }; Returns: boolean };
     };
     Enums: {

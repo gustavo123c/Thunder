@@ -3,6 +3,8 @@ import { Tabs } from 'expo-router';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 
+import { useUserId } from '@/features/auth';
+import { useRunTrackingBootstrap } from '@/features/run-tracking';
 import { colors } from '@/theme/tokens';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -22,6 +24,10 @@ function tabIcon(name: IconName) {
 }
 
 export default function TabsLayout() {
+  const userId = useUserId();
+  // Restores an interrupted run and uploads runs saved while offline.
+  useRunTrackingBootstrap(userId);
+
   return (
     <Tabs
       screenOptions={{

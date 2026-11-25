@@ -225,7 +225,7 @@ describe('summarizeRun', () => {
       weightKg: 70,
     });
 
-    // The jitter filter may drop the last < 3 m of each segment.
+    // The jitter filter may drop the last < 2 m of each segment.
     expect(Math.abs(summary.distanceM - 3600)).toBeLessThan(10);
     expect(summary.elapsedTimeS).toBe(1320);
     expect(summary.activeTimeS).toBe(1200);

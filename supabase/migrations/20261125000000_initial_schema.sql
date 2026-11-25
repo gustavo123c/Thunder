@@ -264,6 +264,29 @@ create trigger comments_sync_count
 -- Visibility helper
 -- SECURITY DEFINER so child-table policies do not re-run runs' RLS per row.
 -- -----------------------------------------------------------------------------
+-- Row-level rule, evaluated on the run row itself (works for INSERT ... RETURNING,
+-- where the new row is not yet visible to a lookup by id).
+create function public.can_view_run_row(owner_id uuid, run_visibility public.run_visibility)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select owner_id = (select auth.uid())
+      or run_visibility = 'public'
+      or (
+        run_visibility = 'followers'
+        and exists (
+          select 1
+            from public.follows f
+           where f.follower_id = (select auth.uid())
+             and f.following_id = owner_id
+        )
+      );
+$$;
+
+-- Lookup by id, for child tables (points, splits, kudos, comments).
 create function public.can_view_run(target_run_id uuid)
 returns boolean
 language sql
@@ -275,19 +298,7 @@ as $$
     select 1
       from public.runs r
      where r.id = target_run_id
-       and (
-         r.user_id = (select auth.uid())
-         or r.visibility = 'public'
-         or (
-           r.visibility = 'followers'
-           and exists (
-             select 1
-               from public.follows f
-              where f.follower_id = (select auth.uid())
-                and f.following_id = r.user_id
-           )
-         )
-       )
+       and public.can_view_run_row(r.user_id, r.visibility)
   );
 $$;
 
@@ -304,6 +315,8 @@ as $$
   );
 $$;
 
+revoke execute on function public.can_view_run_row(uuid, public.run_visibility) from public, anon;
+grant execute on function public.can_view_run_row(uuid, public.run_visibility) to authenticated;
 revoke execute on function public.can_view_run(uuid) from public, anon;
 revoke execute on function public.owns_run(uuid) from public, anon;
 grant execute on function public.can_view_run(uuid) to authenticated;
@@ -333,7 +346,7 @@ create policy profiles_update_own on public.profiles
 -- runs
 create policy runs_select_visible on public.runs
   for select to authenticated
-  using (public.can_view_run(id));
+  using (public.can_view_run_row(user_id, visibility));
 
 create policy runs_insert_own on public.runs
   for insert to authenticated

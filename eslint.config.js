@@ -18,7 +18,15 @@ module.exports = defineConfig([
         {
           patterns: [
             {
-              group: ['react', 'react-*', 'expo', 'expo-*', '@expo/*', '@supabase/*', '@rnmapbox/*'],
+              group: [
+                'react',
+                'react-*',
+                'expo',
+                'expo-*',
+                '@expo/*',
+                '@supabase/*',
+                '@rnmapbox/*',
+              ],
               message: 'src/domain must stay framework-free.',
             },
             {

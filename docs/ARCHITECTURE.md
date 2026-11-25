@@ -92,23 +92,39 @@ amostras GPS ─► applyGpsFilter ─► buildIntervals ─► distância · te
 
 **Filtro de GPS** (`applyGpsFilter`, função pura com estado explícito): descarta coordenadas inválidas,
 pontos fora de ordem, precisão > 30 m, saltos > 12 m/s (com margem da precisão; após 5 saltos seguidos
-reancora) e jitter < 3 m (mas aceita um ponto a cada 10 s parado). A distância é medida sempre a partir
-do último ponto aceito, então descartar jitter não perde distância — no máximo os últimos < 3 m de um segmento.
+reancora) e jitter < 2 m (mas aceita um ponto a cada 10 s parado). A distância é medida sempre a partir
+do último ponto aceito, então descartar jitter não perde distância — no máximo os últimos < 2 m de um segmento.
 
 `simplifyRoute` (Douglas–Peucker, tolerância 5 m) gera a polyline leve salva em `runs.route`.
 
-## Fluxo de uma corrida
+## Rastreamento ao vivo (Etapa 3)
 
 ```
-expo-location (TaskManager, background)
-  → domain/geo/gps-filter (descarta baixa precisão e saltos)
-  → SQLite local (durável)  +  store Zustand (UI ao vivo)
-  → domain/metrics → distância, pace atual/médio, calorias
+expo-location (TaskManager "thunder-run-location", 1 Hz, BestForNavigation, foreground service)
+  → RunRecorder.ingest()          fila serial: nada intercala com pausar/finalizar
+      → toGpsSample (normaliza -1 do iOS) → applyGpsFilter
+      → SQLite local (local_points)  ← durável: sobrevive ao app ser morto
+      → listeners → Zustand (useRunSessionStore) → useLiveMetrics (relógio de 1 s)
 Finalizar:
-  → resumo + splits calculados no device
-  → upload único e idempotente (client_id) — RPC finish_run (Etapa 3)
-  → SQLite limpo só após confirmação do servidor
+  → finishRunSession + summarizeRun → local_runs.status = 'finished' (com resumo)
+  → buildFinishRunPayload (rota simplificada, arredondamentos que respeitam os CHECKs)
+  → RPC finish_run (idempotente por client_id) → apaga a cópia local só após sucesso
+  → sem rede: fica pendente; useRunTrackingBootstrap reenvia ao abrir o app / voltar ao foreground
 ```
+
+- `RunRecorder` recebe dependências (`RunRepository`, `LocationTracker`, relógio, gerador de id):
+  os testes usam repositório em memória e GPS falso; o app usa SQLite + expo-location.
+- O módulo `features/run-tracking/services/recorder.ts` define a task em escopo global
+  (importado no topo de `src/app/_layout.tsx`): o SO pode iniciar o JS só para entregar localizações.
+- Ao abrir o app, `restore()` recarrega uma corrida interrompida e religa o GPS se ela estava em andamento.
+- Pausar desliga o GPS (bateria); retomar abre um novo segmento.
+- Corridas com < 50 m oferecem "descartar".
+
+### `finish_run(payload jsonb)`
+
+`SECURITY INVOKER` — RLS e grants continuam valendo. Insere `runs`, `run_points` e `run_splits`
+numa transação; se o `client_id` já existe para o usuário, devolve o id existente (inclusive em
+corrida concorrente, tratando `unique_violation`).
 
 ## Banco de dados
 
@@ -124,10 +140,11 @@ Migration: `supabase/migrations/20261125000000_initial_schema.sql`.
 | `kudos`      | "Raio" ⚡ — PK `(run_id, user_id)`.                                                                                                                                                 |
 | `comments`   | Até 500 caracteres; soft delete por `deleted_at`.                                                                                                                                   |
 
-**Segurança (RLS)**
+**Segurança (RLS)** — coberta por `supabase/tests/*.sql` (`npm run test:db`)
 
 - `anon` não acessa nada; todas as políticas são `to authenticated`.
-- Corrida visível se: é sua, `public`, ou `followers` e você segue o autor (`can_view_run`).
+- Corrida visível se: é sua, `public`, ou `followers` e você segue o autor (`can_view_run_row`,
+  avaliada na própria linha — funciona com `INSERT … RETURNING`).
 - Pontos, splits, kudos e comentários herdam a visibilidade da corrida.
 - Grants por coluna: usuários não conseguem alterar contadores, `user_id` ou timestamps.
 

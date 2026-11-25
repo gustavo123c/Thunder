@@ -11,7 +11,7 @@ Arquitetura completa: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | 0     | Setup do projeto, tooling, schema do banco              | ✅     |
 | 1     | Autenticação e perfil (onboarding)                      | ✅     |
 | 2     | Domínio de métricas (distância, pace, splits, calorias) | ✅     |
-| 3     | Rastreamento GPS ao vivo                                | ⏳     |
+| 3     | Rastreamento GPS ao vivo                                | ✅     |
 | 4     | Histórico e análise pós-treino                          | ⏳     |
 | 5     | Feed social                                             | ⏳     |
 
@@ -56,6 +56,7 @@ Com Android Studio/Xcode locais: `npm run android` / `npm run ios`.
 | `npm run typecheck` | `tsc --noEmit`                               |
 | `npm run lint`      | ESLint (config Expo + Prettier)              |
 | `npm test`          | Jest                                         |
+| `npm run test:db`   | Testes SQL (RLS, RPCs) num Postgres+PostGIS  |
 | `npm run format`    | Prettier (com ordenação de classes Tailwind) |
 | `npm run db:*`      | Supabase local (start/stop/reset/types)      |
 

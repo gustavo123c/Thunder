@@ -87,7 +87,8 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
   ];
   const width = (height * vbWidth) / vbHeight;
 
-  const muscleFill = scheme === 'dark' ? colors.ink[600] : colors.ink[200];
+  // Dark mode needs a light muscle tone, or the body disappears into the card.
+  const muscleFill = scheme === 'dark' ? '#7C889A' : colors.ink[200];
   const decorFill = scheme === 'dark' ? colors.ink[500] : colors.ink[300];
   const separator = scheme === 'dark' ? colors.ink[800] : '#FFFFFF';
 

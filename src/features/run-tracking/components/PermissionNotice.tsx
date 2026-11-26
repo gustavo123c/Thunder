@@ -16,10 +16,10 @@ export function PermissionNotice({ permission, onRequest }: PermissionNoticeProp
   if (permission === 'foreground_only') {
     return (
       <View className="gap-2 rounded-[20px] border border-bolt-500/30 bg-bolt-500/10 p-4">
-        <Text className="text-sm font-semibold text-ink-900 dark:text-ink-50">
+        <Text className="text-sm font-semibold text-ink-50">
           Permita a localização &quot;sempre&quot;
         </Text>
-        <Text className="text-sm text-ink-600 dark:text-ink-300">
+        <Text className="text-sm text-ink-300">
           Sem ela, a gravação pode parar quando a tela bloquear ou você trocar de app.
         </Text>
         <Button
@@ -33,10 +33,8 @@ export function PermissionNotice({ permission, onRequest }: PermissionNoticeProp
 
   return (
     <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
-      <Text className="text-base font-semibold text-ink-900 dark:text-ink-50">
-        Precisamos da sua localização
-      </Text>
-      <Text className="text-sm text-ink-600 dark:text-ink-300">
+      <Text className="text-base font-semibold text-ink-50">Precisamos da sua localização</Text>
+      <Text className="text-sm text-ink-300">
         O Thunder usa o GPS para medir seu trajeto, distância e pace. Sua localização só é
         registrada enquanto uma corrida está sendo gravada.
       </Text>

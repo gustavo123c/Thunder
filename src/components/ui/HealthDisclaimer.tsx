@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 type HealthDisclaimerProps = {
   /** Extra emphasis when the user reported pain. */
@@ -22,6 +22,7 @@ function recommendation(withPain: boolean) {
 
 /** Health/legal notice shown wherever the app suggests training adjustments. */
 export function HealthDisclaimer({ withPain = false, variant = 'banner' }: HealthDisclaimerProps) {
+  const theme = useThemeColors();
   const [expanded, setExpanded] = useState(variant === 'full');
 
   if (variant === 'full') {
@@ -46,7 +47,7 @@ export function HealthDisclaimer({ withPain = false, variant = 'banner' }: Healt
         <Ionicons
           name="medkit-outline"
           size={16}
-          color={withPain ? colors.bolt[500] : colors.ink[300]}
+          color={withPain ? theme.accent : theme.ink[300]}
         />
         <Text className="flex-1 text-xs font-semibold text-ink-200">
           Aviso de saúde · não substitui um profissional
@@ -54,7 +55,7 @@ export function HealthDisclaimer({ withPain = false, variant = 'banner' }: Healt
         <Ionicons
           name={expanded ? 'chevron-up' : 'chevron-down'}
           size={16}
-          color={colors.ink[400]}
+          color={theme.ink[400]}
         />
       </View>
       {expanded ? (

@@ -25,7 +25,7 @@ export function Avatar({ name, imageUrl, size = 40 }: AvatarProps) {
 
   return (
     <View className="items-center justify-center bg-bolt-500" style={dimension}>
-      <Text className="font-bold text-ink-900" style={{ fontSize: size * 0.38 }}>
+      <Text className="font-bold text-onbolt" style={{ fontSize: size * 0.38 }}>
         {initialsOf(name)}
       </Text>
     </View>

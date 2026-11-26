@@ -35,7 +35,7 @@ export function SegmentedControl<T extends string | number>({
             className={`flex-1 items-center rounded-xl py-2.5 ${selected ? 'bg-bolt-500' : 'active:bg-ink-800'}`}
           >
             <Text
-              className={`text-sm font-bold ${selected ? 'text-ink-900' : 'text-ink-300'}`}
+              className={`text-sm font-bold ${selected ? 'text-onbolt' : 'text-ink-300'}`}
               style={{ fontVariant: ['tabular-nums'] }}
             >
               {option.label}

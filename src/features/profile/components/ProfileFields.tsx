@@ -90,9 +90,7 @@ export function BodyFields({ values, errors, setField }: FieldsProps) {
         keyboardType="number-pad"
       />
       <View className="gap-2">
-        <Text className="text-sm font-medium text-ink-700 dark:text-ink-200">
-          Modelo do mapa corporal
-        </Text>
+        <Text className="text-sm font-medium text-ink-200">Modelo do mapa corporal</Text>
         <View accessibilityRole="radiogroup" className="flex-row gap-2">
           {SEX_OPTIONS.map((option) => {
             const selected = values.sex === option.value;
@@ -106,7 +104,7 @@ export function BodyFields({ values, errors, setField }: FieldsProps) {
                   selected ? 'border-bolt-500 bg-bolt-500/10' : 'border-hairline bg-ink-800'
                 }`}
               >
-                <Text className="text-center text-sm font-semibold text-ink-900 dark:text-ink-50">
+                <Text className="text-center text-sm font-semibold text-ink-50">
                   {option.label}
                 </Text>
               </Pressable>

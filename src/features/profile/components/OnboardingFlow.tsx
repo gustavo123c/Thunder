@@ -136,7 +136,7 @@ export function OnboardingFlow({ profile }: { profile: Profile }) {
         {STEPS.map((item, index) => (
           <View
             key={item.title}
-            className={`h-1.5 flex-1 rounded-full ${index <= stepIndex ? 'bg-bolt-500' : 'bg-ink-200 dark:bg-ink-700'}`}
+            className={`h-1.5 flex-1 rounded-full ${index <= stepIndex ? 'bg-bolt-500' : 'bg-ink-700'}`}
           />
         ))}
       </View>
@@ -150,8 +150,8 @@ export function OnboardingFlow({ profile }: { profile: Profile }) {
         keyboardShouldPersistTaps="handled"
       >
         <View className="gap-2">
-          <Text className="text-3xl font-bold text-ink-900 dark:text-ink-50">{step.title}</Text>
-          <Text className="text-base text-ink-500 dark:text-ink-300">{step.subtitle}</Text>
+          <Text className="text-3xl font-bold text-ink-50">{step.title}</Text>
+          <Text className="text-base text-ink-300">{step.subtitle}</Text>
         </View>
         <Fields values={values} errors={errors} setField={setField} />
         <FormMessage message={formMessage} />

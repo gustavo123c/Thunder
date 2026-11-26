@@ -60,11 +60,11 @@ export function AvatarEditor({
           )}
         </View>
         <View className="absolute bottom-0 right-0 h-8 w-8 items-center justify-center rounded-full border-2 border-ink-900 bg-bolt-500">
-          <Ionicons name="camera" size={15} color={colors.ink[900]} />
+          <Ionicons name="camera" size={15} color={colors.onBolt} />
         </View>
       </Pressable>
       {showLabel || upload.isPending ? (
-        <Text className="text-sm font-semibold text-bolt-500">
+        <Text className="text-sm font-semibold text-accent">
           {upload.isPending ? 'Enviando foto…' : 'Alterar foto'}
         </Text>
       ) : null}

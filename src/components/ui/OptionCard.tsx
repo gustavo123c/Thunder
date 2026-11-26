@@ -27,10 +27,8 @@ export function OptionCard({ title, description, selected, onPress }: OptionCard
         {selected ? <View className="h-2.5 w-2.5 rounded-full bg-bolt-500" /> : null}
       </View>
       <View className="flex-1 gap-0.5">
-        <Text className="text-base font-semibold text-ink-900 dark:text-ink-50">{title}</Text>
-        {description ? (
-          <Text className="text-sm text-ink-500 dark:text-ink-300">{description}</Text>
-        ) : null}
+        <Text className="text-base font-semibold text-ink-50">{title}</Text>
+        {description ? <Text className="text-sm text-ink-300">{description}</Text> : null}
       </View>
     </Pressable>
   );

@@ -10,7 +10,7 @@ import { FormMessage } from '@/components/ui/FormMessage';
 import { samplesToMultiLineString } from '@/domain/geo/geojson';
 import { isActive } from '@/domain/run-session/run-session';
 import { isExpoGo } from '@/lib/runtime';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { useLiveMetrics } from '../hooks/useLiveMetrics';
 import { useLocationPermission, useRunControls } from '../hooks/useRunTracking';
@@ -28,6 +28,7 @@ type RecordViewProps = {
 };
 
 export function RecordView({ userId, weightKg }: RecordViewProps) {
+  const theme = useThemeColors();
   const run = useRunSessionStore((s) => s.run);
   const samples = useRunSessionStore((s) => s.samples);
   const ready = useRunSessionStore((s) => s.ready);
@@ -101,7 +102,7 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
         {isExpoGo ? (
           <SafeAreaView edges={['top']} className="absolute left-0 right-0 top-0 items-center">
             <View className="mt-2 flex-row items-center gap-1.5 rounded-full border border-hairline bg-ink-900/80 px-3 py-1.5">
-              <Ionicons name="flask-outline" size={12} color={colors.ink[400]} />
+              <Ionicons name="flask-outline" size={12} color={theme.ink[400]} />
               <Text className="text-[11px] text-ink-300">
                 Modo de teste · mantenha o app aberto durante a corrida
               </Text>

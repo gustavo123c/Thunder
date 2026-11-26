@@ -11,6 +11,7 @@ import {
   type PainLevel,
 } from '@/domain/health/body-regions';
 import type { BodySex } from '@/domain/types/profile';
+import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 import type { PainLog } from '../api/pain.api';
@@ -67,6 +68,7 @@ function Toggle<T extends string>({
  * Tap a muscle to report pain there; painful regions are colored by intensity.
  */
 export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
+  const theme = useThemeColors();
   const [view, setView] = useState<BodyView>('front');
   const [model, setModel] = useState<BodySex>(sex ?? 'male');
   const [showList, setShowList] = useState(false);
@@ -84,9 +86,9 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
   const width = (height * vbWidth) / vbHeight;
 
   // Light slate muscles on the dark card, so the body reads clearly.
-  const muscleFill = '#7C889A';
-  const decorFill = colors.ink[500];
-  const separator = colors.ink[800];
+  const muscleFill = theme.isDark ? '#7C889A' : '#A9B3C1';
+  const decorFill = theme.ink[500];
+  const separator = theme.ink[800];
 
   /** Pain for a region/side; a "center" entry of a bilateral region covers both sides. */
   function painFor(region: BodyRegion, side: BodySide): PainLog | undefined {
@@ -159,7 +161,7 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
         onPress={() => setShowList((v) => !v)}
         className="self-center"
       >
-        <Text className="text-sm font-semibold text-bolt-500">
+        <Text className="text-sm font-semibold text-accent">
           {showList ? 'Ocultar lista de regiões' : 'Escolher pela lista'}
         </Text>
       </Pressable>
@@ -191,7 +193,7 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: PAIN_COLORS[level] }}
             />
-            <Text className="text-xs text-ink-500 dark:text-ink-300">
+            <Text className="text-xs text-ink-300">
               {level === 'mild' ? 'Leve' : level === 'moderate' ? 'Moderada' : 'Forte'}
             </Text>
           </View>

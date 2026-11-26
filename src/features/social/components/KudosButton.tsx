@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
 import { Pressable, Text } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 type KudosButtonProps = {
   liked: boolean;
@@ -13,6 +13,7 @@ type KudosButtonProps = {
 };
 
 export function KudosButton({ liked, count, onToggle, disabled = false }: KudosButtonProps) {
+  const theme = useThemeColors();
   return (
     <Pressable
       accessibilityRole="button"
@@ -24,16 +25,14 @@ export function KudosButton({ liked, count, onToggle, disabled = false }: KudosB
         void Haptics.selectionAsync();
         onToggle(!liked);
       }}
-      className={`flex-row items-center gap-1.5 rounded-full px-3 py-2 ${liked ? 'bg-bolt-100 dark:bg-ink-700' : ''}`}
+      className={`flex-row items-center gap-1.5 rounded-full px-3 py-2 ${liked ? 'bg-ink-700' : ''}`}
     >
       <Ionicons
         name={liked ? 'flash' : 'flash-outline'}
         size={20}
-        color={liked ? colors.bolt[500] : colors.ink[400]}
+        color={liked ? theme.accent : theme.ink[400]}
       />
-      <Text
-        className={`text-sm font-semibold ${liked ? 'text-bolt-700 dark:text-bolt-400' : 'text-ink-500 dark:text-ink-300'}`}
-      >
+      <Text className={`text-sm font-semibold ${liked ? 'text-accent' : 'text-ink-300'}`}>
         {count}
       </Text>
     </Pressable>

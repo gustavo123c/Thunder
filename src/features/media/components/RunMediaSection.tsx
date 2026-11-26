@@ -51,7 +51,7 @@ export function RunMediaSection({ runId, media, ownerId }: RunMediaSectionProps)
 
   return (
     <View className="gap-3">
-      <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">Fotos e vídeos</Text>
+      <Text className="text-lg font-bold text-ink-50">Fotos e vídeos</Text>
 
       <RunMediaGallery media={media} onRemove={isOwner ? confirmRemove : undefined} />
 

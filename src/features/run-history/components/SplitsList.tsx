@@ -21,7 +21,7 @@ export function SplitsList({ splits }: { splits: readonly Split[] }) {
 
   return (
     <View className="gap-3">
-      <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">Parciais</Text>
+      <Text className="text-lg font-bold text-ink-50">Parciais</Text>
       <View className="flex-row px-1">
         <Text className="w-12 text-xs font-semibold text-ink-400">KM</Text>
         <Text className="w-16 text-xs font-semibold text-ink-400">PACE</Text>
@@ -43,20 +43,20 @@ export function SplitsList({ splits }: { splits: readonly Split[] }) {
             accessibilityLabel={`Quilômetro ${label}: pace ${formatPaceValue(split.paceSPerKm)} por quilômetro`}
             className="flex-row items-center px-1"
           >
-            <Text className="w-12 text-base text-ink-700 dark:text-ink-200">{label}</Text>
+            <Text className="w-12 text-base text-ink-200">{label}</Text>
             <Text
-              className="w-16 text-base font-semibold text-ink-900 dark:text-ink-50"
+              className="w-16 text-base font-semibold text-ink-50"
               style={{ fontVariant: ['tabular-nums'] }}
             >
               {formatPaceValue(split.paceSPerKm)}
             </Text>
             <View className="h-3 flex-1 justify-center">
               <View
-                className={`h-3 rounded-full ${split.index === bestIndex ? 'bg-bolt-500' : 'bg-ink-300 dark:bg-ink-600'}`}
+                className={`h-3 rounded-full ${split.index === bestIndex ? 'bg-bolt-500' : 'bg-ink-600'}`}
                 style={{ width }}
               />
             </View>
-            <Text className="w-14 text-right text-sm text-ink-500 dark:text-ink-300">
+            <Text className="w-14 text-right text-sm text-ink-300">
               {split.elevationDeltaM === null
                 ? '--'
                 : `${split.elevationDeltaM > 0 ? '+' : ''}${Math.round(split.elevationDeltaM)} m`}

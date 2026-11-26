@@ -5,7 +5,7 @@ import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { RouteThumbnail } from '@/components/map/RouteThumbnail';
 import type { RunRecord } from '@/domain/types/run';
 import { formatDistanceKm, formatDuration, formatPace, formatRunDate } from '@/lib/format';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 type RunCardProps = {
   run: Pick<
@@ -41,6 +41,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 /** Summary card of a run: title, date, key metrics and a route thumbnail. */
 export function RunCard({ run, onPress, header, footer, onDelete, media }: RunCardProps) {
+  const theme = useThemeColors();
   const { width } = useWindowDimensions();
   const thumbnailWidth = Math.min(width - 64, 520);
 
@@ -56,7 +57,7 @@ export function RunCard({ run, onPress, header, footer, onDelete, media }: RunCa
       >
         <View className="flex-row items-start gap-2">
           <View className="flex-1 gap-0.5">
-            <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">{run.title}</Text>
+            <Text className="text-lg font-bold text-ink-50">{run.title}</Text>
             <Text className="text-sm text-ink-400">{formatRunDate(run.startedAt)}</Text>
           </View>
           {onDelete ? (
@@ -67,7 +68,7 @@ export function RunCard({ run, onPress, header, footer, onDelete, media }: RunCa
               onPress={onDelete}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-ink-700"
             >
-              <Ionicons name="trash-outline" size={18} color={colors.ink[400]} />
+              <Ionicons name="trash-outline" size={18} color={theme.ink[400]} />
             </Pressable>
           ) : null}
         </View>

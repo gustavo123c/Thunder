@@ -33,7 +33,7 @@ export function TrainingStepper({
             <View className={`h-1 rounded-full ${active || done ? 'bg-bolt-500' : 'bg-ink-700'}`} />
             <View className="flex-row items-center gap-1.5">
               <Text
-                className={`text-xs font-bold ${active ? 'text-bolt-500' : 'text-ink-400'}`}
+                className={`text-xs font-bold ${active ? 'text-accent' : 'text-ink-400'}`}
                 style={{ fontVariant: ['tabular-nums'] }}
               >
                 {index + 1}

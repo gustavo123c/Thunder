@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 
 import { Skeleton } from '@/components/ui/Skeleton';
 import { computeAchievements } from '@/domain/insights/records';
+import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 import { ACHIEVEMENT_COPY } from '../achievements-copy';
@@ -17,6 +18,7 @@ type AchievementsGridProps = {
 
 /** Badge grid: unlocked medals glow in amber, locked ones show progress. */
 export function AchievementsGrid({ userId, totals }: AchievementsGridProps) {
+  const theme = useThemeColors();
   const { data } = useRecords(userId);
 
   const achievements = useMemo(
@@ -49,7 +51,7 @@ export function AchievementsGrid({ userId, totals }: AchievementsGridProps) {
   return (
     <View className="gap-3">
       <Text className="px-1 text-sm text-ink-400">
-        <Text className="font-extrabold text-bolt-500">{unlocked}</Text> de {achievements.length}{' '}
+        <Text className="font-extrabold text-accent">{unlocked}</Text> de {achievements.length}{' '}
         conquistas desbloqueadas
       </Text>
       <View className="flex-row flex-wrap justify-between gap-y-3">
@@ -74,7 +76,7 @@ export function AchievementsGrid({ userId, totals }: AchievementsGridProps) {
                 <Ionicons
                   name={a.unlocked ? copy.icon : 'lock-closed'}
                   size={a.unlocked ? 26 : 18}
-                  color={a.unlocked ? colors.ink[900] : colors.ink[500]}
+                  color={a.unlocked ? colors.onBolt : theme.ink[500]}
                 />
               </View>
               <Text

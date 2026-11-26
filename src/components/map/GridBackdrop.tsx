@@ -2,6 +2,7 @@ import { type ReactNode, useState } from 'react';
 import { View } from 'react-native';
 import Svg, { Circle, Defs, Line, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
+import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 type GridBackdropProps = {
@@ -18,6 +19,7 @@ const CELL = 36;
  * the idle background of the record screen.
  */
 export function GridBackdrop({ showLocation = true, children }: GridBackdropProps) {
+  const theme = useThemeColors();
   const [size, setSize] = useState({ width: 0, height: 0 });
   const { width, height } = size;
   const cx = width / 2;
@@ -49,8 +51,8 @@ export function GridBackdrop({ showLocation = true, children }: GridBackdropProp
               y1={0}
               x2={i * CELL}
               y2={height}
-              stroke="#FFFFFF"
-              strokeOpacity={0.035}
+              stroke={theme.ink[50]}
+              strokeOpacity={theme.isDark ? 0.035 : 0.05}
             />
           ))}
           {Array.from({ length: horizontals + 1 }, (_, i) => (
@@ -60,27 +62,27 @@ export function GridBackdrop({ showLocation = true, children }: GridBackdropProp
               y1={i * CELL}
               x2={width}
               y2={i * CELL}
-              stroke="#FFFFFF"
-              strokeOpacity={0.035}
+              stroke={theme.ink[50]}
+              strokeOpacity={theme.isDark ? 0.035 : 0.05}
             />
           ))}
 
           {/* Faint "streets" */}
           <Path
             d={`M -20 ${height * 0.72} C ${width * 0.3} ${height * 0.6}, ${width * 0.55} ${height * 0.78}, ${width + 20} ${height * 0.55}`}
-            stroke={colors.ink[700]}
+            stroke={theme.ink[700]}
             strokeWidth={10}
             fill="none"
           />
           <Path
             d={`M ${width * 0.18} -20 L ${width * 0.34} ${height + 20}`}
-            stroke={colors.ink[700]}
+            stroke={theme.ink[700]}
             strokeWidth={7}
             fill="none"
           />
           <Path
             d={`M ${width + 20} ${height * 0.18} L ${-20} ${height * 0.34}`}
-            stroke={colors.ink[700]}
+            stroke={theme.ink[700]}
             strokeWidth={5}
             fill="none"
           />
@@ -103,7 +105,7 @@ export function GridBackdrop({ showLocation = true, children }: GridBackdropProp
                 cy={cy}
                 r={9}
                 fill={colors.bolt[500]}
-                stroke={colors.ink[900]}
+                stroke={theme.ink[900]}
                 strokeWidth={3}
               />
             </>

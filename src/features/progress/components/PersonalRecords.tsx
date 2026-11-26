@@ -6,7 +6,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { activityWindowStart } from '@/domain/insights/activity';
 import { formatDecimal, formatDuration, formatPaceValue, formatRunDate } from '@/lib/format';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { useRecords } from '../hooks/useRecords';
 
@@ -27,6 +27,7 @@ function RecordCard({
   detail: string;
   runId: string | null;
 }) {
+  const theme = useThemeColors();
   return (
     <Pressable
       accessibilityRole={runId ? 'button' : undefined}
@@ -40,7 +41,7 @@ function RecordCard({
           runId ? 'bg-bolt-500/15' : 'bg-ink-700'
         }`}
       >
-        <Ionicons name={icon} size={22} color={runId ? colors.bolt[500] : colors.ink[400]} />
+        <Ionicons name={icon} size={22} color={runId ? theme.accent : theme.ink[400]} />
       </View>
       <View className="flex-1 gap-0.5">
         <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400">
@@ -57,7 +58,7 @@ function RecordCard({
         </View>
         <Text className="text-xs text-ink-400">{detail}</Text>
       </View>
-      {runId ? <Ionicons name="chevron-forward" size={18} color={colors.ink[500]} /> : null}
+      {runId ? <Ionicons name="chevron-forward" size={18} color={theme.ink[500]} /> : null}
     </Pressable>
   );
 }

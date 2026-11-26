@@ -7,7 +7,7 @@ import { recentAveragePace } from '@/domain/insights/activity';
 import { type GoalProgress, goalProgress } from '@/domain/insights/records';
 import type { RunnerGoal } from '@/domain/types/profile';
 import { formatDistanceKm, formatDuration, formatPace } from '@/lib/format';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { useActivity } from '../hooks/useActivity';
 import { useRecords } from '../hooks/useRecords';
@@ -43,6 +43,7 @@ export function GoalProgressCard({
   goalDescription,
   targetPaceSPerKm,
 }: GoalProgressCardProps) {
+  const theme = useThemeColors();
   const activity = useActivity(userId);
   const { data } = useRecords(userId);
 
@@ -61,8 +62,8 @@ export function GoalProgressCard({
   return (
     <Card variant="highlight" className="gap-3">
       <View className="flex-row items-center gap-2">
-        <Ionicons name="flag" size={14} color={colors.bolt[500]} />
-        <Text className="flex-1 text-[11px] font-bold uppercase tracking-[1.5px] text-bolt-500">
+        <Ionicons name="flag" size={14} color={theme.accent} />
+        <Text className="flex-1 text-[11px] font-bold uppercase tracking-[1.5px] text-accent">
           Meta principal
         </Text>
         {percent !== null ? (

@@ -6,7 +6,10 @@ import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { Card } from '@/components/ui/Card';
 import { HealthDisclaimer } from '@/components/ui/HealthDisclaimer';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { useAuth, useSignOut } from '@/features/auth';
+import { useThemePreference } from '@/theme/AppThemeProvider';
+import { type ThemePreference, useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -33,6 +36,7 @@ function Row({
   onPress?: () => void;
   destructive?: boolean;
 }) {
+  const theme = useThemeColors();
   return (
     <Pressable
       accessibilityRole={onPress ? 'button' : undefined}
@@ -40,15 +44,40 @@ function Row({
       onPress={onPress}
       className="flex-row items-center gap-3 rounded-xl px-3 py-3 active:bg-ink-700"
     >
-      <Ionicons name={icon} size={20} color={destructive ? colors.danger : colors.ink[300]} />
+      <Ionicons name={icon} size={20} color={destructive ? colors.danger : theme.ink[300]} />
       <Text className={`flex-1 text-base ${destructive ? 'text-danger' : 'text-ink-50'}`}>
         {label}
       </Text>
       {detail ? <Text className="text-sm text-ink-400">{detail}</Text> : null}
       {onPress && !destructive ? (
-        <Ionicons name="chevron-forward" size={18} color={colors.ink[500]} />
+        <Ionicons name="chevron-forward" size={18} color={theme.ink[500]} />
       ) : null}
     </Pressable>
+  );
+}
+
+const APPEARANCE_OPTIONS = [
+  { value: 'system', label: 'Automático' },
+  { value: 'light', label: 'Claro' },
+  { value: 'dark', label: 'Escuro' },
+] as const satisfies readonly { value: ThemePreference; label: string }[];
+
+function AppearancePicker() {
+  const { preference, setPreference } = useThemePreference();
+  return (
+    <View className="gap-2 px-2 py-2">
+      <SegmentedControl
+        accessibilityLabel="Aparência"
+        options={APPEARANCE_OPTIONS}
+        value={preference}
+        onChange={setPreference}
+      />
+      <Text className="px-1 text-xs text-ink-400">
+        {preference === 'system'
+          ? 'Segue o modo claro ou escuro do seu celular.'
+          : 'Salvo neste aparelho.'}
+      </Text>
+    </View>
   );
 }
 
@@ -66,6 +95,10 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView className="flex-1 bg-ink-900" contentContainerClassName="gap-6 px-4 pb-12 pt-4">
+      <Section title="Aparência">
+        <AppearancePicker />
+      </Section>
+
       <Section title="Conta">
         <Row icon="mail-outline" label="E-mail" detail={session?.user.email ?? ''} />
         <Row

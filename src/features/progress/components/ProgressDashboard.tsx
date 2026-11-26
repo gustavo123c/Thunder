@@ -13,7 +13,7 @@ const PERIODS: Period[] = ['day', 'week', 'month', 'year'];
 const toneText = {
   positive: 'text-success',
   negative: 'text-danger',
-  neutral: 'text-ink-500 dark:text-ink-300',
+  neutral: 'text-ink-300',
 } as const;
 
 function DeltaBadge({
@@ -72,7 +72,7 @@ export function ProgressDashboard({ userId }: { userId: string }) {
               className={`flex-1 items-center rounded-xl py-2 ${selected ? 'bg-bolt-500' : ''}`}
             >
               <Text
-                className={`text-sm font-semibold ${selected ? 'text-ink-900' : 'text-ink-500 dark:text-ink-300'}`}
+                className={`text-sm font-semibold ${selected ? 'text-onbolt' : 'text-ink-300'}`}
               >
                 {PERIOD_LABELS[p]}
               </Text>

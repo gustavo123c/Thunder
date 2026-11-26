@@ -52,7 +52,7 @@ export function RunMediaGallery({
               accessibilityHint={onRemove ? 'Toque e segure para remover' : undefined}
               onPress={() => setOpen(item)}
               onLongPress={onRemove ? () => onRemove(item) : undefined}
-              className="overflow-hidden rounded-2xl bg-ink-100 dark:bg-ink-700"
+              className="overflow-hidden rounded-2xl bg-ink-700"
               style={{ width: size, height: size }}
             >
               {url ? (

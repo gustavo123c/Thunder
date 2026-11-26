@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ComponentProps, ReactNode } from 'react';
 import { Text, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 type EmptyStateProps = {
   icon: ComponentProps<typeof Ionicons>['name'];
@@ -15,6 +15,7 @@ type EmptyStateProps = {
 
 /** Minimal empty state: icon inside a dashed ring with a soft glow. */
 export function EmptyState({ icon, title, description, action, compact = false }: EmptyStateProps) {
+  const theme = useThemeColors();
   const ring = compact ? 64 : 104;
   return (
     <View className={`items-center ${compact ? 'gap-3 py-6' : 'gap-5 py-14'}`}>
@@ -26,7 +27,7 @@ export function EmptyState({ icon, title, description, action, compact = false }
           className="items-center justify-center rounded-full border border-dashed border-bolt-500/40 bg-ink-800"
           style={{ width: ring, height: ring }}
         >
-          <Ionicons name={icon} size={compact ? 26 : 40} color={colors.bolt[500]} />
+          <Ionicons name={icon} size={compact ? 26 : 40} color={theme.accent} />
         </View>
       </View>
       <View className="items-center gap-1.5 px-6">

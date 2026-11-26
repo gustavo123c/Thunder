@@ -2,6 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import type { RunStatus } from '@/domain/run-session/run-session';
+import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 type RoundButtonProps = {
@@ -16,7 +17,7 @@ type RoundButtonProps = {
 
 const toneClass = {
   primary: 'bg-bolt-500 active:bg-bolt-600',
-  dark: 'bg-ink-900 active:bg-ink-700 dark:bg-ink-700',
+  dark: 'bg-ink-700 active:bg-ink-600',
   danger: 'bg-danger active:opacity-80',
 } as const;
 
@@ -29,8 +30,9 @@ function RoundButton({
   loading,
   disabled,
 }: RoundButtonProps) {
+  const theme = useThemeColors();
   const dimension = size === 'large' ? 'h-24 w-24' : 'h-20 w-20';
-  const iconColor = tone === 'primary' ? colors.ink[900] : colors.ink[50];
+  const iconColor = tone === 'primary' ? colors.onBolt : theme.ink[50];
   return (
     <View className="items-center gap-2">
       <Pressable
@@ -47,7 +49,7 @@ function RoundButton({
           <Ionicons name={icon} size={size === 'large' ? 40 : 32} color={iconColor} />
         )}
       </Pressable>
-      <Text className="text-sm font-semibold text-ink-700 dark:text-ink-200">{label}</Text>
+      <Text className="text-sm font-semibold text-ink-200">{label}</Text>
     </View>
   );
 }

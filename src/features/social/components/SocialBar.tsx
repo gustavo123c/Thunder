@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { useToggleKudo } from '../hooks/useSocial';
 import { KudosButton } from './KudosButton';
@@ -14,11 +14,12 @@ type SocialBarProps = {
 
 /** Raio + comments row used on feed cards and the run detail. */
 export function SocialBar({ run, viewerId }: SocialBarProps) {
+  const theme = useThemeColors();
   const toggleKudo = useToggleKudo(viewerId);
   const isOwn = run.userId === viewerId;
 
   return (
-    <View className="flex-row items-center gap-2 border-t border-ink-100 pt-2 dark:border-ink-700">
+    <View className="flex-row items-center gap-2 border-t border-ink-700 pt-2">
       <KudosButton
         liked={run.hasKudo}
         count={run.kudosCount}
@@ -32,10 +33,8 @@ export function SocialBar({ run, viewerId }: SocialBarProps) {
         onPress={() => router.push(`/run/${run.id}/comments`)}
         className="flex-row items-center gap-1.5 rounded-full px-3 py-2"
       >
-        <Ionicons name="chatbubble-outline" size={19} color={colors.ink[400]} />
-        <Text className="text-sm font-semibold text-ink-500 dark:text-ink-300">
-          {run.commentsCount}
-        </Text>
+        <Ionicons name="chatbubble-outline" size={19} color={theme.ink[400]} />
+        <Text className="text-sm font-semibold text-ink-300">{run.commentsCount}</Text>
       </Pressable>
     </View>
   );

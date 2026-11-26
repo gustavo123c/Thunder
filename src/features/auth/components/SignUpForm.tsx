@@ -42,7 +42,7 @@ export function SignUpForm() {
           message={`Enviamos um link de confirmação para ${email.trim()}. Confirme o e-mail e depois entre com sua senha.`}
         />
         <Link href="/sign-in" replace asChild>
-          <Text accessibilityRole="link" className="text-center font-semibold text-bolt-600">
+          <Text accessibilityRole="link" className="text-center font-semibold text-accent">
             Ir para o login
           </Text>
         </Link>
@@ -107,9 +107,9 @@ export function SignUpForm() {
       <Button label="Criar conta" onPress={handleSubmit} loading={signUp.isPending} />
 
       <View className="flex-row justify-center gap-1">
-        <Text className="text-ink-500 dark:text-ink-300">Já tem conta?</Text>
+        <Text className="text-ink-300">Já tem conta?</Text>
         <Link href="/sign-in" replace asChild>
-          <Text accessibilityRole="link" className="font-semibold text-bolt-600">
+          <Text accessibilityRole="link" className="font-semibold text-accent">
             Entrar
           </Text>
         </Link>

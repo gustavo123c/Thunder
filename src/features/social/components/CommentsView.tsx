@@ -17,6 +17,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { FormMessage } from '@/components/ui/FormMessage';
 import { formatRunDate } from '@/lib/format';
+import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 import { MAX_COMMENT_LENGTH } from '../api/social.api';
@@ -24,6 +25,7 @@ import { useAddComment, useComments, useDeleteComment } from '../hooks/useSocial
 import { displayName } from './AuthorRow';
 
 export function CommentsView({ runId, viewerId }: { runId: string; viewerId: string }) {
+  const theme = useThemeColors();
   const comments = useComments(runId);
   const addComment = useAddComment(runId, viewerId);
   const deleteComment = useDeleteComment(runId);
@@ -49,11 +51,11 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      className="flex-1 bg-ink-50 dark:bg-ink-900"
+      className="flex-1 bg-ink-900"
     >
       {comments.isPending ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color={colors.bolt[500]} />
+          <ActivityIndicator color={theme.accent} />
         </View>
       ) : (
         <FlatList
@@ -83,12 +85,12 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
                 />
                 <View className="flex-1 gap-1 rounded-2xl border border-hairline bg-ink-800 p-3">
                   <View className="flex-row items-baseline justify-between gap-2">
-                    <Text className="font-semibold text-ink-900 dark:text-ink-50">
+                    <Text className="font-semibold text-ink-50">
                       {own ? 'Você' : displayName(item.author)}
                     </Text>
                     <Text className="text-xs text-ink-400">{formatRunDate(item.createdAt)}</Text>
                   </View>
-                  <Text className="text-base text-ink-700 dark:text-ink-100">{item.body}</Text>
+                  <Text className="text-base text-ink-100">{item.body}</Text>
                   {own ? (
                     <Pressable
                       accessibilityRole="button"
@@ -97,7 +99,7 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
                       onPress={() => confirmDelete(item.id)}
                       className="flex-row items-center gap-1 self-end"
                     >
-                      <Ionicons name="trash-outline" size={14} color={colors.ink[400]} />
+                      <Ionicons name="trash-outline" size={14} color={theme.ink[400]} />
                       <Text className="text-xs text-ink-400">Apagar</Text>
                     </Pressable>
                   ) : null}
@@ -121,10 +123,10 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
             value={body}
             onChangeText={setBody}
             placeholder="Escreva um comentário…"
-            placeholderTextColor={colors.ink[300]}
+            placeholderTextColor={theme.ink[300]}
             maxLength={MAX_COMMENT_LENGTH}
             multiline
-            className="max-h-28 min-h-11 flex-1 rounded-2xl bg-ink-50 px-4 py-3 text-base text-ink-900 dark:bg-ink-900 dark:text-ink-50"
+            className="max-h-28 min-h-11 flex-1 rounded-2xl bg-ink-900 px-4 py-3 text-base text-ink-50"
           />
           <Pressable
             accessibilityRole="button"
@@ -135,9 +137,9 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
             className={`h-11 w-11 items-center justify-center rounded-full bg-bolt-500 ${canSend ? '' : 'opacity-40'}`}
           >
             {addComment.isPending ? (
-              <ActivityIndicator color={colors.ink[900]} />
+              <ActivityIndicator color={colors.onBolt} />
             ) : (
-              <Ionicons name="send" size={18} color={colors.ink[900]} />
+              <Ionicons name="send" size={18} color={colors.onBolt} />
             )}
           </Pressable>
         </View>

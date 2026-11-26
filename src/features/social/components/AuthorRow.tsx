@@ -19,7 +19,7 @@ export function AuthorRow({ author, isViewer }: { author: RunAuthor; isViewer: b
     >
       <Avatar name={displayName(author)} imageUrl={author.avatarUrl} size={36} />
       <View>
-        <Text className="text-base font-semibold text-ink-900 dark:text-ink-50">{name}</Text>
+        <Text className="text-base font-semibold text-ink-50">{name}</Text>
         {author.username && !isViewer ? (
           <Text className="text-xs text-ink-400">@{author.username}</Text>
         ) : null}

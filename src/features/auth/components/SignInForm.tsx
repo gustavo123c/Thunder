@@ -57,9 +57,9 @@ export function SignInForm() {
       <Button label="Entrar" onPress={handleSubmit} loading={signIn.isPending} />
 
       <View className="flex-row justify-center gap-1">
-        <Text className="text-ink-500 dark:text-ink-300">Ainda não tem conta?</Text>
+        <Text className="text-ink-300">Ainda não tem conta?</Text>
         <Link href="/sign-up" replace asChild>
-          <Text accessibilityRole="link" className="font-semibold text-bolt-600">
+          <Text accessibilityRole="link" className="font-semibold text-accent">
             Criar conta
           </Text>
         </Link>

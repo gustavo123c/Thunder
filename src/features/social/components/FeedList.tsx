@@ -7,20 +7,21 @@ import { RunCard } from '@/components/run/RunCard';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { useFeed } from '../hooks/useSocial';
 import { AuthorRow } from './AuthorRow';
 import { SocialBar } from './SocialBar';
 
 export function FeedList({ viewerId }: { viewerId: string }) {
+  const theme = useThemeColors();
   const feed = useFeed();
   const items = feed.data?.pages.flat() ?? [];
 
   if (feed.isPending) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator color={colors.bolt[500]} />
+        <ActivityIndicator color={theme.accent} />
       </View>
     );
   }
@@ -44,7 +45,7 @@ export function FeedList({ viewerId }: { viewerId: string }) {
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-2">
             <Text className="text-3xl font-extrabold text-ink-50">Feed</Text>
-            <Ionicons name="flash" size={22} color={colors.bolt[500]} />
+            <Ionicons name="flash" size={22} color={theme.accent} />
           </View>
           <Pressable
             accessibilityRole="button"
@@ -53,7 +54,7 @@ export function FeedList({ viewerId }: { viewerId: string }) {
             onPress={() => router.push('/people')}
             className="h-11 w-11 items-center justify-center rounded-full border border-hairline bg-ink-800"
           >
-            <Ionicons name="person-add-outline" size={20} color={colors.bolt[500]} />
+            <Ionicons name="person-add-outline" size={20} color={theme.accent} />
           </Pressable>
         </View>
       }
@@ -89,13 +90,13 @@ export function FeedList({ viewerId }: { viewerId: string }) {
         if (feed.hasNextPage && !feed.isFetchingNextPage) void feed.fetchNextPage();
       }}
       ListFooterComponent={
-        feed.isFetchingNextPage ? <ActivityIndicator color={colors.bolt[500]} /> : undefined
+        feed.isFetchingNextPage ? <ActivityIndicator color={theme.accent} /> : undefined
       }
       refreshControl={
         <RefreshControl
           refreshing={feed.isRefetching && !feed.isFetchingNextPage}
           onRefresh={() => void feed.refetch()}
-          tintColor={colors.bolt[500]}
+          tintColor={theme.accent}
         />
       }
     />

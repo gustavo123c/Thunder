@@ -5,6 +5,7 @@ import { Text, View } from 'react-native';
 import { Card } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { computeWinStreak } from '@/domain/insights/activity';
+import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 import { useActivity } from '../hooks/useActivity';
@@ -12,6 +13,7 @@ import { describeStreakCounts, describeWeekStreak } from '../progress-copy';
 
 /** Gamified frequency card: runs this week/month + consecutive active weeks. */
 export function WinStreakCard({ userId }: { userId: string }) {
+  const theme = useThemeColors();
   const activity = useActivity(userId);
   const streak = useMemo(
     () => (activity.data ? computeWinStreak(activity.data, new Date()) : null),
@@ -37,7 +39,7 @@ export function WinStreakCard({ userId }: { userId: string }) {
             onFire ? 'bg-bolt-500' : 'border border-bolt-500/40 bg-bolt-500/10'
           }`}
         >
-          <Ionicons name={icon} size={28} color={onFire ? colors.ink[900] : colors.bolt[500]} />
+          <Ionicons name={icon} size={28} color={onFire ? colors.onBolt : theme.accent} />
         </View>
         <View className="flex-1 gap-1">
           <View className="flex-row items-baseline gap-2">
@@ -47,7 +49,7 @@ export function WinStreakCard({ userId }: { userId: string }) {
             >
               {streak.weekStreak}
             </Text>
-            <Text className="text-xs font-bold uppercase tracking-[1.5px] text-bolt-500">
+            <Text className="text-xs font-bold uppercase tracking-[1.5px] text-accent">
               {streak.weekStreak === 1 ? 'semana ativa' : 'semanas seguidas'}
             </Text>
           </View>

@@ -10,7 +10,7 @@ export default function EditProfileScreen() {
   if (!profile) return null;
 
   return (
-    <View className="flex-1 bg-ink-50 dark:bg-ink-900">
+    <View className="flex-1 bg-ink-900">
       <EditProfileForm profile={profile} />
     </View>
   );

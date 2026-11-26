@@ -6,7 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/Avatar';
 import type { Profile } from '@/domain/types/profile';
-import { bannerGradient, colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { LEVEL_COPY } from '../labels';
 
@@ -21,6 +21,7 @@ function HeaderButton({
   label: string;
   onPress: () => void;
 }) {
+  const theme = useThemeColors();
   return (
     <Pressable
       accessibilityRole="button"
@@ -29,7 +30,7 @@ function HeaderButton({
       onPress={onPress}
       className="h-10 w-10 items-center justify-center rounded-full border border-hairline bg-ink-900/70 active:opacity-70"
     >
-      <Ionicons name={icon} size={19} color={colors.ink[100]} />
+      <Ionicons name={icon} size={19} color={theme.ink[100]} />
     </Pressable>
   );
 }
@@ -42,20 +43,21 @@ type ProfileHeaderProps = {
 
 /** Athlete header: gradient cover, ringed avatar, name, @username, level badge and actions. */
 export function ProfileHeader({ profile, avatarSlot }: ProfileHeaderProps) {
+  const theme = useThemeColors();
   const name = profile.fullName ?? profile.username;
 
   return (
     <View>
       <View className="h-32 overflow-hidden rounded-[24px] border border-hairline">
         <LinearGradient
-          colors={bannerGradient}
+          colors={theme.bannerGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
         {/* Oversized bolt as a watermark on the cover. */}
         <View className="absolute -bottom-10 -right-4 opacity-10" pointerEvents="none">
-          <Ionicons name="flash" size={170} color={colors.bolt[500]} />
+          <Ionicons name="flash" size={170} color={theme.accent} />
         </View>
         <View className="flex-row justify-end gap-2 p-3">
           <HeaderButton
@@ -84,8 +86,8 @@ export function ProfileHeader({ profile, avatarSlot }: ProfileHeaderProps) {
           ) : null}
           {profile.level ? (
             <View className="flex-row items-center gap-1 rounded-full border border-bolt-500/40 bg-bolt-500/10 px-2.5 py-0.5">
-              <Ionicons name="flash" size={11} color={colors.bolt[500]} />
-              <Text className="text-[11px] font-bold uppercase tracking-wider text-bolt-500">
+              <Ionicons name="flash" size={11} color={theme.accent} />
+              <Text className="text-[11px] font-bold uppercase tracking-wider text-accent">
                 {LEVEL_COPY[profile.level].title}
               </Text>
             </View>

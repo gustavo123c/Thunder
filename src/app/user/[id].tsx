@@ -10,7 +10,7 @@ export default function AthleteScreen() {
   const viewerId = useUserId();
 
   return (
-    <View className="flex-1 bg-ink-50 dark:bg-ink-900">
+    <View className="flex-1 bg-ink-900">
       <RunHistoryList
         userId={id}
         variant="athlete"

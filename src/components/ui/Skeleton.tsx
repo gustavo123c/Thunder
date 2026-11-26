@@ -25,7 +25,7 @@ export function Skeleton({ width = '100%', height, radius = 12 }: SkeletonProps)
   return (
     <Animated.View
       accessibilityLabel="Carregando"
-      className="bg-ink-200 dark:bg-ink-700"
+      className="bg-ink-700"
       style={{ width, height, borderRadius: radius, opacity }}
     />
   );

@@ -3,11 +3,10 @@ import '../../global.css';
 import '@/features/run-tracking';
 
 import { QueryClientProvider } from '@tanstack/react-query';
-import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { colorScheme } from 'nativewind';
-import { useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -15,12 +14,11 @@ import { AuthProvider, useSignOut } from '@/features/auth';
 import { queryClient } from '@/lib/query-client';
 import { useAppGate } from '@/navigation/useAppGate';
 import { initMapbox } from '@/services/mapbox/init';
-import { colors } from '@/theme/tokens';
+import { AppThemeProvider } from '@/theme/AppThemeProvider';
+import { useThemeColors } from '@/theme/theme';
 
 void SplashScreen.preventAutoHideAsync();
 initMapbox();
-// "Performance Dark": the app always uses the dark palette.
-colorScheme.set('dark');
 
 function RootNavigator() {
   const { gate, profileQuery } = useAppGate();
@@ -96,30 +94,41 @@ function RootNavigator() {
   );
 }
 
-/** Navigation chrome (headers, screen backgrounds) in the Performance Dark palette. */
-const navigationTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: colors.bolt[500],
-    background: colors.ink[900],
-    card: colors.ink[900],
-    text: colors.ink[50],
-    border: colors.hairline,
-  },
-};
+/** Navigation chrome (headers, screen backgrounds) and status bar for the active theme. */
+function ThemedNavigation({ children }: { children: ReactNode }) {
+  const theme = useThemeColors();
+  const base = theme.isDark ? DarkTheme : DefaultTheme;
+  const navigationTheme = {
+    ...base,
+    colors: {
+      ...base.colors,
+      primary: theme.accent,
+      background: theme.ink[900],
+      card: theme.ink[900],
+      text: theme.ink[50],
+      border: theme.hairline,
+    },
+  };
+  return (
+    <ThemeProvider value={navigationTheme}>
+      <StatusBar style={theme.isDark ? 'light' : 'dark'} />
+      {children}
+    </ThemeProvider>
+  );
+}
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider value={navigationTheme}>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <StatusBar style="light" />
-            <RootNavigator />
-          </AuthProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
+      <AppThemeProvider>
+        <ThemedNavigation>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <RootNavigator />
+            </AuthProvider>
+          </QueryClientProvider>
+        </ThemedNavigation>
+      </AppThemeProvider>
     </SafeAreaProvider>
   );
 }

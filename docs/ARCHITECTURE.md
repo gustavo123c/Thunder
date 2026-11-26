@@ -237,9 +237,21 @@ sem privilégios padrão, para pegar qualquer permissão faltando.
 | 2026-11 | Rotas em `src/app/`                              | Convenção do Expo Router; mantém código não-rota fora da pasta de rotas.                                    |
 | 2026-11 | UI em pt-BR, código em inglês                    | Público brasileiro; código legível para qualquer contribuidor.                                              |
 
-## Design system — "Performance Dark"
+## Design system — "Performance Dark" + light mode
 
-The app is dark-only (`userInterfaceStyle: "dark"`, NativeWind `colorScheme.set('dark')`).
+Appearance is a per-device choice in Settings → Aparência (Automático / Claro / Escuro),
+stored in AsyncStorage by `src/theme/AppThemeProvider.tsx`, which also calls NativeWind's
+`colorScheme.set()` and defines the themed CSS variables at the root.
+
+- **Themed tokens:** `ink-*`, `accent` and `hairline` resolve through CSS variables
+  (`rgb(var(--ink-800) / <alpha-value>)`). Class names keep their *role* in both modes — write
+  `bg-ink-900` (background), `bg-ink-800` (card), `bg-ink-700` (raised), `text-ink-50` (primary
+  text), `text-ink-300/400` (secondary/muted). Never add `dark:` variants.
+- **Fixed colors:** `bolt-*` (amber backgrounds), `onbolt` (text/icons on amber), success,
+  danger, info. Amber *text/icons* on surfaces use `text-accent` / `theme.accent`, which is a
+  darker amber in light mode for contrast.
+- **JS colors** (icons, SVG, navigation, Mapbox style): `useThemeColors()` from `@/theme/theme`.
+- `src/theme/__tests__/theme.test.tsx` runs the real NativeWind runtime to check both themes.
 
 - **Surfaces:** background `ink-900` (#090C10); cards `ink-800` (#121721) with
   `border-hairline` (rgba(255,255,255,0.08)) and 20px radius. Use `components/ui/Card`;

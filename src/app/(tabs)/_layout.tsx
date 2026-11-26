@@ -12,6 +12,7 @@ import {
 
 import { useUserId } from '@/features/auth';
 import { useRunTrackingBootstrap } from '@/features/run-tracking';
+import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -38,6 +39,7 @@ type TabButtonProps = {
 
 /** Elevated circular amber button for the central "Correr" tab. */
 function RecordTabButton({ onPress, onLongPress, accessibilityState }: TabButtonProps) {
+  const theme = useThemeColors();
   const selected = accessibilityState?.selected ?? false;
   return (
     <View className="flex-1 items-center">
@@ -52,16 +54,16 @@ function RecordTabButton({ onPress, onLongPress, accessibilityState }: TabButton
         <View
           className="h-16 w-16 items-center justify-center rounded-full border-4 border-ink-900 bg-bolt-500"
           style={{
-            shadowColor: colors.bolt[500],
+            shadowColor: theme.accent,
             shadowOpacity: 0.35,
             shadowRadius: 12,
             shadowOffset: { width: 0, height: 4 },
             elevation: 8,
           }}
         >
-          <Ionicons name="play" size={26} color={colors.ink[900]} style={{ marginLeft: 3 }} />
+          <Ionicons name="play" size={26} color={colors.onBolt} style={{ marginLeft: 3 }} />
         </View>
-        <Text className={`text-[11px] font-bold ${selected ? 'text-bolt-500' : 'text-ink-300'}`}>
+        <Text className={`text-[11px] font-bold ${selected ? 'text-accent' : 'text-ink-300'}`}>
           Correr
         </Text>
       </Pressable>
@@ -70,6 +72,7 @@ function RecordTabButton({ onPress, onLongPress, accessibilityState }: TabButton
 }
 
 export default function TabsLayout() {
+  const theme = useThemeColors();
   const userId = useUserId();
   // Restores an interrupted run and uploads runs saved while offline.
   useRunTrackingBootstrap(userId);
@@ -78,12 +81,12 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.bolt[500],
-        tabBarInactiveTintColor: colors.ink[400],
+        tabBarActiveTintColor: theme.accent,
+        tabBarInactiveTintColor: theme.ink[400],
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
         tabBarStyle: {
-          backgroundColor: colors.ink[900],
-          borderTopColor: colors.hairline,
+          backgroundColor: theme.ink[900],
+          borderTopColor: theme.hairline,
           borderTopWidth: 1,
           height: 84,
           paddingTop: 8,

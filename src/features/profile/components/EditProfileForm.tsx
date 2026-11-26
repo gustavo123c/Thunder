@@ -26,7 +26,7 @@ const EDITABLE_FIELDS: readonly ProfileFormField[] = [
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View className="gap-3">
-      <Text className="text-lg font-semibold text-ink-900 dark:text-ink-50">{title}</Text>
+      <Text className="text-lg font-semibold text-ink-50">{title}</Text>
       {children}
     </View>
   );

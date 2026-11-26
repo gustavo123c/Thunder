@@ -4,13 +4,14 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native
 
 import { Avatar } from '@/components/ui/Avatar';
 import { TextField } from '@/components/ui/TextField';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { useProfileSearch } from '../hooks/useSocial';
 import { displayName } from './AuthorRow';
 import { FollowButton } from './FollowButton';
 
 export function PeopleSearch({ viewerId }: { viewerId: string }) {
+  const theme = useThemeColors();
   const [query, setQuery] = useState('');
   const search = useProfileSearch(query);
   const tooShort = query.trim().length < 2;
@@ -34,9 +35,9 @@ export function PeopleSearch({ viewerId }: { viewerId: string }) {
         contentContainerClassName="gap-3 pb-8"
         ListEmptyComponent={
           search.isFetching ? (
-            <ActivityIndicator color={colors.bolt[500]} />
+            <ActivityIndicator color={theme.accent} />
           ) : (
-            <Text className="py-6 text-center text-base text-ink-500 dark:text-ink-300">
+            <Text className="py-6 text-center text-base text-ink-300">
               {tooShort
                 ? 'Digite pelo menos 2 letras.'
                 : search.isError
@@ -55,9 +56,7 @@ export function PeopleSearch({ viewerId }: { viewerId: string }) {
             >
               <Avatar name={displayName(item)} imageUrl={item.avatarUrl} size={44} />
               <View className="flex-1">
-                <Text className="text-base font-semibold text-ink-900 dark:text-ink-50">
-                  {displayName(item)}
-                </Text>
+                <Text className="text-base font-semibold text-ink-50">{displayName(item)}</Text>
                 {item.username ? (
                   <Text className="text-sm text-ink-400">@{item.username}</Text>
                 ) : null}

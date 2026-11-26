@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 import Svg, { Circle, Polyline } from 'react-native-svg';
 
 import { type Position, projectToBox } from '@/domain/geo/geojson';
+import { useThemeColors } from '@/theme/theme';
 import { colors, mapColors } from '@/theme/tokens';
 
 import { GridBackdrop } from './GridBackdrop';
@@ -14,6 +15,7 @@ import type { RouteMapProps } from './MapboxRouteMap';
  * one polyline per segment so pauses show as gaps.
  */
 export function RouteSketch({ route, followUser, style }: RouteMapProps) {
+  const theme = useThemeColors();
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   const lines = useMemo(() => {
@@ -70,13 +72,13 @@ export function RouteSketch({ route, followUser, style }: RouteMapProps) {
               cy={last[1]}
               r={followUser ? 9 : 6}
               fill={followUser ? colors.bolt[500] : mapColors.finish}
-              stroke={colors.ink[900]}
+              stroke={theme.ink[900]}
               strokeWidth={followUser ? 3 : 0}
             />
           </Svg>
         ) : !followUser && !hasRouteData ? (
           <View className="flex-1 items-center justify-center gap-2 px-6">
-            <Ionicons name="navigate-outline" size={28} color={colors.ink[400]} />
+            <Ionicons name="navigate-outline" size={28} color={theme.ink[400]} />
             <Text className="text-center text-sm text-ink-400">
               Sem trajeto de GPS nesta corrida.
             </Text>

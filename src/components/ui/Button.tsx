@@ -2,7 +2,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ComponentProps } from 'react';
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
+import { colors, type ThemeColors } from '@/theme/tokens';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
@@ -24,16 +25,15 @@ const containerByVariant: Record<ButtonVariant, string> = {
 };
 
 const labelByVariant: Record<ButtonVariant, string> = {
-  primary: 'text-ink-900',
+  primary: 'text-onbolt',
   secondary: 'text-ink-50',
   ghost: 'text-ink-300',
 };
 
-const iconColor: Record<ButtonVariant, string> = {
-  primary: colors.ink[900],
-  secondary: colors.ink[50],
-  ghost: colors.ink[300],
-};
+function iconColorFor(variant: ButtonVariant, theme: ThemeColors): string {
+  if (variant === 'primary') return colors.onBolt;
+  return variant === 'secondary' ? theme.ink[50] : theme.ink[300];
+}
 
 export function Button({
   label,
@@ -44,6 +44,7 @@ export function Button({
   loading = false,
   className = '',
 }: ButtonProps) {
+  const theme = useThemeColors();
   const isDisabled = disabled || loading;
 
   return (
@@ -56,10 +57,10 @@ export function Button({
       className={`h-14 flex-row items-center justify-center gap-2 rounded-2xl px-6 ${containerByVariant[variant]} ${isDisabled ? 'opacity-50' : ''} ${className}`}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? colors.ink[900] : colors.bolt[500]} />
+        <ActivityIndicator color={variant === 'primary' ? colors.onBolt : theme.accent} />
       ) : (
         <>
-          {icon ? <Ionicons name={icon} size={18} color={iconColor[variant]} /> : null}
+          {icon ? <Ionicons name={icon} size={18} color={iconColorFor(variant, theme)} /> : null}
           <Text className={`text-base font-bold ${labelByVariant[variant]}`}>{label}</Text>
         </>
       )}

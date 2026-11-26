@@ -2,6 +2,7 @@ import Mapbox, { Camera, LineLayer, LocationPuck, MapView, ShapeSource } from '@
 import type { StyleProp, ViewStyle } from 'react-native';
 
 import type { Bounds, LineStringGeometry, MultiLineStringGeometry } from '@/domain/geo/geojson';
+import { useThemeColors } from '@/theme/theme';
 import { mapColors } from '@/theme/tokens';
 
 export type RouteMapProps = {
@@ -25,12 +26,13 @@ export function MapboxRouteMap({
   interactive = true,
   style = { flex: 1 },
 }: RouteMapProps) {
+  const { isDark } = useThemeColors();
   const hasRoute = route !== null && route.coordinates.length > 0;
 
   return (
     <MapView
       style={style}
-      styleURL={Mapbox.StyleURL.Dark}
+      styleURL={isDark ? Mapbox.StyleURL.Dark : Mapbox.StyleURL.Light}
       scaleBarEnabled={false}
       logoPosition={{ bottom: 8, left: 8 }}
       attributionPosition={{ bottom: 8, right: 8 }}

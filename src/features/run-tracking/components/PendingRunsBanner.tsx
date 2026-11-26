@@ -3,12 +3,13 @@ import { Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { formatDistanceKm } from '@/lib/format';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { usePendingRuns, useRetryPendingRuns } from '../hooks/usePendingRuns';
 
 /** Shows runs saved offline and lets the user retry the upload. Hidden when there are none. */
 export function PendingRunsBanner({ userId }: { userId: string }) {
+  const theme = useThemeColors();
   const { data: pending = [] } = usePendingRuns(userId);
   const retry = useRetryPendingRuns(userId);
 
@@ -24,10 +25,10 @@ export function PendingRunsBanner({ userId }: { userId: string }) {
     <View className="gap-3 rounded-[20px] border border-bolt-500/40 bg-ink-800 p-4">
       <View className="gap-1">
         <View className="flex-row items-center gap-2">
-          <Ionicons name="cloud-upload-outline" size={18} color={colors.bolt[500]} />
+          <Ionicons name="cloud-upload-outline" size={18} color={theme.accent} />
           <Text className="text-base font-bold text-ink-50">{label}</Text>
         </View>
-        <Text className="text-sm text-ink-600 dark:text-ink-300">
+        <Text className="text-sm text-ink-300">
           {formatDistanceKm(distance)} salvos no aparelho. Enviaremos automaticamente quando houver
           conexão.
         </Text>

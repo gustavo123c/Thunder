@@ -16,6 +16,7 @@ import {
 } from '@/domain/training/workout-generator';
 import type { RunnerLevel } from '@/domain/types/profile';
 import { formatPace, formatRunDate } from '@/lib/format';
+import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
 
 import { useDeleteWorkout, useGenerateWorkout, useRecentWorkouts } from '../hooks/useWorkouts';
@@ -45,6 +46,7 @@ function GoalCard({
   selected: boolean;
   onPress: () => void;
 }) {
+  const theme = useThemeColors();
   const copy = GOALS[goal];
   return (
     <Pressable
@@ -62,7 +64,7 @@ function GoalCard({
           selected ? 'bg-bolt-500' : 'bg-ink-700'
         }`}
       >
-        <Ionicons name={copy.icon} size={20} color={selected ? colors.ink[900] : colors.ink[200]} />
+        <Ionicons name={copy.icon} size={20} color={selected ? colors.onBolt : theme.ink[200]} />
       </View>
       <View className="gap-1">
         <Text
@@ -88,9 +90,10 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 function ContextRow({ icon, label, value }: { icon: IconName; label: string; value: string }) {
+  const theme = useThemeColors();
   return (
     <View className="flex-row items-center gap-3">
-      <Ionicons name={icon} size={16} color={colors.ink[300]} />
+      <Ionicons name={icon} size={16} color={theme.ink[300]} />
       <Text className="text-sm text-ink-400">{label}</Text>
       <Text className="flex-1 text-right text-sm font-semibold text-ink-100" numberOfLines={2}>
         {value}
@@ -116,6 +119,7 @@ export function WorkoutBuilder({
   recentPaceSPerKm,
   onEditPains,
 }: WorkoutBuilderProps) {
+  const theme = useThemeColors();
   const [goal, setGoal] = useState<WorkoutGoal>('pace');
   const [level, setLevel] = useState<RunnerLevel>(defaultLevel);
   const [duration, setDuration] = useState<WorkoutDuration>(30);
@@ -210,7 +214,7 @@ export function WorkoutBuilder({
             hitSlop={8}
             className="self-start"
           >
-            <Text className="text-sm font-semibold text-bolt-500">Revisar check-up corporal</Text>
+            <Text className="text-sm font-semibold text-accent">Revisar check-up corporal</Text>
           </Pressable>
         ) : null}
       </View>
@@ -239,7 +243,7 @@ export function WorkoutBuilder({
               className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4 active:opacity-80"
             >
               <View className="h-10 w-10 items-center justify-center rounded-full bg-ink-700">
-                <Ionicons name="document-text-outline" size={18} color={colors.ink[200]} />
+                <Ionicons name="document-text-outline" size={18} color={theme.ink[200]} />
               </View>
               <View className="flex-1 gap-0.5">
                 <Text className="font-bold text-ink-50">{saved.plan.title}</Text>
@@ -247,7 +251,7 @@ export function WorkoutBuilder({
                   {saved.plan.totalMinutes} min · {formatRunDate(saved.createdAt)}
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={18} color={colors.ink[400]} />
+              <Ionicons name="chevron-forward" size={18} color={theme.ink[400]} />
             </Pressable>
           ))}
         </Section>

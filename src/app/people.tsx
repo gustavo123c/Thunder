@@ -7,7 +7,7 @@ export default function PeopleScreen() {
   const viewerId = useUserId();
 
   return (
-    <View className="flex-1 bg-ink-50 dark:bg-ink-900">
+    <View className="flex-1 bg-ink-900">
       <PeopleSearch viewerId={viewerId} />
     </View>
   );

@@ -12,7 +12,7 @@ import {
   painLevel,
 } from '@/domain/health/body-regions';
 import type { BodySex } from '@/domain/types/profile';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { useOpenPains, useResolvePain, useSetPain } from '../hooks/usePains';
 import { BodyMap, PAIN_COLORS } from './BodyMap';
@@ -20,6 +20,7 @@ import { PainSheet } from './PainSheet';
 
 /** "Como está seu corpo hoje?" — body map, active pains and the health notice. */
 export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex | null }) {
+  const theme = useThemeColors();
   const pains = useOpenPains(userId);
   const setPain = useSetPain(userId);
   const resolve = useResolvePain(userId);
@@ -83,7 +84,7 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
                   onPress={() => resolve.mutate(pain.id)}
                   className="h-8 w-8 items-center justify-center rounded-full active:bg-ink-700"
                 >
-                  <Ionicons name="close" size={16} color={colors.ink[400]} />
+                  <Ionicons name="close" size={16} color={theme.ink[400]} />
                 </Pressable>
               </View>
             );

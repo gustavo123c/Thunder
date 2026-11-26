@@ -54,7 +54,7 @@ export function PainSheet({
               <Text className="text-xl font-extrabold text-ink-50">
                 {describeRegion(target.region, target.side)}
               </Text>
-              <Text className="text-sm text-ink-500 dark:text-ink-300">
+              <Text className="text-sm text-ink-300">
                 Como está a dor ou desconforto nesta região?
               </Text>
             </View>

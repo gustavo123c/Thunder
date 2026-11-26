@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { formatDistanceKm } from '@/lib/format';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { confirmDeleteRun } from '../confirm-delete';
 import { groupRunsByMonth } from '../group-by-month';
@@ -29,6 +29,7 @@ export function RunHistoryList({
   variant = 'own',
   titleAction = null,
 }: RunHistoryListProps) {
+  const theme = useThemeColors();
   const isOwn = variant === 'own';
   const query = useUserRuns(userId);
   const deleteRun = useDeleteRun();
@@ -38,7 +39,7 @@ export function RunHistoryList({
   if (query.isPending) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator color={colors.bolt[500]} />
+        <ActivityIndicator color={theme.accent} />
       </View>
     );
   }
@@ -129,13 +130,13 @@ export function RunHistoryList({
         if (query.hasNextPage && !query.isFetchingNextPage) void query.fetchNextPage();
       }}
       ListFooterComponent={
-        query.isFetchingNextPage ? <ActivityIndicator color={colors.bolt[500]} /> : undefined
+        query.isFetchingNextPage ? <ActivityIndicator color={theme.accent} /> : undefined
       }
       refreshControl={
         <RefreshControl
           refreshing={query.isRefetching && !query.isFetchingNextPage}
           onRefresh={() => void query.refetch()}
-          tintColor={colors.bolt[500]}
+          tintColor={theme.accent}
         />
       }
     />

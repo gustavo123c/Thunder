@@ -17,7 +17,7 @@ import {
   formatRunDate,
 } from '@/lib/format';
 import type { RunDetail } from '@/services/supabase/run-json';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 import { RunNotFoundError } from '../api/runs.api';
 import { describeComparison } from '../comparison-copy';
@@ -107,6 +107,7 @@ function OwnerActions({ detail }: { detail: RunDetail }) {
 }
 
 export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: RunDetailViewProps) {
+  const theme = useThemeColors();
   const query = useRunDetail(runId);
   const detail = query.data;
 
@@ -122,8 +123,8 @@ export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: Ru
 
   if (query.isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-ink-50 dark:bg-ink-900">
-        <ActivityIndicator color={colors.bolt[500]} />
+      <View className="flex-1 items-center justify-center bg-ink-900">
+        <ActivityIndicator color={theme.accent} />
       </View>
     );
   }
@@ -151,7 +152,7 @@ export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: Ru
   const authorName = detail.author.fullName ?? detail.author.username ?? 'Corredor';
 
   return (
-    <ScrollView className="flex-1 bg-ink-50 dark:bg-ink-900" contentContainerClassName="pb-10">
+    <ScrollView className="flex-1 bg-ink-900" contentContainerClassName="pb-10">
       {route ? (
         <View style={{ height: 280 }}>
           <RouteMap route={route} bounds={boundsOf(detail.route)} interactive={false} />
@@ -163,7 +164,7 @@ export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: Ru
           <Text className="text-sm text-ink-400">
             {isOwner ? 'Você' : authorName} · {formatRunDate(detail.startedAt)}
           </Text>
-          <Text className="text-3xl font-black text-ink-900 dark:text-ink-50">{detail.title}</Text>
+          <Text className="text-3xl font-black text-ink-50">{detail.title}</Text>
         </View>
 
         <View className="flex-row justify-around rounded-[20px] border border-hairline bg-ink-800 py-5">

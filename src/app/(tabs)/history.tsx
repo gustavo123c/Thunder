@@ -6,9 +6,10 @@ import { Screen } from '@/components/ui/Screen';
 import { useUserId } from '@/features/auth';
 import { RunHistoryList } from '@/features/run-history';
 import { PendingRunsBanner } from '@/features/run-tracking';
-import { colors } from '@/theme/tokens';
+import { useThemeColors } from '@/theme/theme';
 
 function RetrospectiveButton() {
+  const theme = useThemeColors();
   return (
     <Pressable
       accessibilityRole="button"
@@ -18,8 +19,8 @@ function RetrospectiveButton() {
       onPress={() => router.push('/retrospective')}
       className="flex-row items-center gap-1.5 rounded-full border border-bolt-500/40 bg-bolt-500/10 px-3.5 py-2 active:opacity-70"
     >
-      <Ionicons name="stats-chart" size={14} color={colors.bolt[500]} />
-      <Text className="text-sm font-bold text-bolt-500">Retrospectiva</Text>
+      <Ionicons name="stats-chart" size={14} color={theme.accent} />
+      <Text className="text-sm font-bold text-accent">Retrospectiva</Text>
     </Pressable>
   );
 }

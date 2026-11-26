@@ -28,7 +28,7 @@ export function RouteThumbnail({ positions, width, height }: RouteThumbnailProps
     <View
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
-      className="overflow-hidden rounded-2xl bg-ink-100 dark:bg-ink-800"
+      className="overflow-hidden rounded-2xl bg-ink-800"
       style={{ width, height }}
     >
       {points.length >= 2 && first && last ? (

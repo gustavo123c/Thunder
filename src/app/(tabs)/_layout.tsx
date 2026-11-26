@@ -37,7 +37,10 @@ type TabButtonProps = {
   accessibilityState?: AccessibilityState;
 };
 
-/** Elevated circular amber button for the central "Correr" tab. */
+/**
+ * Elevated circular amber button for the central "Correr" tab. It only rises a little:
+ * on iOS the part drawn above the tab bar does not receive touches.
+ */
 function RecordTabButton({ onPress, onLongPress, accessibilityState }: TabButtonProps) {
   const theme = useThemeColors();
   const selected = accessibilityState?.selected ?? false;
@@ -49,7 +52,7 @@ function RecordTabButton({ onPress, onLongPress, accessibilityState }: TabButton
         accessibilityState={{ selected }}
         onPress={onPress ?? undefined}
         onLongPress={onLongPress ?? undefined}
-        className="-mt-6 items-center gap-1"
+        className="-mt-4 items-center gap-1"
       >
         <View
           className="h-16 w-16 items-center justify-center rounded-full border-4 border-ink-900 bg-bolt-500"

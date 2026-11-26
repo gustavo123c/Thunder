@@ -12,7 +12,7 @@ import { LEVEL_COPY } from '../labels';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-function HeaderButton({
+function ActionButton({
   icon,
   label,
   onPress,
@@ -26,11 +26,12 @@ function HeaderButton({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
-      hitSlop={8}
+      hitSlop={6}
       onPress={onPress}
-      className="h-10 w-10 items-center justify-center rounded-full border border-hairline bg-ink-900/70 active:opacity-70"
+      className="h-10 flex-row items-center gap-2 rounded-full border border-hairline bg-ink-800 px-4 active:bg-ink-700"
     >
-      <Ionicons name={icon} size={19} color={theme.ink[100]} />
+      <Ionicons name={icon} size={17} color={theme.ink[100]} />
+      <Text className="text-sm font-semibold text-ink-100">{label}</Text>
     </Pressable>
   );
 }
@@ -48,7 +49,7 @@ export function ProfileHeader({ profile, avatarSlot }: ProfileHeaderProps) {
 
   return (
     <View>
-      <View className="h-32 overflow-hidden rounded-[24px] border border-hairline">
+      <View className="h-28 overflow-hidden rounded-[24px] border border-hairline">
         <LinearGradient
           colors={theme.bannerGradient}
           start={{ x: 0, y: 0 }}
@@ -58,18 +59,6 @@ export function ProfileHeader({ profile, avatarSlot }: ProfileHeaderProps) {
         {/* Oversized bolt as a watermark on the cover. */}
         <View className="absolute -bottom-10 -right-4 opacity-10" pointerEvents="none">
           <Ionicons name="flash" size={170} color={theme.accent} />
-        </View>
-        <View className="flex-row justify-end gap-2 p-3">
-          <HeaderButton
-            icon="create-outline"
-            label="Editar perfil"
-            onPress={() => router.push('/profile/edit')}
-          />
-          <HeaderButton
-            icon="settings-outline"
-            label="Configurações"
-            onPress={() => router.push('/settings')}
-          />
         </View>
       </View>
 
@@ -92,6 +81,20 @@ export function ProfileHeader({ profile, avatarSlot }: ProfileHeaderProps) {
               </Text>
             </View>
           ) : null}
+        </View>
+        {/* Actions sit below the name, away from the top-right corner where Expo Go's
+            floating developer button covers the screen. */}
+        <View className="mt-3 flex-row gap-2">
+          <ActionButton
+            icon="create-outline"
+            label="Editar perfil"
+            onPress={() => router.push('/profile/edit')}
+          />
+          <ActionButton
+            icon="settings-outline"
+            label="Configurações"
+            onPress={() => router.push('/settings')}
+          />
         </View>
       </View>
     </View>

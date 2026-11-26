@@ -1,9 +1,11 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ReactNode } from 'react';
 import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
 import { RouteThumbnail } from '@/components/map/RouteThumbnail';
 import type { RunRecord } from '@/domain/types/run';
 import { formatDistanceKm, formatDuration, formatPace, formatRunDate } from '@/lib/format';
+import { colors } from '@/theme/tokens';
 
 type RunCardProps = {
   run: Pick<
@@ -15,6 +17,10 @@ type RunCardProps = {
   header?: ReactNode;
   /** e.g. kudos/comments in the feed */
   footer?: ReactNode;
+  /** Shows a delete button (own runs in the history). */
+  onDelete?: () => void;
+  /** e.g. photo/video strip */
+  media?: ReactNode;
 };
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -32,7 +38,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 /** Summary card of a run: title, date, key metrics and a route thumbnail. */
-export function RunCard({ run, onPress, header, footer }: RunCardProps) {
+export function RunCard({ run, onPress, header, footer, onDelete, media }: RunCardProps) {
   const { width } = useWindowDimensions();
   const thumbnailWidth = Math.min(width - 64, 520);
 
@@ -46,15 +52,29 @@ export function RunCard({ run, onPress, header, footer }: RunCardProps) {
         disabled={!onPress}
         className="gap-3 active:opacity-80"
       >
-        <View className="gap-0.5">
-          <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">{run.title}</Text>
-          <Text className="text-sm text-ink-400">{formatRunDate(run.startedAt)}</Text>
+        <View className="flex-row items-start gap-2">
+          <View className="flex-1 gap-0.5">
+            <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">{run.title}</Text>
+            <Text className="text-sm text-ink-400">{formatRunDate(run.startedAt)}</Text>
+          </View>
+          {onDelete ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Apagar corrida ${run.title}`}
+              hitSlop={10}
+              onPress={onDelete}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-ink-100 dark:active:bg-ink-700"
+            >
+              <Ionicons name="trash-outline" size={18} color={colors.ink[400]} />
+            </Pressable>
+          ) : null}
         </View>
         <View className="flex-row gap-3">
           <Metric label="Distância" value={formatDistanceKm(run.distanceM)} />
           <Metric label="Pace" value={formatPace(run.avgPaceSPerKm)} />
           <Metric label="Tempo" value={formatDuration(run.movingTimeS)} />
         </View>
+        {media}
         {run.route.length >= 2 ? (
           <RouteThumbnail positions={run.route} width={thumbnailWidth} height={140} />
         ) : null}

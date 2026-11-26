@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { OptionCard } from '@/components/ui/OptionCard';
 import { TextField } from '@/components/ui/TextField';
@@ -7,6 +7,12 @@ import { RUNNER_GOALS, RUNNER_LEVELS } from '@/domain/types/profile';
 import type { SetProfileField } from '../hooks/useProfileFormState';
 import { GOAL_COPY, LEVEL_COPY } from '../labels';
 import { needsTargetPace, type ProfileFormErrors, type ProfileFormValues } from '../profile-form';
+
+const SEX_OPTIONS = [
+  { value: 'male', label: 'Masculino' },
+  { value: 'female', label: 'Feminino' },
+  { value: null, label: 'Prefiro não informar' },
+] as const;
 
 type FieldsProps = {
   values: ProfileFormValues;
@@ -83,8 +89,35 @@ export function BodyFields({ values, errors, setField }: FieldsProps) {
         placeholder="170"
         keyboardType="number-pad"
       />
+      <View className="gap-2">
+        <Text className="text-sm font-medium text-ink-700 dark:text-ink-200">
+          Modelo do mapa corporal
+        </Text>
+        <View accessibilityRole="radiogroup" className="flex-row gap-2">
+          {SEX_OPTIONS.map((option) => {
+            const selected = values.sex === option.value;
+            return (
+              <Pressable
+                key={option.label}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: selected }}
+                onPress={() => setField('sex', option.value)}
+                className={`flex-1 items-center rounded-2xl border-2 px-2 py-3 ${
+                  selected
+                    ? 'border-bolt-500 bg-bolt-50 dark:bg-ink-800'
+                    : 'border-ink-100 bg-white dark:border-ink-700 dark:bg-ink-800'
+                }`}
+              >
+                <Text className="text-center text-sm font-semibold text-ink-900 dark:text-ink-50">
+                  {option.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
       <Text className="text-sm text-ink-400">
-        Usamos esses dados apenas para estimar as calorias das suas corridas.
+        Peso e altura estimam as calorias; o modelo escolhe o desenho do mapa de dores.
       </Text>
     </View>
   );

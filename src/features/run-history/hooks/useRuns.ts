@@ -45,11 +45,12 @@ export function useUpdateRun(runId: string) {
   });
 }
 
-export function useDeleteRun(runId: string) {
+/** Deletes a run (and its media); every ['runs'] query — history, feed, streak, dashboard — refreshes. */
+export function useDeleteRun() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => deleteRun(runId),
-    onSuccess: async () => {
+    mutationFn: (runId: string) => deleteRun(runId),
+    onSuccess: async (_data, runId) => {
       queryClient.removeQueries({ queryKey: runKeys.detail(runId) });
       await queryClient.invalidateQueries({ queryKey: runKeys.all });
     },

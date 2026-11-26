@@ -52,7 +52,7 @@ it('hides owner-only sections from other athletes', async () => {
 
   expect(await screen.findByText(/Ana Souza ·/)).toBeOnTheScreen();
   expect(screen.queryByText('Sua evolução')).not.toBeOnTheScreen();
-  expect(screen.queryByRole('button', { name: 'Excluir corrida' })).not.toBeOnTheScreen();
+  expect(screen.queryByRole('button', { name: 'Apagar corrida' })).not.toBeOnTheScreen();
 });
 
 it('explains when a run is not available', async () => {

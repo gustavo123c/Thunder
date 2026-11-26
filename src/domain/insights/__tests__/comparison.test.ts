@@ -1,5 +1,5 @@
 import type { RunHistoryEntry } from '../../types/run';
-import { compareWithHistory, currentWeekTotals } from '../comparison';
+import { compareWithHistory } from '../comparison';
 
 let n = 0;
 function run(partial: Partial<RunHistoryEntry>): RunHistoryEntry {
@@ -76,28 +76,5 @@ describe('compareWithHistory', () => {
   it('ignores the run itself if it appears in the history', () => {
     const current = run({ distanceM: 5000 });
     expect(compareWithHistory(current, [current]).isFirstRun).toBe(true);
-  });
-});
-
-describe('currentWeekTotals', () => {
-  it('sums runs since Monday 00:00 local time', () => {
-    const wednesday = new Date(2026, 10, 25, 18, 0); // Wed 25 Nov 2026
-    const totals = currentWeekTotals(
-      [
-        {
-          startedAt: new Date(2026, 10, 23, 7, 0).toISOString(),
-          distanceM: 5000,
-          movingTimeS: 1800,
-        },
-        {
-          startedAt: new Date(2026, 10, 25, 7, 0).toISOString(),
-          distanceM: 3000,
-          movingTimeS: 1000,
-        },
-        { startedAt: new Date(2026, 10, 22, 23, 0).toISOString(), distanceM: 9999, movingTimeS: 1 }, // Sunday
-      ],
-      wednesday,
-    );
-    expect(totals).toEqual({ runs: 2, distanceM: 8000, movingTimeS: 2800 });
   });
 });

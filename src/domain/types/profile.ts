@@ -10,6 +10,9 @@ export const RUNNER_GOALS = [
 ] as const;
 export type RunnerGoal = (typeof RUNNER_GOALS)[number];
 
+export const BODY_SEXES = ['male', 'female'] as const;
+export type BodySex = (typeof BODY_SEXES)[number];
+
 export type Profile = {
   id: string;
   username: string | null;
@@ -22,6 +25,8 @@ export type Profile = {
   mainGoal: RunnerGoal | null;
   goalTargetPaceSPerKm: number | null;
   onboardedAt: string | null; // ISO timestamp
+  /** Used to pick the body-map model; optional. */
+  sex: BodySex | null;
 };
 
 /** Fields the user can edit (onboarding and profile edit). */
@@ -36,6 +41,7 @@ export type ProfileUpdate = Partial<
     | 'birthDate'
     | 'mainGoal'
     | 'goalTargetPaceSPerKm'
+    | 'sex'
   >
 >;
 

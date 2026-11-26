@@ -159,3 +159,23 @@ export function parseRunDetail(value: unknown): RunDetail {
 export function parseRunList(value: unknown): RunRecord[] {
   return asArray(value, 'runs').map(parseRunRecord);
 }
+
+export type ActivityItem = {
+  id: string;
+  startedAt: string;
+  distanceM: number;
+  movingTimeS: number;
+};
+
+/** Output of the list_activity RPC (streaks and progress dashboard). */
+export function parseActivity(value: unknown): ActivityItem[] {
+  return asArray(value, 'activity').map((item) => {
+    const obj = asObject(item, 'activity_item');
+    return {
+      id: str(obj, 'id'),
+      startedAt: str(obj, 'started_at'),
+      distanceM: num(obj, 'distance_m'),
+      movingTimeS: num(obj, 'moving_time_s'),
+    };
+  });
+}

@@ -31,6 +31,7 @@ const newProfile: Profile = {
   mainGoal: null,
   goalTargetPaceSPerKm: null,
   onboardedAt: null,
+  sex: null,
 };
 
 let queryClient: QueryClient;
@@ -85,6 +86,7 @@ it('walks through the four steps and completes onboarding', async () => {
   expect(await screen.findByText('Sobre você')).toBeOnTheScreen();
   await user.type(screen.getByLabelText('Peso'), '62,5');
   await user.type(screen.getByLabelText('Altura'), '168');
+  await user.press(screen.getByRole('radio', { name: 'Feminino' }));
   await user.press(screen.getByRole('button', { name: 'Continuar' }));
 
   // Step 4 — goal; target pace only appears for "improve pace"
@@ -102,6 +104,7 @@ it('walks through the four steps and completes onboarding', async () => {
       level: 'beginner',
       weightKg: 62.5,
       heightCm: 168,
+      sex: 'female',
       mainGoal: 'improve_pace',
       goalTargetPaceSPerKm: 375,
     },

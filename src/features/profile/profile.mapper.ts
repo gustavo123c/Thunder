@@ -24,6 +24,7 @@ export function profileFromRow(row: ProfileRow): Profile {
     mainGoal: row.main_goal,
     goalTargetPaceSPerKm: toNumber(row.goal_target_pace_s_per_km),
     onboardedAt: row.onboarded_at,
+    sex: row.sex ?? null,
   };
 }
 
@@ -36,6 +37,7 @@ const COLUMN_BY_FIELD = {
   birthDate: 'birth_date',
   mainGoal: 'main_goal',
   goalTargetPaceSPerKm: 'goal_target_pace_s_per_km',
+  sex: 'sex',
 } as const satisfies Record<keyof ProfileUpdate, keyof ProfileRowUpdate>;
 
 /** Only fields present in `update` are sent, so partial edits never null other columns. */

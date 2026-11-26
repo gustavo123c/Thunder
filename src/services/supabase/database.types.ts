@@ -26,6 +26,7 @@ export type Database = {
           main_goal: Database['public']['Enums']['runner_goal'] | null;
           goal_target_pace_s_per_km: number | null;
           onboarded_at: Timestamp | null;
+          sex: 'male' | 'female' | null;
           created_at: Timestamp;
           updated_at: Timestamp;
         };
@@ -41,7 +42,71 @@ export type Database = {
           main_goal?: Database['public']['Enums']['runner_goal'] | null;
           goal_target_pace_s_per_km?: number | null;
           onboarded_at?: Timestamp | null;
+          sex?: 'male' | 'female' | null;
         };
+        Relationships: [];
+      };
+      run_media: {
+        Row: {
+          id: string;
+          run_id: string;
+          user_id: string;
+          storage_path: string;
+          media_type: 'image' | 'video';
+          mime_type: string;
+          size_bytes: number;
+          width: number | null;
+          height: number | null;
+          duration_s: number | null;
+          created_at: Timestamp;
+        };
+        Insert: {
+          id?: string;
+          run_id: string;
+          user_id: string;
+          storage_path: string;
+          media_type: 'image' | 'video';
+          mime_type: string;
+          size_bytes: number;
+          width?: number | null;
+          height?: number | null;
+          duration_s?: number | null;
+        };
+        Update: { [_ in never]: never };
+        Relationships: [];
+      };
+      pain_logs: {
+        Row: {
+          id: string;
+          user_id: string;
+          region: string;
+          side: 'left' | 'right' | 'center';
+          intensity: number;
+          notes: string | null;
+          created_at: Timestamp;
+          resolved_at: Timestamp | null;
+        };
+        Insert: {
+          user_id: string;
+          region: string;
+          side?: 'left' | 'right' | 'center';
+          intensity: number;
+          notes?: string | null;
+        };
+        Update: { intensity?: number; notes?: string | null; resolved_at?: Timestamp | null };
+        Relationships: [];
+      };
+      generated_workouts: {
+        Row: {
+          id: string;
+          user_id: string;
+          generator: 'rules' | 'ai';
+          request: Json;
+          plan: Json;
+          created_at: Timestamp;
+        };
+        Insert: { user_id: string; generator: 'rules' | 'ai'; request: Json; plan: Json };
+        Update: { [_ in never]: never };
         Relationships: [];
       };
       runs: {
@@ -252,6 +317,7 @@ export type Database = {
       list_comments: { Args: { p_run_id: string; p_limit?: number }; Returns: Json };
       search_profiles: { Args: { p_query: string; p_limit?: number }; Returns: Json };
       get_profile_stats: { Args: { p_user_id: string }; Returns: Json };
+      list_activity: { Args: { p_user_id: string; p_since: string }; Returns: Json };
       owns_run: { Args: { target_run_id: string }; Returns: boolean };
     };
     Enums: {

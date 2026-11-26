@@ -98,29 +98,3 @@ export function compareWithHistory(
     isFirstRun: earlier.length === 0,
   };
 }
-
-export type WeekTotals = { runs: number; distanceM: number; movingTimeS: number };
-
-/** Totals for the ISO week (Monday 00:00 local time) containing `now`. */
-export function currentWeekTotals(
-  runs: readonly Pick<RunHistoryEntry, 'startedAt' | 'distanceM' | 'movingTimeS'>[],
-  now: Date,
-): WeekTotals {
-  const start = new Date(now);
-  start.setHours(0, 0, 0, 0);
-  const daysSinceMonday = (start.getDay() + 6) % 7;
-  start.setDate(start.getDate() - daysSinceMonday);
-
-  return runs.reduce<WeekTotals>(
-    (totals, run) => {
-      const startedAt = new Date(run.startedAt);
-      if (startedAt < start || startedAt > now) return totals;
-      return {
-        runs: totals.runs + 1,
-        distanceM: totals.distanceM + run.distanceM,
-        movingTimeS: totals.movingTimeS + run.movingTimeS,
-      };
-    },
-    { runs: 0, distanceM: 0, movingTimeS: 0 },
-  );
-}

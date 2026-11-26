@@ -18,6 +18,7 @@ const EDITABLE_FIELDS: readonly ProfileFormField[] = [
   'level',
   'weightKg',
   'heightCm',
+  'sex',
   'mainGoal',
   'targetPace',
 ];

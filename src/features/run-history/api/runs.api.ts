@@ -38,9 +38,28 @@ export async function updateRun(
   if (error) throw error;
 }
 
+export const WORKOUT_MEDIA_BUCKET = 'workout-media';
+
+/**
+ * Deletes a run and its photos/videos. The database row goes first (it is what the
+ * user sees); media rows cascade, and the files are then removed from Storage.
+ * A failed file cleanup leaves only unreachable files behind (their run is gone).
+ */
 export async function deleteRun(runId: string): Promise<void> {
+  const { data: media, error: mediaError } = await supabase
+    .from('run_media')
+    .select('storage_path')
+    .eq('run_id', runId);
+  if (mediaError) throw mediaError;
+
   const { error } = await supabase.from('runs').delete().eq('id', runId);
   if (error) throw error;
+
+  const paths = (media ?? []).map((m) => m.storage_path);
+  if (paths.length > 0) {
+    const { error: storageError } = await supabase.storage.from(WORKOUT_MEDIA_BUCKET).remove(paths);
+    if (storageError) console.warn('[runs] media cleanup failed', storageError);
+  }
 }
 
 /** Next-page cursor from the last item of a page; null when the page was not full. */

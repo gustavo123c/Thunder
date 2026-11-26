@@ -1,14 +1,14 @@
 import { router } from 'expo-router';
 import type { ReactElement } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { RunCard } from '@/components/run/RunCard';
 import { Button } from '@/components/ui/Button';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { colors } from '@/theme/tokens';
 
-import { useUserRuns } from '../hooks/useRuns';
-import { WeekSummary } from './WeekSummary';
+import { confirmDeleteRun } from '../confirm-delete';
+import { useDeleteRun, useUserRuns } from '../hooks/useRuns';
 
 type RunHistoryListProps = {
   userId: string;
@@ -21,6 +21,7 @@ type RunHistoryListProps = {
 export function RunHistoryList({ userId, header = null, variant = 'own' }: RunHistoryListProps) {
   const isOwn = variant === 'own';
   const query = useUserRuns(userId);
+  const deleteRun = useDeleteRun();
   const runs = query.data?.pages.flat() ?? [];
 
   if (query.isPending) {
@@ -52,7 +53,6 @@ export function RunHistoryList({ userId, header = null, variant = 'own' }: RunHi
             <Text className="text-3xl font-black text-ink-900 dark:text-ink-50">Histórico</Text>
           ) : null}
           {header}
-          {isOwn && runs.length > 0 ? <WeekSummary runs={runs} /> : null}
         </View>
       }
       ListEmptyComponent={
@@ -67,7 +67,20 @@ export function RunHistoryList({ userId, header = null, variant = 'own' }: RunHi
         </View>
       }
       renderItem={({ item }) => (
-        <RunCard run={item} onPress={() => router.push(`/run/${item.id}`)} />
+        <RunCard
+          run={item}
+          onPress={() => router.push(`/run/${item.id}`)}
+          onDelete={
+            isOwn
+              ? () =>
+                  confirmDeleteRun(() =>
+                    deleteRun.mutate(item.id, {
+                      onError: () => Alert.alert('Não foi possível apagar', 'Tente novamente.'),
+                    }),
+                  )
+              : undefined
+          }
+        />
       )}
       onEndReachedThreshold={0.5}
       onEndReached={() => {

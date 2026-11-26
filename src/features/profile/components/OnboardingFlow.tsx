@@ -47,7 +47,7 @@ const STEPS: readonly Step[] = [
   {
     title: 'Sobre você',
     subtitle: 'Peso e altura deixam a estimativa de calorias mais precisa.',
-    fields: ['weightKg', 'heightCm'],
+    fields: ['weightKg', 'heightCm', 'sex'],
     Fields: BodyFields,
   },
   {

@@ -21,6 +21,7 @@ import { colors } from '@/theme/tokens';
 
 import { RunNotFoundError } from '../api/runs.api';
 import { describeComparison } from '../comparison-copy';
+import { confirmDeleteRun } from '../confirm-delete';
 import { useDeleteRun, useRunDetail, useUpdateRun } from '../hooks/useRuns';
 import { VISIBILITY_COPY } from '../visibility';
 import { InsightsCard } from './InsightsCard';
@@ -61,7 +62,7 @@ function StatsGrid({ detail }: { detail: RunDetail }) {
 
 function OwnerActions({ detail }: { detail: RunDetail }) {
   const updateRun = useUpdateRun(detail.id);
-  const deleteRun = useDeleteRun(detail.id);
+  const deleteRun = useDeleteRun();
 
   function chooseVisibility() {
     const options = (Object.keys(VISIBILITY_COPY) as RunRecord['visibility'][]).map((value) => ({
@@ -75,18 +76,12 @@ function OwnerActions({ detail }: { detail: RunDetail }) {
   }
 
   function confirmDelete() {
-    Alert.alert('Excluir corrida?', 'Esta ação não pode ser desfeita.', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Excluir',
-        style: 'destructive',
-        onPress: () =>
-          deleteRun.mutate(undefined, {
-            onSuccess: () => router.back(),
-            onError: () => Alert.alert('Não foi possível excluir', 'Tente novamente.'),
-          }),
-      },
-    ]);
+    confirmDeleteRun(() =>
+      deleteRun.mutate(detail.id, {
+        onSuccess: () => router.back(),
+        onError: () => Alert.alert('Não foi possível apagar', 'Tente novamente.'),
+      }),
+    );
   }
 
   const visibility = VISIBILITY_COPY[detail.visibility];
@@ -99,7 +94,7 @@ function OwnerActions({ detail }: { detail: RunDetail }) {
         loading={updateRun.isPending}
       />
       <Button
-        label="Excluir corrida"
+        label="Apagar corrida"
         variant="ghost"
         onPress={confirmDelete}
         loading={deleteRun.isPending}

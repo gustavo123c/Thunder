@@ -14,6 +14,7 @@ const ALL_FIELDS = [
   'level',
   'weightKg',
   'heightCm',
+  'sex',
   'mainGoal',
   'targetPace',
 ] as const;
@@ -24,6 +25,7 @@ const validForm: ProfileFormValues = {
   level: 'beginner',
   weightKg: '62,5',
   heightCm: '168',
+  sex: 'male',
   mainGoal: 'improve_pace',
   targetPace: '6:15',
 };
@@ -38,6 +40,7 @@ describe('validateProfileForm', () => {
         level: 'beginner',
         weightKg: 62.5,
         heightCm: 168,
+        sex: 'male',
         mainGoal: 'improve_pace',
         goalTargetPaceSPerKm: 375,
       },
@@ -96,6 +99,7 @@ describe('formValuesFromProfile', () => {
       mainGoal: 'improve_pace',
       goalTargetPaceSPerKm: 375,
       onboardedAt: '2026-11-25T10:00:00Z',
+      sex: 'female',
     };
     expect(formValuesFromProfile(profile)).toEqual({
       fullName: 'Ana',
@@ -103,6 +107,7 @@ describe('formValuesFromProfile', () => {
       level: 'beginner',
       weightKg: '62,5',
       heightCm: '168',
+      sex: 'female',
       mainGoal: 'improve_pace',
       targetPace: '6:15',
     });
@@ -123,6 +128,7 @@ describe('profile mapper', () => {
       main_goal: 'complete_10k',
       goal_target_pace_s_per_km: null,
       onboarded_at: null,
+      sex: null,
       created_at: '2026-11-25T10:00:00Z',
       updated_at: '2026-11-25T10:00:00Z',
     });

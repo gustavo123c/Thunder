@@ -9,7 +9,13 @@ import {
   validateUsername,
   validateWeightKg,
 } from '@/domain/profile/profile-rules';
-import type { Profile, ProfileUpdate, RunnerGoal, RunnerLevel } from '@/domain/types/profile';
+import type {
+  BodySex,
+  Profile,
+  ProfileUpdate,
+  RunnerGoal,
+  RunnerLevel,
+} from '@/domain/types/profile';
 import { formatPaceValue } from '@/lib/format';
 
 /** Raw form state: text inputs stay as strings until validated. */
@@ -19,6 +25,8 @@ export type ProfileFormValues = {
   level: RunnerLevel | null;
   weightKg: string;
   heightCm: string;
+  /** Optional: null = prefers not to say. */
+  sex: BodySex | null;
   mainGoal: RunnerGoal | null;
   targetPace: string; // "m:ss"
 };
@@ -32,6 +40,7 @@ export const EMPTY_PROFILE_FORM: ProfileFormValues = {
   level: null,
   weightKg: '',
   heightCm: '',
+  sex: null,
   mainGoal: null,
   targetPace: '',
 };
@@ -72,6 +81,7 @@ export function formValuesFromProfile(profile: Profile): ProfileFormValues {
     level: profile.level,
     weightKg: profile.weightKg?.toString().replace('.', ',') ?? '',
     heightCm: profile.heightCm?.toString() ?? '',
+    sex: profile.sex,
     mainGoal: profile.mainGoal,
     targetPace:
       profile.goalTargetPaceSPerKm === null ? '' : formatPaceValue(profile.goalTargetPaceSPerKm),
@@ -122,6 +132,10 @@ export function validateProfileForm(
     const { min, max } = PROFILE_LIMITS.heightCm;
     if (result.ok) update.heightCm = result.value;
     else errors.heightCm = rangeMessage(result.error, 'sua altura', `${min} e ${max} cm`);
+  }
+
+  if (has('sex')) {
+    update.sex = values.sex;
   }
 
   if (has('mainGoal')) {

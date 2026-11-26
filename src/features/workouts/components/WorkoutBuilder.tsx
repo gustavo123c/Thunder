@@ -142,7 +142,7 @@ function ReturningPainCard({
     <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
       <View className="flex-row items-center gap-2">
         <Ionicons name="repeat" size={16} color={theme.accent} />
-        <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
+        <Text className="font-mono-medium text-[11px] uppercase tracking-[1.5px] text-accent">
           Dor recorrente
         </Text>
       </View>
@@ -258,7 +258,7 @@ export function WorkoutBuilder({
   return (
     <View className="gap-6">
       <View className="gap-1">
-        <Text accessibilityRole="header" className="text-2xl font-bold text-ink-50">
+        <Text accessibilityRole="header" className="font-display text-[22px] text-ink-50">
           Monte seu treino de corrida
         </Text>
         <Text className="text-sm text-ink-400">

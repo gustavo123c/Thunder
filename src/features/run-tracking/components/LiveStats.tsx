@@ -1,7 +1,13 @@
 import { Text, View } from 'react-native';
 
+import { Lanes } from '@/components/ui/Lanes';
 import { StatBlock } from '@/components/ui/StatBlock';
-import { formatDistanceKm, formatDuration, formatPaceTrack } from '@/lib/format';
+import {
+  formatDistanceKm,
+  formatDuration,
+  formatPaceDiffTrack,
+  formatPaceTrack,
+} from '@/lib/format';
 
 import type { LiveMetrics } from '../hooks/useLiveMetrics';
 
@@ -11,7 +17,51 @@ type LiveStatsProps = {
   status: 'idle' | 'running' | 'paused';
 };
 
-/** Run metrics panel: big tabular numbers, labels small and muted. */
+/** The last completed laps ("voltas") with the difference to the lap before. */
+function Laps({ paces }: { paces: readonly number[] }) {
+  const recent = paces
+    .map((pace, index) => ({
+      lap: index + 1,
+      pace,
+      diff: index > 0 ? pace - paces[index - 1]! : null,
+    }))
+    .slice(-2)
+    .reverse();
+  if (recent.length === 0) return null;
+  return (
+    <View className="gap-2">
+      <Lanes />
+      {recent.map(({ lap, pace, diff }, i) => (
+        <View
+          key={lap}
+          accessible
+          accessibilityLabel={`Volta ${lap}: ${formatPaceTrack(pace)} por quilômetro`}
+          className="flex-row items-center justify-between"
+        >
+          <Text
+            className={`font-mono-medium text-[13px] ${i === 0 ? 'text-ink-200' : 'text-ink-400'}`}
+          >
+            VOLTA {String(lap).padStart(2, '0')}
+          </Text>
+          <Text
+            className={`font-mono-medium text-[13px] ${i === 0 ? 'text-ink-50' : 'text-ink-400'}`}
+          >
+            {formatPaceTrack(pace)}
+          </Text>
+          <Text
+            className={`w-20 text-right font-mono-medium text-[13px] ${
+              diff !== null && diff < 0 && i === 0 ? 'text-success' : 'text-ink-400'
+            }`}
+          >
+            {diff === null ? '—' : formatPaceDiffTrack(diff)}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/** Run panel in stopwatch type: huge distance, three metrics and the latest laps. */
 export function LiveStats({ metrics, status }: LiveStatsProps) {
   const distance = formatDistanceKm(metrics.distanceM).replace(' km', '');
 
@@ -26,33 +76,42 @@ export function LiveStats({ metrics, status }: LiveStatsProps) {
   }
 
   return (
-    <View className="gap-5">
+    <View className="gap-4">
       {status === 'paused' ? (
-        <View className="self-center rounded-full border border-hairline bg-bolt-500/10 px-3 py-1">
-          <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
+        <View className="self-start rounded-md bg-ink-700 px-2.5 py-1">
+          <Text className="font-mono-medium text-[11px] uppercase tracking-[1.6px] text-ink-200">
             Pausado
           </Text>
         </View>
       ) : null}
 
-      <StatBlock size="hero" label="Distância" value={distance} unit="km" />
+      <StatBlock size="hero" align="left" label="Distância" value={distance} unit="km" />
 
-      <View className="flex-row justify-between px-2">
-        <StatBlock size="medium" label="Tempo" value={formatDuration(metrics.activeTimeS)} />
+      <View className="flex-row justify-between">
         <StatBlock
           size="medium"
+          align="left"
+          label="Tempo"
+          value={formatDuration(metrics.activeTimeS)}
+        />
+        <StatBlock
+          size="medium"
+          align="left"
           label="Pace atual"
           value={formatPaceTrack(metrics.currentPaceSPerKm)}
           accent
         />
         <StatBlock
           size="medium"
+          align="left"
           label="Pace médio"
           value={formatPaceTrack(metrics.avgPaceSPerKm)}
         />
       </View>
 
-      <Text className="text-center text-xs text-ink-400">
+      <Laps paces={metrics.lapPacesSPerKm} />
+
+      <Text className="font-mono-medium text-[11px] text-ink-400">
         {metrics.caloriesKcal === null
           ? 'Calorias: informe seu peso no perfil'
           : `${Math.round(metrics.caloriesKcal)} kcal estimadas`}

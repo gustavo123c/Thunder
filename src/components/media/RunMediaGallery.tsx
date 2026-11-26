@@ -79,7 +79,7 @@ export function RunMediaGallery({
               ) : null}
               {isLast ? (
                 <View className="absolute inset-0 items-center justify-center bg-black/50">
-                  <Text className="text-xl font-bold text-white">+{hidden}</Text>
+                  <Text className="font-display text-lg text-white">+{hidden}</Text>
                 </View>
               ) : null}
             </Pressable>

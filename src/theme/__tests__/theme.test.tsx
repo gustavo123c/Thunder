@@ -42,10 +42,10 @@ describe.each([
   [
     'dark',
     {
-      card: 'rgba(18, 23, 33, 1)',
-      text: 'rgba(245, 247, 250, 1)',
+      card: 'rgba(15, 20, 29, 1)',
+      text: 'rgba(238, 242, 247, 1)',
       accent: 'rgba(250, 204, 21, 1)',
-      hairline: 'rgba(255, 255, 255, 0.08)',
+      hairline: 'rgba(160, 180, 210, 0.10)',
     },
   ],
   [

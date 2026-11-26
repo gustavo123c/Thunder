@@ -125,7 +125,7 @@ describe('progress components', () => {
     await renderWithQuery(<PersonalRecords userId="u1" />);
 
     expect(await screen.findByText('Melhor pace')).toBeOnTheScreen();
-    expect(screen.getByText('5:00')).toBeOnTheScreen(); // 3 km at 5:00
+    expect(screen.getByText('5\'00"')).toBeOnTheScreen(); // 3 km at 5:00
     expect(screen.getByText('10,00')).toBeOnTheScreen(); // longest run
     expect(screen.getByText('26:40')).toBeOnTheScreen(); // 5 km at 5:20
   });
@@ -152,12 +152,13 @@ describe('progress components', () => {
     jest.mocked(fetchActivity).mockResolvedValue([daysAgo(0, 330, 8)]);
     await renderWithQuery(<RunCelebration userId="u1" runId="r0" visible onClose={jest.fn()} />);
 
-    expect(await screen.findByText('Corrida concluída!')).toBeOnTheScreen();
-    expect(await screen.findByText('Novas medalhas')).toBeOnTheScreen();
-    expect(screen.getByText('Primeira corrida')).toBeOnTheScreen();
+    // The first new medal headlines the screen; the others are listed below.
+    expect(await screen.findByText('2 novas medalhas')).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Primeira corrida' })).toBeOnTheScreen();
+    expect(screen.getByText('1ª')).toBeOnTheScreen(); // medal disc
     expect(screen.getByText('Primeiros 5 km')).toBeOnTheScreen();
     expect(
-      screen.getByText('Faltam 2,0 km na sua maior corrida para a medalha Primeiros 10 km!'),
+      screen.getByText('Faltam 2,0 km na sua maior corrida para a medalha Primeiros 10 km.'),
     ).toBeOnTheScreen();
     await waitFor(() =>
       expect(unlockAchievements).toHaveBeenCalledWith('u1', ['first_run', 'first_5k'], 'r0'),

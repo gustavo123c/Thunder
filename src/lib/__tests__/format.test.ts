@@ -1,4 +1,6 @@
 import {
+  formatPaceDiffTrack,
+  formatRunStamp,
   formatRest,
   formatDecimal,
   formatMonthYear,
@@ -135,5 +137,22 @@ describe('formatRest', () => {
     expect(formatRest(45)).toBe('45 s');
     expect(formatRest(90)).toBe('1:30');
     expect(formatRest(120)).toBe('2:00');
+  });
+});
+
+describe('formatRunStamp / formatPaceDiffTrack', () => {
+  const now = new Date(2026, 10, 27, 12);
+  it('formats bib-style stamps', () => {
+    expect(formatRunStamp(new Date(2026, 10, 27, 7, 2).toISOString(), now)).toBe('HOJE · 07:02');
+    expect(formatRunStamp(new Date(2026, 10, 26, 18, 30).toISOString(), now)).toBe('ONTEM · 18:30');
+    expect(formatRunStamp(new Date(2026, 10, 22, 6, 45).toISOString(), now)).toBe(
+      'DOM 22 NOV · 06:45',
+    );
+    expect(formatRunStamp(new Date(2025, 0, 3, 7).toISOString(), now)).toBe('3 JAN 2025');
+  });
+  it('formats lap differences', () => {
+    expect(formatPaceDiffTrack(-8)).toBe('−0\'08"');
+    expect(formatPaceDiffTrack(65)).toBe('+1\'05"');
+    expect(formatPaceDiffTrack(0)).toBe('±0\'00"');
   });
 });

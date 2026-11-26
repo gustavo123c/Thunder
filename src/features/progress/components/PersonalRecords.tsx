@@ -5,7 +5,7 @@ import { Pressable, Text, View } from 'react-native';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { activityWindowStart } from '@/domain/insights/activity';
-import { formatDecimal, formatDuration, formatPaceValue, formatRunDate } from '@/lib/format';
+import { formatDecimal, formatDuration, formatRunDate, formatPaceTrack } from '@/lib/format';
 import { useThemeColors } from '@/theme/theme';
 
 import { useRecords } from '../hooks/useRecords';
@@ -44,12 +44,12 @@ function RecordCard({
         <Ionicons name={icon} size={22} color={runId ? theme.accent : theme.ink[400]} />
       </View>
       <View className="flex-1 gap-0.5">
-        <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
+        <Text className="font-mono-medium text-[11px] uppercase tracking-[1.5px] text-ink-400">
           {label}
         </Text>
         <View className="flex-row items-baseline gap-1">
           <Text
-            className="text-[32px] font-extrabold leading-[36px] text-ink-50"
+            className="font-mono text-[32px] leading-[36px] text-ink-50"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {value}
@@ -98,7 +98,7 @@ export function PersonalRecords({ userId }: { userId: string }) {
       <RecordCard
         icon="flash"
         label="Melhor pace"
-        value={formatPaceValue(bestPace?.paceSPerKm)}
+        value={formatPaceTrack(bestPace?.paceSPerKm)}
         unit="/km"
         detail={bestPace ? formatRunDate(bestPace.startedAt) : 'Corra pelo menos 1 km'}
         runId={bestPace?.runId ?? null}

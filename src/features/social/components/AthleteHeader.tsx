@@ -16,7 +16,7 @@ export function AthleteHeader({ userId, viewerId }: { userId: string; viewerId: 
     <View className="gap-5 pb-2">
       <View className="items-center gap-2">
         <Avatar name={name} imageUrl={profile?.avatarUrl} size={88} />
-        <Text className="text-2xl font-bold text-ink-50">{name ?? ' '}</Text>
+        <Text className="font-display text-[22px] text-ink-50">{name ?? ' '}</Text>
         {profile?.username ? (
           <Text className="text-base text-ink-400">@{profile.username}</Text>
         ) : null}

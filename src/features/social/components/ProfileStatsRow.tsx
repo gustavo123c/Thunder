@@ -14,14 +14,16 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-1 items-center gap-0.5">
       <Text
-        className="text-[22px] font-extrabold text-ink-50"
+        className="font-mono text-[22px] text-ink-50"
         style={{ fontVariant: ['tabular-nums'] }}
         numberOfLines={1}
         adjustsFontSizeToFit
       >
         {value}
       </Text>
-      <Text className="text-[11px] uppercase tracking-wider text-ink-400">{label}</Text>
+      <Text className="font-mono-medium text-[11px] uppercase tracking-wider text-ink-400">
+        {label}
+      </Text>
     </View>
   );
 }

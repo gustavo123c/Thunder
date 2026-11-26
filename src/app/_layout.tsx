@@ -15,6 +15,7 @@ import { queryClient } from '@/lib/query-client';
 import { useAppGate } from '@/navigation/useAppGate';
 import { initMapbox } from '@/services/mapbox/init';
 import { AppThemeProvider } from '@/theme/AppThemeProvider';
+import { useBrandFonts } from '@/theme/fonts';
 import { useThemeColors } from '@/theme/theme';
 
 void SplashScreen.preventAutoHideAsync();
@@ -142,6 +143,10 @@ function ThemedNavigation({ children }: { children: ReactNode }) {
 }
 
 export default function RootLayout() {
+  // Keep the splash screen until the brand fonts are ready.
+  const fontsReady = useBrandFonts();
+  if (!fontsReady) return null;
+
   return (
     <SafeAreaProvider>
       <AppThemeProvider>

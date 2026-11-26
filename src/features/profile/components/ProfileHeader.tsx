@@ -84,7 +84,7 @@ export function ProfileHeader({ profile, avatarSlot }: ProfileHeaderProps) {
             <Avatar name={name} imageUrl={profile.avatarUrl} size={88} />
           </View>
         )}
-        <Text className="mt-1 text-2xl font-bold text-ink-50">{name}</Text>
+        <Text className="mt-1 font-display text-[22px] text-ink-50">{name}</Text>
         <View className="flex-row items-center gap-2">
           {profile.username ? (
             <Text className="text-sm text-ink-400">@{profile.username}</Text>
@@ -92,7 +92,7 @@ export function ProfileHeader({ profile, avatarSlot }: ProfileHeaderProps) {
           {profile.level ? (
             <View className="flex-row items-center gap-1 rounded-full bg-ink-700 px-2.5 py-0.5">
               <Ionicons name="flash" size={11} color={theme.accent} />
-              <Text className="text-[11px] font-medium uppercase tracking-wider text-accent">
+              <Text className="font-mono-medium text-[11px] uppercase tracking-wider text-accent">
                 {LEVEL_COPY[profile.level].title}
               </Text>
             </View>

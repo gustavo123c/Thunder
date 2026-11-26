@@ -36,8 +36,8 @@ export const themes: Record<ColorSchemeName, ThemeColors> = {
     ink: palette.inkDark,
     accent: palette.brand,
     hairline: palette.hairlineDark,
-    highlightGradient: ['#1D2535', '#121721', '#0E131B'],
-    bannerGradient: ['#3A3112', '#1A1F2B', '#090C10'],
+    highlightGradient: ['#182131', '#0F141D', '#0B0F16'],
+    bannerGradient: ['#3A3112', '#141B27', '#070A10'],
   },
   light: {
     scheme: 'light',

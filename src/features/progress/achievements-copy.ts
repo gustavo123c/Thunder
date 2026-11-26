@@ -47,21 +47,37 @@ export const ACHIEVEMENT_COPY: Record<
   km_250: { title: '250 km acumulados', description: 'Some 250 km no total.', icon: 'diamond' },
 };
 
-/** "Faltam 2 km para a medalha Primeiros 10 km!" */
+/** "Faltam 2,0 km na sua maior corrida para a medalha Primeiros 10 km." */
 export function remainingToMedal(achievement: Achievement, remaining: number): string {
   const title = ACHIEVEMENT_COPY[achievement.id].title;
   switch (achievement.unit) {
     case 'meters_single':
-      return `Faltam ${formatDecimal(remaining / 1000)} km na sua maior corrida para a medalha ${title}!`;
+      return `Faltam ${formatDecimal(remaining / 1000)} km na sua maior corrida para a medalha ${title}.`;
     case 'meters_total':
-      return `Faltam apenas ${formatDecimal(remaining / 1000)} km para a medalha ${title}!`;
+      return `Faltam ${formatDecimal(remaining / 1000)} km para a medalha ${title}.`;
     case 'runs':
-      return `Faltam ${remaining} ${remaining === 1 ? 'corrida' : 'corridas'} para a medalha ${title}!`;
+      return `Faltam ${remaining} ${remaining === 1 ? 'corrida' : 'corridas'} para a medalha ${title}.`;
     case 'weeks':
-      return `Mais ${remaining} ${remaining === 1 ? 'semana' : 'semanas'} de treino para a medalha ${title}!`;
+      return `Mais ${remaining} ${remaining === 1 ? 'semana' : 'semanas'} de treino para a medalha ${title}.`;
     case 'days':
-      return `Mais ${remaining} ${remaining === 1 ? 'dia' : 'dias'} seguidos para a medalha ${title}!`;
+      return `Mais ${remaining} ${remaining === 1 ? 'dia' : 'dias'} seguidos para a medalha ${title}.`;
     case 'month_runs':
-      return `Mais ${remaining} ${remaining === 1 ? 'treino' : 'treinos'} num mês para a medalha ${title}!`;
+      return `Mais ${remaining} ${remaining === 1 ? 'treino' : 'treinos'} num mês para a medalha ${title}.`;
   }
 }
+
+/** What the medal disc shows in the celebration (e.g. "10" over "KM"). */
+export const MEDAL_FACE: Record<AchievementId, { value: string; unit: string }> = {
+  first_run: { value: '1ª', unit: 'CORRIDA' },
+  first_5k: { value: '5', unit: 'KM' },
+  first_10k: { value: '10', unit: 'KM' },
+  half_marathon: { value: '21', unit: 'KM' },
+  days_7: { value: '7', unit: 'DIAS' },
+  month_12: { value: '12', unit: 'NO MÊS' },
+  streak_3: { value: '3', unit: 'SEMANAS' },
+  streak_8: { value: '8', unit: 'SEMANAS' },
+  runs_10: { value: '10', unit: 'CORRIDAS' },
+  km_50: { value: '50', unit: 'KM' },
+  km_100: { value: '100', unit: 'KM' },
+  km_250: { value: '250', unit: 'KM' },
+};

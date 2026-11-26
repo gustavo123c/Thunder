@@ -8,7 +8,9 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { formatDistanceKm } from '@/lib/format';
 import { useThemeColors } from '@/theme/theme';
+import { Lanes } from '@/components/ui/Lanes';
 import { ScreenTitle } from '@/components/ui/Typography';
+import { computePersonalRecords } from '@/domain/insights/records';
 
 import { confirmDeleteRun } from '../confirm-delete';
 import { groupRunsByMonth } from '../group-by-month';
@@ -36,6 +38,13 @@ export function RunHistoryList({
   const deleteRun = useDeleteRun();
   const pages = query.data?.pages;
   const sections = useMemo(() => groupRunsByMonth(pages?.flat() ?? []), [pages]);
+  // "Recorde" badge: longest run and best pace among the loaded runs.
+  const recordIds = useMemo(() => {
+    const runs = pages?.flat() ?? [];
+    if (runs.length < 2) return new Set<string>();
+    const records = computePersonalRecords(runs);
+    return new Set([records.longestRun?.runId, records.bestPace?.runId].filter(Boolean));
+  }, [pages]);
 
   if (query.isPending) {
     return (
@@ -77,20 +86,20 @@ export function RunHistoryList({
         </View>
       }
       renderSectionHeader={({ section }) => (
-        <View
-          accessibilityRole="header"
-          className="flex-row items-baseline justify-between pb-3 pt-5"
-        >
-          <Text className="text-[13px] font-semibold uppercase tracking-[1.5px] text-ink-200">
-            {section.title}
-          </Text>
-          <Text
-            className="text-xs font-semibold text-ink-400"
-            style={{ fontVariant: ['tabular-nums'] }}
-          >
-            {section.data.length} {section.data.length === 1 ? 'corrida' : 'corridas'} ·{' '}
-            {formatDistanceKm(section.totalDistanceM)}
-          </Text>
+        <View accessibilityRole="header" className="gap-2.5 pb-3 pt-5">
+          <View className="flex-row items-baseline justify-between">
+            <Text className="font-mono-medium text-[13px] uppercase tracking-[1.5px] text-ink-200">
+              {section.title}
+            </Text>
+            <Text
+              className="font-mono-medium text-xs text-ink-400"
+              style={{ fontVariant: ['tabular-nums'] }}
+            >
+              {section.data.length} {section.data.length === 1 ? 'corrida' : 'corridas'} ·{' '}
+              {formatDistanceKm(section.totalDistanceM)}
+            </Text>
+          </View>
+          <Lanes />
         </View>
       )}
       ListEmptyComponent={
@@ -117,6 +126,7 @@ export function RunHistoryList({
       renderItem={({ item }) => (
         <RunCard
           run={item}
+          record={isOwn && recordIds.has(item.id)}
           onPress={() => router.push(`/run/${item.id}`)}
           onDelete={
             isOwn

@@ -1,12 +1,13 @@
 import { router } from 'expo-router';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Alert, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RouteMap } from '@/components/map/RouteMap';
 import { FormMessage } from '@/components/ui/FormMessage';
+import { LightningFlash } from '@/components/ui/LightningFlash';
 import { samplesToMultiLineString } from '@/domain/geo/geojson';
 import { isActive } from '@/domain/run-session/run-session';
 import { hasRecordedDistance } from '@/domain/metrics/recorded-distance';
@@ -50,10 +51,13 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
     };
   }, [active]);
 
+  const [flash, setFlash] = useState(0);
+
   async function handleStart() {
     const current = permission === 'denied' || permission === null ? await request() : permission;
     if (current === 'denied') return;
-    await controls.start();
+    // Storm flash when the run actually starts (the start haptic already fired).
+    if (await controls.start()) setFlash((n) => n + 1);
   }
 
   async function finishAndNavigate() {
@@ -139,6 +143,7 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
           onFinish={confirmFinish}
         />
       </View>
+      <LightningFlash trigger={flash} haptic={false} />
     </View>
   );
 }

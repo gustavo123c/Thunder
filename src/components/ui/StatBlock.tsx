@@ -18,9 +18,8 @@ const valueSize = {
 } as const;
 
 /**
- * Metric scale: hero 56 · large 32 · medium 22 px, always ExtraBold (800) with tabular
- * digits — the only place that weight is used. A labelled metric: small uppercase label, big ExtraBold tabular value — strong
- * contrast between the two, so numbers read at a glance mid-run.
+ * A labelled metric in "stopwatch" type: JetBrains Mono for both the small uppercase
+ * label and the value. Scale: hero 56 · large 32 · medium 22 px.
  */
 export function StatBlock({
   label,
@@ -36,19 +35,19 @@ export function StatBlock({
       accessibilityLabel={`${label}: ${value}${unit ? ` ${unit}` : ''}`}
       className={`gap-1 ${align === 'center' ? 'items-center' : 'items-start'}`}
     >
-      <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
+      <Text className="font-mono-medium text-[10.5px] uppercase tracking-[1.6px] text-ink-400">
         {label}
       </Text>
       <View className="flex-row items-baseline gap-1">
         <Text
-          className={`${valueSize[size]} font-extrabold ${accent ? 'text-accent' : 'text-ink-50'}`}
+          className={`${valueSize[size]} ${size === 'hero' ? 'font-mono-heavy' : 'font-mono'} ${accent ? 'text-accent' : 'text-ink-50'}`}
           style={{ fontVariant: ['tabular-nums'], flexShrink: 1 }}
           numberOfLines={1}
           adjustsFontSizeToFit
         >
           {value}
         </Text>
-        {unit ? <Text className="text-sm font-semibold text-ink-400">{unit}</Text> : null}
+        {unit ? <Text className="font-mono-medium text-xs text-ink-400">{unit}</Text> : null}
       </View>
     </View>
   );

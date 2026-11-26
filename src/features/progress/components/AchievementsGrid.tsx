@@ -113,7 +113,7 @@ export function AchievementsGrid({ userId, totals }: AchievementsGridProps) {
                 {copy.title}
               </Text>
               {a.unlocked ? (
-                <Text className="text-[10px] font-medium uppercase tracking-wider text-accent">
+                <Text className="font-mono-medium text-[10px] uppercase tracking-wider text-accent">
                   Conquistada
                 </Text>
               ) : (

@@ -15,7 +15,7 @@ import { colors } from '@/theme/tokens';
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View className="gap-2">
-      <Text className="px-1 text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
+      <Text className="px-1 font-mono-medium text-[11px] uppercase tracking-[1.5px] text-ink-400">
         {title}
       </Text>
       <Card className="gap-1 p-2">{children}</Card>
@@ -136,7 +136,7 @@ export default function SettingsScreen() {
       <Section title="Sobre">
         <Row icon="flash-outline" label="Thunder" detail={`versão ${version}`} />
         <View className="gap-2 px-3 py-2">
-          <Text className="text-xs font-medium uppercase tracking-wider text-ink-400">
+          <Text className="font-mono-medium text-xs uppercase tracking-wider text-ink-400">
             Créditos e licenças
           </Text>
           <Text className="text-sm leading-5 text-ink-300">

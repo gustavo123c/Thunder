@@ -10,6 +10,14 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      // "Pista" type: stopwatch numbers, wide titles. Names match the fonts loaded in
+      // src/theme/fonts.ts. With a custom family, don't add font-bold/extrabold classes.
+      fontFamily: {
+        mono: ['JetBrainsMono_700Bold'],
+        'mono-medium': ['JetBrainsMono_500Medium'],
+        'mono-heavy': ['JetBrainsMono_800ExtraBold'],
+        display: ['ArchivoExpanded_700Bold'],
+      },
       colors: {
         bolt: palette.bolt,
         ink: Object.fromEntries(

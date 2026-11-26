@@ -1,43 +1,67 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Modal, ScrollView, Text, View } from 'react-native';
+import { Animated, Easing, Modal, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { LightningFlash, useReduceMotion } from '@/components/ui/LightningFlash';
 import { StatBlock } from '@/components/ui/StatBlock';
+import { Zigzag } from '@/components/ui/Zigzag';
 import {
   celebrationHighlights,
   type Highlight,
   medalsUnlockedBy,
 } from '@/domain/insights/celebration';
-import { formatDecimal, formatDuration, formatPaceValue } from '@/lib/format';
-import { useThemeColors } from '@/theme/theme';
+import { hasRecordedDistance } from '@/domain/metrics/recorded-distance';
+import { formatDecimal, formatDuration, formatPaceTrack, formatRunStamp } from '@/lib/format';
+import { ThemeScope } from '@/theme/AppThemeProvider';
 import { colors } from '@/theme/tokens';
 
-import { ACHIEVEMENT_COPY, remainingToMedal } from '../achievements-copy';
+import { ACHIEVEMENT_COPY, MEDAL_FACE, remainingToMedal } from '../achievements-copy';
 import { useUnlockAchievements, useUnlockedAchievements } from '../hooks/useAchievements';
 import { useActivity } from '../hooks/useActivity';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
+/** Technical, calm wording (no hype). */
 function describeHighlight(highlight: Highlight): { icon: IconName; text: string } {
   switch (highlight.kind) {
     case 'pace_vs_week':
       return {
         icon: 'trending-up',
-        text: `Seu pace foi ${highlight.percentFaster}% mais rápido que a média da semana!`,
+        text: `Pace ${highlight.percentFaster}% abaixo da sua média da semana.`,
       };
     case 'longest_run':
-      return { icon: 'resize', text: 'Sua corrida mais longa até agora!' };
+      return { icon: 'resize', text: 'Maior distância registrada até hoje.' };
     case 'best_pace':
-      return { icon: 'flash', text: 'Novo recorde pessoal de pace!' };
+      return { icon: 'flash', text: 'Melhor pace registrado até hoje.' };
     case 'next_medal':
       return {
         icon: 'medal-outline',
         text: remainingToMedal(highlight.achievement, highlight.remaining),
       };
   }
+}
+
+/** Counts a number up from zero like a stopwatch display (skipped with reduced motion). */
+function useCountUp(target: number, reduceMotion: boolean, durationMs = 700): number {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (reduceMotion) return;
+    const anim = new Animated.Value(0);
+    const id = anim.addListener(({ value: v }) => setValue(v * target));
+    Animated.timing(anim, {
+      toValue: 1,
+      duration: durationMs,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+    return () => anim.removeListener(id);
+  }, [target, reduceMotion, durationMs]);
+  return reduceMotion ? target : value;
 }
 
 type RunCelebrationProps = {
@@ -51,7 +75,10 @@ type RunCelebrationProps = {
   children?: ReactNode;
 };
 
-/** Full-screen celebration right after finishing a run: summary, new medals, highlights. */
+/**
+ * Full-screen celebration after finishing a run ("Pista na Tempestade"): a bolt strikes
+ * the medal disc with a short flash, then the run as a race bib, highlights and medals.
+ */
 export function RunCelebration({
   userId,
   runId,
@@ -60,12 +87,13 @@ export function RunCelebration({
   allTime,
   children,
 }: RunCelebrationProps) {
-  const theme = useThemeColors();
+  const reduceMotion = useReduceMotion();
   const activity = useActivity(userId);
   const unlock = useUnlockAchievements(userId);
   const stored = useUnlockedAchievements(userId);
-  const [scale] = useState(() => new Animated.Value(0.4));
+  const [boltY] = useState(() => new Animated.Value(-70));
   const [fade] = useState(() => new Animated.Value(0));
+  const [flash, setFlash] = useState(0);
 
   const run = activity.data?.find((e) => e.id === runId);
 
@@ -98,111 +126,169 @@ export function RunCelebration({
     mutate({ ids: medals, runId });
   }, [visible, medals, mutate, runId]);
 
+  // The bolt drops onto the disc, then one flash.
   useEffect(() => {
     if (!visible) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
-    Animated.parallel([
-      Animated.spring(scale, { toValue: 1, friction: 5, tension: 80, useNativeDriver: true }),
-      Animated.timing(fade, { toValue: 1, duration: 350, useNativeDriver: true }),
-    ]).start();
-  }, [visible, scale, fade]);
+    if (reduceMotion) {
+      boltY.setValue(0);
+      fade.setValue(1);
+      return;
+    }
+    Animated.sequence([
+      Animated.timing(fade, { toValue: 1, duration: 220, useNativeDriver: true }),
+      Animated.timing(boltY, {
+        toValue: 0,
+        duration: 260,
+        easing: Easing.in(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start(() => setFlash((n) => n + 1));
+  }, [visible, reduceMotion, boltY, fade]);
 
   const pace = run && run.distanceM > 0 ? run.movingTimeS / (run.distanceM / 1000) : null;
+  const distanceKm = useCountUp(run ? run.distanceM / 1000 : 0, reduceMotion);
+  const featured = medals[0];
+  const face = featured ? MEDAL_FACE[featured] : null;
 
   return (
     <Modal visible={visible} animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <SafeAreaView className="flex-1 bg-ink-900">
-        <ScrollView contentContainerClassName="gap-6 px-5 pb-8 pt-10">
-          <Animated.View style={{ opacity: fade }} className="items-center gap-3">
-            <Animated.View
-              style={{ transform: [{ scale }] }}
-              className="h-28 w-28 items-center justify-center rounded-full bg-bolt-500/15"
-            >
-              <View className="h-20 w-20 items-center justify-center rounded-full bg-bolt-500">
-                <Ionicons name="trophy" size={38} color={colors.onBolt} />
+      <ThemeScope>
+        <SafeAreaView className="flex-1 bg-ink-900">
+          <LinearGradient
+            colors={['rgba(250,204,21,0.20)', 'rgba(250,204,21,0.04)', 'rgba(7,10,16,0)']}
+            style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 380 }}
+          />
+          <ScrollView contentContainerClassName="gap-5 px-5 pb-8 pt-8">
+            <Animated.View style={{ opacity: fade }}>
+              <View className="items-center">
+                <View className="h-[170px] w-[150px] items-center justify-end">
+                  <View className="h-[118px] w-[118px] items-center justify-center rounded-full bg-bolt-500/15">
+                    <View className="h-[104px] w-[104px] items-center justify-center rounded-full bg-bolt-500">
+                      {face ? (
+                        <View className="items-center">
+                          <Text className="font-mono-heavy text-[34px] leading-[38px] text-onbolt">
+                            {face.value}
+                          </Text>
+                          <Text className="font-mono text-[10px] tracking-[1.6px] text-onbolt">
+                            {face.unit}
+                          </Text>
+                        </View>
+                      ) : (
+                        <Ionicons name="trophy" size={40} color={colors.onBolt} />
+                      )}
+                    </View>
+                  </View>
+                  <Animated.View
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      transform: [{ translateY: boltY }, { rotate: '-10deg' }],
+                    }}
+                  >
+                    <Ionicons name="flash" size={60} color={colors.brand} />
+                  </Animated.View>
+                </View>
+
+                <Text className="mt-4 font-mono-medium text-[11px] uppercase tracking-[1.8px] text-accent">
+                  {featured
+                    ? medals.length > 1
+                      ? `${medals.length} novas medalhas`
+                      : 'Nova medalha'
+                    : 'Corrida concluída'}
+                </Text>
+                <Text
+                  accessibilityRole="header"
+                  className="mt-1 text-center font-display text-[26px] text-ink-50"
+                >
+                  {featured ? ACHIEVEMENT_COPY[featured].title : 'Corrida concluída'}
+                </Text>
+                {run ? (
+                  <Text className="mt-1 font-mono-medium text-[12px] text-ink-300">
+                    {formatRunStamp(run.startedAt)}
+                  </Text>
+                ) : null}
               </View>
             </Animated.View>
-            <Text accessibilityRole="header" className="text-[28px] font-bold text-ink-50">
-              Corrida concluída!
-            </Text>
-            <Text className="text-center text-sm text-ink-400">
-              Mais um passo na sua evolução. Veja o que você conquistou.
-            </Text>
-          </Animated.View>
 
-          {run ? (
-            <View className="flex-row rounded-[20px] border border-hairline bg-ink-800 p-4">
-              <View className="flex-1">
-                <StatBlock
-                  size="medium"
-                  align="left"
-                  label="Distância"
-                  value={formatDecimal(run.distanceM / 1000, 2)}
-                  unit="km"
-                />
-              </View>
-              <View className="flex-1">
-                <StatBlock
-                  size="medium"
-                  align="left"
-                  label="Tempo"
-                  value={formatDuration(run.movingTimeS)}
-                />
-              </View>
-              <View className="flex-1">
-                <StatBlock
-                  size="medium"
-                  align="left"
-                  label="Pace"
-                  value={formatPaceValue(pace)}
-                  unit="/km"
-                />
-              </View>
-            </View>
-          ) : null}
+            <Zigzag />
 
-          {medals.length > 0 ? (
-            <View className="gap-3">
-              <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
-                {medals.length === 1 ? 'Nova medalha' : 'Novas medalhas'}
-              </Text>
-              {medals.map((id) => (
-                <View
-                  key={id}
-                  className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-bolt-500/10 p-4"
-                >
-                  <View className="h-12 w-12 items-center justify-center rounded-full bg-bolt-500">
-                    <Ionicons name={ACHIEVEMENT_COPY[id].icon} size={24} color={colors.onBolt} />
+            {run ? (
+              <Card
+                variant="bib"
+                tag={hasRecordedDistance(run.distanceM) ? 'Resumo' : 'Sem distância registrada'}
+              >
+                <View className="flex-row">
+                  <View className="flex-1">
+                    <StatBlock
+                      size="medium"
+                      align="left"
+                      label="Dist"
+                      value={formatDecimal(distanceKm, 2)}
+                      unit="km"
+                    />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-base font-semibold text-ink-50">
-                      {ACHIEVEMENT_COPY[id].title}
-                    </Text>
-                    <Text className="text-xs text-ink-300">{ACHIEVEMENT_COPY[id].description}</Text>
+                    <StatBlock
+                      size="medium"
+                      align="left"
+                      label="Pace"
+                      value={formatPaceTrack(pace)}
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <StatBlock
+                      size="medium"
+                      align="left"
+                      label="Tempo"
+                      value={formatDuration(run.movingTimeS)}
+                    />
                   </View>
                 </View>
-              ))}
-            </View>
-          ) : null}
+              </Card>
+            ) : null}
 
-          {highlights.length > 0 ? (
-            <View className="gap-2">
-              {highlights.map((h) => (
-                <View key={h.text} className="flex-row items-center gap-3 px-1">
-                  <Ionicons name={h.icon} size={18} color={theme.accent} />
-                  <Text className="flex-1 text-sm font-semibold leading-5 text-ink-100">
-                    {h.text}
-                  </Text>
-                </View>
-              ))}
-            </View>
-          ) : null}
+            {highlights.length > 0 ? (
+              <View className="gap-2.5">
+                {highlights.map((h) => (
+                  <View key={h.text} className="flex-row items-center gap-3 px-1">
+                    <View className="h-1.5 w-1.5 rounded-[1px] bg-bolt-500" />
+                    <Text className="flex-1 text-sm leading-5 text-ink-100">{h.text}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : null}
 
-          {children}
+            {medals.length > 1 ? (
+              <View className="gap-2">
+                {medals.slice(1).map((id) => (
+                  <View
+                    key={id}
+                    className="flex-row items-center gap-3 rounded-2xl border border-hairline bg-ink-800 p-3"
+                  >
+                    <View className="h-10 w-10 items-center justify-center rounded-full bg-bolt-500">
+                      <Ionicons name={ACHIEVEMENT_COPY[id].icon} size={20} color={colors.onBolt} />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-[15px] font-semibold text-ink-50">
+                        {ACHIEVEMENT_COPY[id].title}
+                      </Text>
+                      <Text className="text-xs text-ink-400">
+                        {ACHIEVEMENT_COPY[id].description}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            ) : null}
 
-          <Button label="Ver resumo da corrida" icon="arrow-forward" onPress={onClose} />
-        </ScrollView>
-      </SafeAreaView>
+            {children}
+
+            <Button label="Ver resumo da corrida" icon="arrow-forward" onPress={onClose} />
+          </ScrollView>
+          <LightningFlash trigger={flash} haptic={false} />
+        </SafeAreaView>
+      </ThemeScope>
     </Modal>
   );
 }

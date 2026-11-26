@@ -62,3 +62,12 @@ export function useThemePreference(): ThemePreferenceContextValue {
   if (!value) throw new Error('useThemePreference must be used inside AppThemeProvider');
   return value;
 }
+
+/**
+ * Re-applies the theme variables inside a <Modal>. Modals render outside the app's root
+ * view (a separate native window / a portal on web), so they need their own scope.
+ */
+export function ThemeScope({ children }: { children: ReactNode }) {
+  const { colorScheme } = useColorScheme();
+  return <View style={[{ flex: 1 }, themeVariables[resolveScheme(colorScheme)]]}>{children}</View>;
+}

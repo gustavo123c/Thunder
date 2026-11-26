@@ -23,7 +23,7 @@ export function SourcesView() {
         <View key={group.title} className="gap-3">
           <Text
             accessibilityRole="header"
-            className="px-1 text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400"
+            className="px-1 font-mono-medium text-[11px] uppercase tracking-[1.5px] text-ink-400"
           >
             {group.title}
           </Text>

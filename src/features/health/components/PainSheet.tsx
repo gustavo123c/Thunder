@@ -12,6 +12,7 @@ import {
   painLevel,
 } from '@/domain/health/body-regions';
 
+import { ThemeScope } from '@/theme/AppThemeProvider';
 import { useThemeColors } from '@/theme/theme';
 
 import type { PainLog } from '../api/pain.api';
@@ -49,77 +50,79 @@ export function PainSheet({
 
   return (
     <Modal visible={target !== null} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable accessibilityLabel="Fechar" className="flex-1 bg-black/40" onPress={onClose} />
-      <SafeAreaView
-        edges={['bottom']}
-        className="gap-4 rounded-t-[28px] border-t border-hairline bg-ink-800 px-5 pb-4 pt-5"
-      >
-        <View className="-mt-2 mb-1 h-1 w-10 self-center rounded-full bg-ink-600" />
-        {target ? (
-          <>
-            <View className="gap-1">
-              <Text className="text-xl font-bold text-ink-50">
-                {describeRegion(target.region, target.side)}
-              </Text>
-              <Text className="text-sm text-ink-300">
-                Como está a dor ou desconforto nesta região?
-              </Text>
-            </View>
-
-            {returningCount > 0 ? (
-              <View
-                accessibilityLiveRegion="polite"
-                className="flex-row gap-3 rounded-2xl border border-hairline bg-ink-800 p-3"
-              >
-                <Ionicons name="repeat" size={18} color={theme.accent} />
-                <Text className="flex-1 text-sm leading-5 text-ink-100">
-                  Essa dor em {describeRegion(target.region, target.side).toLowerCase()} voltou —
-                  você já a relatou {returningCount} {returningCount === 1 ? 'vez' : 'vezes'} nos
-                  últimos 30 dias. No treino, você pode repetir o treino de recuperação anterior ou
-                  gerar um novo.
+      <ThemeScope>
+        <Pressable accessibilityLabel="Fechar" className="flex-1 bg-black/40" onPress={onClose} />
+        <SafeAreaView
+          edges={['bottom']}
+          className="gap-4 rounded-t-[28px] border-t border-hairline bg-ink-800 px-5 pb-4 pt-5"
+        >
+          <View className="-mt-2 mb-1 h-1 w-10 self-center rounded-full bg-ink-600" />
+          {target ? (
+            <>
+              <View className="gap-1">
+                <Text className="font-display text-lg text-ink-50">
+                  {describeRegion(target.region, target.side)}
+                </Text>
+                <Text className="text-sm text-ink-300">
+                  Como está a dor ou desconforto nesta região?
                 </Text>
               </View>
-            ) : null}
 
-            {(Object.keys(PAIN_PRESETS) as PainLevel[]).map((level) => {
-              const selected = current === level;
-              return (
-                <Pressable
-                  key={level}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: selected, disabled: saving }}
-                  disabled={saving}
-                  onPress={() => onChoose(PAIN_PRESETS[level].intensity)}
-                  className={`flex-row items-center gap-3 rounded-2xl border p-3.5 active:opacity-80 ${
-                    selected ? 'border-bolt-500 bg-bolt-500/10' : 'border-hairline bg-ink-900'
-                  }`}
+              {returningCount > 0 ? (
+                <View
+                  accessibilityLiveRegion="polite"
+                  className="flex-row gap-3 rounded-2xl border border-hairline bg-ink-800 p-3"
                 >
-                  <View
-                    className="h-4 w-4 rounded-full"
-                    style={{ backgroundColor: PAIN_COLORS[level] }}
-                  />
-                  <View className="flex-1 gap-0.5">
-                    <Text className="text-base font-bold text-ink-50">
-                      {PAIN_PRESETS[level].label}
-                    </Text>
-                    <Text className="text-sm text-ink-400">{LEVEL_HINT[level]}</Text>
-                  </View>
-                </Pressable>
-              );
-            })}
+                  <Ionicons name="repeat" size={18} color={theme.accent} />
+                  <Text className="flex-1 text-sm leading-5 text-ink-100">
+                    Essa dor em {describeRegion(target.region, target.side).toLowerCase()} voltou —
+                    você já a relatou {returningCount} {returningCount === 1 ? 'vez' : 'vezes'} nos
+                    últimos 30 dias. No treino, você pode repetir o treino de recuperação anterior
+                    ou gerar um novo.
+                  </Text>
+                </View>
+              ) : null}
 
-            {existing ? (
-              <Button
-                label="Não sinto mais dor aqui"
-                variant="secondary"
-                onPress={onResolve}
-                loading={saving}
-              />
-            ) : null}
-            <Button label="Cancelar" variant="ghost" onPress={onClose} />
-          </>
-        ) : null}
-      </SafeAreaView>
+              {(Object.keys(PAIN_PRESETS) as PainLevel[]).map((level) => {
+                const selected = current === level;
+                return (
+                  <Pressable
+                    key={level}
+                    accessibilityRole="radio"
+                    accessibilityState={{ checked: selected, disabled: saving }}
+                    disabled={saving}
+                    onPress={() => onChoose(PAIN_PRESETS[level].intensity)}
+                    className={`flex-row items-center gap-3 rounded-2xl border p-3.5 active:opacity-80 ${
+                      selected ? 'border-bolt-500 bg-bolt-500/10' : 'border-hairline bg-ink-900'
+                    }`}
+                  >
+                    <View
+                      className="h-4 w-4 rounded-full"
+                      style={{ backgroundColor: PAIN_COLORS[level] }}
+                    />
+                    <View className="flex-1 gap-0.5">
+                      <Text className="text-base font-bold text-ink-50">
+                        {PAIN_PRESETS[level].label}
+                      </Text>
+                      <Text className="text-sm text-ink-400">{LEVEL_HINT[level]}</Text>
+                    </View>
+                  </Pressable>
+                );
+              })}
+
+              {existing ? (
+                <Button
+                  label="Não sinto mais dor aqui"
+                  variant="secondary"
+                  onPress={onResolve}
+                  loading={saving}
+                />
+              ) : null}
+              <Button label="Cancelar" variant="ghost" onPress={onClose} />
+            </>
+          ) : null}
+        </SafeAreaView>
+      </ThemeScope>
     </Modal>
   );
 }

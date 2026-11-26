@@ -34,9 +34,9 @@ function Item({ item }: { item: WorkoutItem }) {
   return (
     <View className="gap-1 border-t border-hairline py-3">
       <View className="flex-row items-baseline justify-between gap-2">
-        <Text className="flex-1 text-base font-bold text-ink-50">{item.name}</Text>
+        <Text className="flex-1 text-base font-semibold text-ink-50">{item.name}</Text>
         {meta ? (
-          <Text className="text-sm font-bold text-accent" style={{ fontVariant: ['tabular-nums'] }}>
+          <Text className="font-mono text-sm text-accent" style={{ fontVariant: ['tabular-nums'] }}>
             {meta}
           </Text>
         ) : null}
@@ -70,11 +70,11 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
         <View className="gap-1">
           <View className="flex-row items-center gap-1.5">
             <Ionicons name="document-text" size={13} color={theme.accent} />
-            <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
+            <Text className="font-mono-medium text-[11px] uppercase tracking-[1.5px] text-accent">
               Ficha de treino de corrida
             </Text>
           </View>
-          <Text accessibilityRole="header" className="text-2xl font-bold text-ink-50">
+          <Text accessibilityRole="header" className="font-display text-[22px] text-ink-50">
             {plan.title}
           </Text>
           <Text className="text-sm text-ink-300">{plan.summary}</Text>
@@ -138,14 +138,14 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
                 <Ionicons name={style.icon} size={18} color={style.iconColor} />
               </View>
               <View className="flex-1">
-                <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
+                <Text className="font-mono-medium text-[11px] uppercase tracking-[1.5px] text-ink-400">
                   {PHASE_LABEL[block.phase]}
                 </Text>
                 <Text className="text-lg font-semibold text-ink-50">{block.title}</Text>
               </View>
               <View className="items-end">
                 <Text
-                  className="text-[22px] font-extrabold text-ink-50"
+                  className="font-mono text-[22px] text-ink-50"
                   style={{ fontVariant: ['tabular-nums'] }}
                 >
                   {block.minutes}

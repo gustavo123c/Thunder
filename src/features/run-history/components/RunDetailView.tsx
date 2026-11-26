@@ -9,13 +9,7 @@ import { StatBlock } from '@/components/ui/StatBlock';
 import { boundsOf, type LineStringGeometry } from '@/domain/geo/geojson';
 import { compareWithHistory } from '@/domain/insights/comparison';
 import type { RunRecord } from '@/domain/types/run';
-import {
-  formatDistanceKm,
-  formatDuration,
-  formatPace,
-  formatPaceValue,
-  formatRunDate,
-} from '@/lib/format';
+import { formatDistanceKm, formatDuration, formatRunDate, formatPaceTrack } from '@/lib/format';
 import type { RunDetail } from '@/services/supabase/run-json';
 import { useThemeColors } from '@/theme/theme';
 
@@ -38,9 +32,9 @@ type RunDetailViewProps = {
 
 function StatsGrid({ detail }: { detail: RunDetail }) {
   const items = [
-    { label: 'Pace médio', value: formatPace(detail.avgPaceSPerKm) },
+    { label: 'Pace médio', value: formatPaceTrack(detail.avgPaceSPerKm) },
     { label: 'Tempo em movimento', value: formatDuration(detail.movingTimeS) },
-    { label: 'Melhor km', value: formatPace(detail.bestPaceSPerKm) },
+    { label: 'Melhor km', value: formatPaceTrack(detail.bestPaceSPerKm) },
     { label: 'Tempo total', value: formatDuration(detail.elapsedTimeS) },
     {
       label: 'Elevação',
@@ -169,12 +163,12 @@ export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: Ru
           <Text className="text-sm text-ink-400">
             {isOwner ? 'Você' : authorName} · {formatRunDate(detail.startedAt)}
           </Text>
-          <Text className="text-[28px] font-bold text-ink-50">{detail.title}</Text>
+          <Text className="font-display text-[28px] text-ink-50">{detail.title}</Text>
         </View>
 
         <View className="flex-row justify-around rounded-[20px] border border-hairline bg-ink-800 py-5">
           <StatBlock label="Distância" value={formatDistanceKm(detail.distanceM)} />
-          <StatBlock label="Pace" value={formatPaceValue(detail.avgPaceSPerKm)} />
+          <StatBlock label="Pace" value={formatPaceTrack(detail.avgPaceSPerKm)} unit="/km" />
         </View>
 
         <StatsGrid detail={detail} />

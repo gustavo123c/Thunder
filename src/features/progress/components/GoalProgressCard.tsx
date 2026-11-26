@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 
 import { Card } from '@/components/ui/Card';
+import { LaneProgress } from '@/components/ui/Lanes';
 import { recentAveragePace } from '@/domain/insights/activity';
 import { type GoalProgress, goalProgress } from '@/domain/insights/records';
 import type { RunnerGoal } from '@/domain/types/profile';
@@ -63,33 +64,22 @@ export function GoalProgressCard({
     <Card variant="highlight" className="gap-3">
       <View className="flex-row items-center gap-2">
         <Ionicons name="flag" size={14} color={theme.accent} />
-        <Text className="flex-1 text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
+        <Text className="flex-1 font-mono-medium text-[11px] uppercase tracking-[1.5px] text-accent">
           Meta principal
         </Text>
         {percent !== null ? (
           <Text
-            className="text-[32px] font-extrabold leading-[36px] text-ink-50"
+            className="font-mono text-[32px] leading-[36px] text-ink-50"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {percent}%
           </Text>
         ) : null}
       </View>
-      <Text className="text-xl font-bold text-ink-50">{goalTitle}</Text>
+      <Text className="font-display text-lg text-ink-50">{goalTitle}</Text>
       {progress ? (
         <>
-          <View
-            accessible
-            accessibilityRole="progressbar"
-            accessibilityLabel={`Progresso da meta: ${percent}%`}
-            accessibilityValue={{ min: 0, max: 100, now: percent ?? 0 }}
-            className="h-2.5 overflow-hidden rounded-full bg-ink-900"
-          >
-            <View
-              className="h-2.5 rounded-full bg-bolt-500"
-              style={{ width: `${Math.max(percent ?? 0, 2)}%` }}
-            />
-          </View>
+          <LaneProgress value={progress.progress} label={`Progresso da meta: ${percent}%`} />
           <Text className="text-sm text-ink-300">{describe(progress)}</Text>
         </>
       ) : (

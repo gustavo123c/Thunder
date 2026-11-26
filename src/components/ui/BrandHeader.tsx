@@ -18,7 +18,7 @@ export function BrandHeader() {
       <View className="h-7 w-7 items-center justify-center rounded-lg bg-bolt-500">
         <Ionicons name="flash" size={16} color={colors.onBolt} />
       </View>
-      <Text className="text-xl font-bold tracking-tight text-ink-50">Thunder</Text>
+      <Text className="font-display text-lg tracking-tight text-ink-50">Thunder</Text>
     </View>
   );
 }

@@ -31,7 +31,7 @@ export function AuthScreenLayout({ title, subtitle, children }: AuthScreenLayout
               </View>
               <Text className="text-4xl font-bold tracking-tight text-ink-50">Thunder</Text>
             </View>
-            <Text className="text-2xl font-bold text-ink-50">{title}</Text>
+            <Text className="font-display text-[22px] text-ink-50">{title}</Text>
             <Text className="text-base text-ink-300">{subtitle}</Text>
           </View>
           {children}

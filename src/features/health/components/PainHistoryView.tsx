@@ -43,7 +43,7 @@ export function PainHistoryView({ userId }: { userId: string }) {
 
       {recurring.length > 0 ? (
         <View className="gap-3">
-          <Text className="px-1 text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
+          <Text className="px-1 font-mono-medium text-[11px] uppercase tracking-[1.5px] text-ink-400">
             Dores recorrentes
           </Text>
           {recurring.map((r) => (
@@ -71,7 +71,7 @@ export function PainHistoryView({ userId }: { userId: string }) {
       ) : null}
 
       <View className="gap-3">
-        <Text className="px-1 text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
+        <Text className="px-1 font-mono-medium text-[11px] uppercase tracking-[1.5px] text-ink-400">
           Últimos 90 dias
         </Text>
         {episodes.length === 0 ? (

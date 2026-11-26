@@ -147,3 +147,28 @@ export function formatRest(seconds: number): string {
   const s = Math.round(seconds);
   return s < 60 ? `${s} s` : `${Math.floor(s / 60)}:${pad2(s % 60)}`;
 }
+
+const WEEKDAYS_SHORT = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+
+/** Bib-style stamp: "HOJE · 07:02", "ONTEM · 18:30", "DOM 22 NOV · 06:45", "3 JAN 2025". */
+export function formatRunStamp(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return PLACEHOLDER;
+  const time = `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (isSameDay(date, now)) return `HOJE · ${time}`;
+  if (isSameDay(date, yesterday)) return `ONTEM · ${time}`;
+  const month = MONTHS_SHORT[date.getMonth()]!.replace('.', '').toUpperCase();
+  return date.getFullYear() === now.getFullYear()
+    ? `${WEEKDAYS_SHORT[date.getDay()]} ${date.getDate()} ${month} · ${time}`
+    : `${date.getDate()} ${month} ${date.getFullYear()}`;
+}
+
+/** Signed lap difference in track format: -8 → `−0'08"`, 0 → `±0'00"`. */
+export function formatPaceDiffTrack(deltaS: number): string {
+  const rounded = Math.round(deltaS);
+  const sign = rounded < 0 ? '−' : rounded > 0 ? '+' : '±';
+  const abs = Math.abs(rounded);
+  return `${sign}${Math.floor(abs / 60)}'${pad2(abs % 60)}"`;
+}

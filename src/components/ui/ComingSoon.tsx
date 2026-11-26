@@ -12,7 +12,7 @@ export function ComingSoon({ title, description }: ComingSoonProps) {
   return (
     <Screen className="items-center justify-center">
       <View className="items-center gap-2">
-        <Text className="text-2xl font-bold text-ink-50">{title}</Text>
+        <Text className="font-display text-[22px] text-ink-50">{title}</Text>
         <Text className="text-center text-base text-ink-300">{description}</Text>
       </View>
     </Screen>

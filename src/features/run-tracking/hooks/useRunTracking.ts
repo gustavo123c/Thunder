@@ -104,6 +104,7 @@ export function useRunControls({ userId, weightKg }: { userId: string; weightKg:
     run('start', async () => {
       await runRecorder.start(userId);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      return true as const;
     });
 
   const pause = () =>

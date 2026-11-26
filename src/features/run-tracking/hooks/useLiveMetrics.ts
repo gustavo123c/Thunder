@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { estimateCaloriesKcal } from '@/domain/metrics/calories';
 import { buildIntervals, movingTimeS, totalDistanceM } from '@/domain/metrics/intervals';
 import { currentPaceSPerKm, paceSPerKm } from '@/domain/metrics/pace';
+import { computeSplits } from '@/domain/metrics/splits';
 import { activeTimeS } from '@/domain/metrics/session-time';
 
 import { useRunSessionStore } from '../store/run-session.store';
@@ -13,6 +14,8 @@ export type LiveMetrics = {
   currentPaceSPerKm: number | null;
   avgPaceSPerKm: number | null;
   caloriesKcal: number | null;
+  /** Completed kilometers ("voltas"), oldest first, as pace in s/km. */
+  lapPacesSPerKm: number[];
 };
 
 /** Re-renders once per second while running so the timer advances between GPS fixes. */
@@ -45,6 +48,9 @@ export function useLiveMetrics(weightKg: number | null): LiveMetrics {
       currentPaceSPerKm: currentPaceSPerKm(intervals),
       avgPaceSPerKm: paceSPerKm(distanceM, movingTimeS(intervals)),
       caloriesKcal: estimateCaloriesKcal(intervals, weightKg),
+      lapPacesSPerKm: computeSplits(intervals)
+        .filter((split) => split.distanceM >= 999)
+        .map((split) => split.paceSPerKm),
     };
   }, [samples, weightKg]);
 

@@ -46,7 +46,7 @@ function GroupHeader({ group }: { group: RunGroup }) {
           <Ionicons name="people" size={24} color={colors.onBolt} />
         </View>
         <View className="flex-1">
-          <Text accessibilityRole="header" className="text-2xl font-bold text-ink-50">
+          <Text accessibilityRole="header" className="font-display text-[22px] text-ink-50">
             {group.name}
           </Text>
           <Text className="text-xs text-ink-400">
@@ -57,12 +57,12 @@ function GroupHeader({ group }: { group: RunGroup }) {
       <View className="flex-row items-center gap-3 rounded-2xl border border-hairline bg-ink-900 p-3">
         <Ionicons name="key-outline" size={18} color={theme.ink[300]} />
         <View className="flex-1">
-          <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
+          <Text className="font-mono-medium text-[11px] uppercase tracking-[1.5px] text-ink-400">
             Código de convite
           </Text>
           <Text
             selectable
-            className="text-xl font-extrabold tracking-[3px] text-ink-50"
+            className="font-mono text-xl tracking-[3px] text-ink-50"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {group.inviteCode}
@@ -104,7 +104,7 @@ function RankingRow({
         style={{ backgroundColor: podium ?? 'transparent' }}
       >
         <Text
-          className={`text-sm font-extrabold ${podium ? 'text-onbolt' : 'text-ink-300'}`}
+          className={`font-mono text-sm ${podium ? 'text-onbolt' : 'text-ink-300'}`}
           style={{ fontVariant: ['tabular-nums'] }}
         >
           {position}
@@ -122,7 +122,7 @@ function RankingRow({
       </View>
       <View className="flex-row items-baseline gap-1">
         <Text
-          className="text-[22px] font-extrabold text-ink-50"
+          className="font-mono text-[22px] text-ink-50"
           style={{ fontVariant: ['tabular-nums'] }}
         >
           {formatDecimal(row.distanceM / 1000)}

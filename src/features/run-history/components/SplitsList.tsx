@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 
 import type { Split } from '@/domain/types/run';
-import { formatPaceValue } from '@/lib/format';
+import { formatPaceValue, formatPaceTrack } from '@/lib/format';
 
 /**
  * Per-km table with a bar proportional to speed (longer = faster), so pacing
@@ -45,10 +45,10 @@ export function SplitsList({ splits }: { splits: readonly Split[] }) {
           >
             <Text className="w-12 text-base text-ink-200">{label}</Text>
             <Text
-              className="w-16 text-base font-semibold text-ink-50"
+              className="w-16 font-mono-medium text-base text-ink-50"
               style={{ fontVariant: ['tabular-nums'] }}
             >
-              {formatPaceValue(split.paceSPerKm)}
+              {formatPaceTrack(split.paceSPerKm)}
             </Text>
             <View className="h-3 flex-1 justify-center">
               <View

@@ -21,7 +21,7 @@ export function ErrorState({
   return (
     <Screen className="justify-center gap-6">
       <View className="items-center gap-2">
-        <Text className="text-center text-2xl font-bold text-ink-50">{title}</Text>
+        <Text className="text-center font-display text-[22px] text-ink-50">{title}</Text>
         <Text className="text-center text-base text-ink-300">{description}</Text>
       </View>
       <View className="gap-3">

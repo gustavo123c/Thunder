@@ -2,16 +2,20 @@ import type { ReactNode } from 'react';
 import { Text } from 'react-native';
 
 /**
- * Type scale. Numbers use StatBlock / tabular ExtraBold (800); everything else is lighter:
- * screen titles 700 · card and section titles 600 · body 400 · labels 500 uppercase.
+ * "Pista" type: numbers in JetBrains Mono (StatBlock, `font-mono`), screen titles in
+ * Archivo Expanded (`font-display`), labels in JetBrains Mono Medium uppercase, body text
+ * in the system font (card titles 600, body 400).
  */
 
 type TextProps = { children: ReactNode; className?: string };
 
-/** Screen title — 28 px, bold. */
+/** Screen title — Archivo Expanded 28 px. */
 export function ScreenTitle({ children, className = '' }: TextProps) {
   return (
-    <Text accessibilityRole="header" className={`text-[28px] font-bold text-ink-50 ${className}`}>
+    <Text
+      accessibilityRole="header"
+      className={`font-display text-[28px] text-ink-50 ${className}`}
+    >
       {children}
     </Text>
   );
@@ -22,11 +26,11 @@ export function CardTitle({ children, className = '' }: TextProps) {
   return <Text className={`text-base font-semibold text-ink-50 ${className}`}>{children}</Text>;
 }
 
-/** Small uppercase label above values and sections — 11 px, medium, muted. */
+/** Small uppercase label above values and sections — mono 10.5 px, muted. */
 export function Label({ children, className = '' }: TextProps) {
   return (
     <Text
-      className={`text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400 ${className}`}
+      className={`font-mono-medium text-[10.5px] uppercase tracking-[1.6px] text-ink-400 ${className}`}
     >
       {children}
     </Text>

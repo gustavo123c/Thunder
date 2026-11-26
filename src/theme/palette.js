@@ -13,16 +13,17 @@ const bolt = { 500: BRAND };
 /** Role per step: 900 app background · 800 card · 700 raised · 600 strong border ·
  *  500 faint · 400 muted text · 300 secondary text · 100–50 primary text. */
 const inkDark = {
-  50: '#F5F7FA',
-  100: '#E6EAF0',
-  200: '#C9D1DC',
-  300: '#9AA6B6',
-  400: '#6B7889',
-  500: '#4A5667',
-  600: '#333D4B',
-  700: '#1C2331',
-  800: '#121721',
-  900: '#090C10',
+  // "Storm" neutrals: blue-tinted night sky.
+  50: '#EEF2F7',
+  100: '#DCE3EC',
+  200: '#C2CCD9',
+  300: '#AEB8C6',
+  400: '#7A8699',
+  500: '#4E5A6B',
+  600: '#2A3444',
+  700: '#161D29', // raised ("cloud") elements
+  800: '#0F141D', // card surface
+  900: '#070A10', // app background
 };
 
 const inkLight = {
@@ -43,7 +44,7 @@ module.exports = {
   inkDark,
   inkLight,
   brand: BRAND,
-  hairlineDark: 'rgba(255, 255, 255, 0.08)',
+  hairlineDark: 'rgba(160, 180, 210, 0.10)',
   hairlineLight: 'rgba(11, 18, 32, 0.09)',
   /** Text/icons on amber backgrounds — the same in both modes. */
   onBolt: '#090C10',

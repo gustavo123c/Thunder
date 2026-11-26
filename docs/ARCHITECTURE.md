@@ -248,7 +248,23 @@ sem privilégios padrão, para pegar qualquer permissão faltando.
 | 2026-11 | Rotas em `src/app/`                              | Convenção do Expo Router; mantém código não-rota fora da pasta de rotas.                                    |
 | 2026-11 | UI em pt-BR, código em inglês                    | Público brasileiro; código legível para qualquer contribuidor.                                              |
 
-## Design system — "Performance Dark" + light mode
+## Design system — "Pista na Tempestade" + light mode
+
+Track ("Pista") structure with storm ("Tempestade") colors and effects:
+
+- **Type:** numbers in **JetBrains Mono** (`font-mono`, `font-mono-heavy` for hero values;
+  pace as `5'16"` via `formatPaceTrack`); uppercase labels in `font-mono-medium`; screen titles
+  in **Archivo Expanded** (`font-display`, a static wdth-125 instance bundled in
+  `assets/fonts`, SIL OFL). Body text stays in the system font. With a custom family, don't add
+  `font-bold`-style weight classes. Fonts load in `src/theme/fonts.ts` before the splash hides.
+- **Shapes:** runs are race bibs (`Card variant="bib"`, `BibNotch`, `BibTag` stamps like
+  "DOM 22 NOV · 06:45"); dividers and progress are track lanes (`Lanes`, `LaneProgress`);
+  live laps are "voltas".
+- **Storm:** blue-tinted dark neutrals (`#070A10` background, `#0F141D` cards); the amber only
+  "discharges" on actions, records and medals; `Zigzag` dividers and `LightningFlash`
+  (~300 ms, run start and the celebration's bolt strike) only in highlight moments — skipped
+  with the OS "reduce motion" setting. Modals wrap content in `ThemeScope`.
+- **Copy:** technical and calm ("Pace 8% abaixo da sua média da semana."), no hype.
 
 Appearance is a per-device choice in Settings → Aparência (Automático / Claro / Escuro),
 stored in AsyncStorage by `src/theme/AppThemeProvider.tsx`, which also calls NativeWind's

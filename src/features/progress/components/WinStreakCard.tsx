@@ -44,12 +44,12 @@ export function WinStreakCard({ userId }: { userId: string }) {
         <View className="flex-1 gap-1">
           <View className="flex-row items-baseline gap-2">
             <Text
-              className="text-[32px] font-extrabold leading-[36px] text-ink-50"
+              className="font-mono text-[32px] leading-[36px] text-ink-50"
               style={{ fontVariant: ['tabular-nums'] }}
             >
               {streak.weekStreak}
             </Text>
-            <Text className="text-xs font-medium uppercase tracking-[1.5px] text-accent">
+            <Text className="font-mono-medium text-xs uppercase tracking-[1.5px] text-accent">
               {streak.weekStreak === 1 ? 'semana ativa' : 'semanas seguidas'}
             </Text>
           </View>

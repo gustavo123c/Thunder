@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Skeleton } from '@/components/ui/Skeleton';
 import { comparePeriods, type Period } from '@/domain/insights/activity';
-import { formatDistanceKm, formatDuration, formatPace } from '@/lib/format';
+import { formatDistanceKm, formatDuration, formatPaceTrack } from '@/lib/format';
 
 import { useActivity } from '../hooks/useActivity';
 import { describeProgress, formatPercent, PERIOD_LABELS } from '../progress-copy';
@@ -32,9 +32,11 @@ function DeltaBadge({
 function Metric({ label, value, delta }: { label: string; value: string; delta: ReactNode }) {
   return (
     <View className="flex-1 gap-1">
-      <Text className="text-[11px] font-medium uppercase tracking-wider text-ink-400">{label}</Text>
+      <Text className="font-mono-medium text-[11px] uppercase tracking-wider text-ink-400">
+        {label}
+      </Text>
       <Text
-        className="text-[22px] font-extrabold leading-[26px] text-ink-50"
+        className="font-mono text-[22px] leading-[26px] text-ink-50"
         style={{ fontVariant: ['tabular-nums'] }}
       >
         {value}
@@ -93,7 +95,7 @@ export function ProgressDashboard({ userId }: { userId: string }) {
           <View className="flex-row gap-3">
             <Metric
               label="Pace médio"
-              value={formatPace(comparison.current.avgPaceSPerKm)}
+              value={formatPaceTrack(comparison.current.avgPaceSPerKm)}
               delta={<DeltaBadge value={comparison.paceImprovementPct} />}
             />
             <Metric

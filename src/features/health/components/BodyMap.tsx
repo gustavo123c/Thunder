@@ -15,6 +15,9 @@ import { colors } from '@/theme/tokens';
 import type { PainLog } from '../api/pain.api';
 import { BODY_VIEWBOX, bodyHotspots, type Hotspot, silhouette } from '../body-geometry';
 
+const SKIN = colors.ink[100];
+const OUTLINE = colors.ink[300];
+
 const PAIN_COLORS = {
   mild: colors.bolt[400],
   moderate: '#F97316',
@@ -71,7 +74,7 @@ export function BodyMap({ sex, pains, onSelect, height = 380 }: BodyMapProps) {
   const [showList, setShowList] = useState(false);
 
   const hotspots = useMemo(() => bodyHotspots(model, view), [model, view]);
-  const shape = useMemo(() => silhouette(model), [model]);
+  const shape = useMemo(() => silhouette(model, view), [model, view]);
   const painByKey = useMemo(() => new Map(pains.map((p) => [`${p.region}:${p.side}`, p])), [pains]);
 
   const width = (height * BODY_VIEWBOX.width) / BODY_VIEWBOX.height;
@@ -81,10 +84,11 @@ export function BodyMap({ sex, pains, onSelect, height = 380 }: BodyMapProps) {
     const fill = pain ? PAIN_COLORS[painLevel(pain.intensity)] : colors.ink[400];
     const common = {
       fill,
-      fillOpacity: pain ? 0.9 : 0.18,
+      fillOpacity: pain ? 0.85 : 0.06,
       stroke: pain ? fill : colors.ink[400],
-      strokeOpacity: pain ? 1 : 0.5,
-      strokeWidth: 1,
+      strokeOpacity: pain ? 1 : 0.55,
+      strokeWidth: pain ? 1.2 : 0.8,
+      strokeDasharray: pain ? undefined : '2 2',
       onPress: () => onSelect(hotspot.region, hotspot.side),
     };
     const label = `${describeRegion(hotspot.region, hotspot.side)}${pain ? ', com dor registrada' : ''}`;
@@ -138,14 +142,25 @@ export function BodyMap({ sex, pains, onSelect, height = 380 }: BodyMapProps) {
           viewBox={`0 0 ${BODY_VIEWBOX.width} ${BODY_VIEWBOX.height}`}
           accessibilityLabel={`Mapa corporal, vista ${view === 'front' ? 'de frente' : 'de costas'}`}
         >
-          {/* Silhouette */}
-          <Circle cx={shape.head.cx} cy={shape.head.cy} r={shape.head.r} fill={colors.ink[200]} />
-          <Path d={shape.torso} fill={colors.ink[200]} />
-          {shape.arms.map((arm, i) => (
-            <Rect key={`arm-${i}`} {...arm} rx={6} fill={colors.ink[200]} />
+          {/* Mannequin */}
+          {shape.limbs.map((d, i) => (
+            <Path key={`limb-${i}`} d={d} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
           ))}
-          {shape.legs.map((leg, i) => (
-            <Rect key={`leg-${i}`} {...leg} rx={14} fill={colors.ink[200]} />
+          {shape.extremities.map((e, i) => (
+            <Ellipse key={`ext-${i}`} {...e} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
+          ))}
+          <Rect {...shape.neck} rx={4} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
+          <Path d={shape.torso} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
+          <Ellipse {...shape.head} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
+          {shape.details.map((d, i) => (
+            <Path
+              key={`detail-${i}`}
+              d={d}
+              fill="none"
+              stroke={OUTLINE}
+              strokeWidth={0.8}
+              strokeOpacity={0.6}
+            />
           ))}
           {/* Tappable regions */}
           {hotspots.map(renderHotspot)}

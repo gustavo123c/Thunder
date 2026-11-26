@@ -58,8 +58,10 @@ export function SignInForm() {
 
       <View className="flex-row justify-center gap-1">
         <Text className="text-ink-500 dark:text-ink-300">Ainda não tem conta?</Text>
-        <Link href="/sign-up" replace className="font-semibold text-bolt-600">
-          Criar conta
+        <Link href="/sign-up" replace asChild>
+          <Text accessibilityRole="link" className="font-semibold text-bolt-600">
+            Criar conta
+          </Text>
         </Link>
       </View>
     </View>

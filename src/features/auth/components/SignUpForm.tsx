@@ -41,8 +41,10 @@ export function SignUpForm() {
           tone="info"
           message={`Enviamos um link de confirmação para ${email.trim()}. Confirme o e-mail e depois entre com sua senha.`}
         />
-        <Link href="/sign-in" replace className="text-center font-semibold text-bolt-600">
-          Ir para o login
+        <Link href="/sign-in" replace asChild>
+          <Text accessibilityRole="link" className="text-center font-semibold text-bolt-600">
+            Ir para o login
+          </Text>
         </Link>
       </View>
     );
@@ -106,8 +108,10 @@ export function SignUpForm() {
 
       <View className="flex-row justify-center gap-1">
         <Text className="text-ink-500 dark:text-ink-300">Já tem conta?</Text>
-        <Link href="/sign-in" replace className="font-semibold text-bolt-600">
-          Entrar
+        <Link href="/sign-in" replace asChild>
+          <Text accessibilityRole="link" className="font-semibold text-bolt-600">
+            Entrar
+          </Text>
         </Link>
       </View>
     </View>

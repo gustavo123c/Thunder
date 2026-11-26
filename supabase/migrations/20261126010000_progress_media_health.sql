@@ -2,6 +2,7 @@
 -- v2: activity stats, run media (photos/videos), avatars, pain logs (body map)
 -- and saved personalized workouts.
 -- Reuses existing tables: `runs` = workouts, `comments` = run comments.
+-- Idempotent: safe to run again if a previous run stopped halfway.
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
@@ -15,7 +16,7 @@ grant update (sex) on public.profiles to authenticated;
 -- -----------------------------------------------------------------------------
 -- run_media: photos and videos attached to a run (files live in Storage).
 -- -----------------------------------------------------------------------------
-create table public.run_media (
+create table if not exists public.run_media (
   id            uuid primary key default gen_random_uuid(),
   run_id        uuid not null references public.runs (id) on delete cascade,
   user_id       uuid not null references public.profiles (id) on delete cascade,
@@ -36,22 +37,25 @@ create table public.run_media (
   )
 );
 
-create index run_media_run_idx on public.run_media (run_id, created_at);
+create index if not exists run_media_run_idx on public.run_media (run_id, created_at);
 
 alter table public.run_media enable row level security;
 
+drop policy if exists run_media_select on public.run_media;
 create policy run_media_select on public.run_media
   for select to authenticated using (public.can_view_run(run_id));
+drop policy if exists run_media_insert_own on public.run_media;
 create policy run_media_insert_own on public.run_media
   for insert to authenticated
   with check (user_id = (select auth.uid()) and public.owns_run(run_id));
+drop policy if exists run_media_delete_own on public.run_media;
 create policy run_media_delete_own on public.run_media
   for delete to authenticated using (user_id = (select auth.uid()));
 
 grant select, insert, delete on public.run_media to authenticated;
 
 -- Max 10 media items per run.
-create function public.enforce_run_media_limit()
+create or replace function public.enforce_run_media_limit()
 returns trigger
 language plpgsql
 set search_path = ''
@@ -64,6 +68,7 @@ begin
 end;
 $$;
 
+drop trigger if exists run_media_limit on public.run_media;
 create trigger run_media_limit
   before insert on public.run_media
   for each row execute function public.enforce_run_media_limit();
@@ -71,7 +76,7 @@ create trigger run_media_limit
 -- -----------------------------------------------------------------------------
 -- pain_logs: pain/discomfort marked on the body map. Health data: owner only.
 -- -----------------------------------------------------------------------------
-create table public.pain_logs (
+create table if not exists public.pain_logs (
   id           uuid primary key default gen_random_uuid(),
   user_id      uuid not null references public.profiles (id) on delete cascade,
   region       text not null check (region in (
@@ -87,18 +92,22 @@ create table public.pain_logs (
 );
 
 -- One open entry per region/side.
-create unique index pain_logs_open_unique on public.pain_logs (user_id, region, side)
+create unique index if not exists pain_logs_open_unique on public.pain_logs (user_id, region, side)
   where resolved_at is null;
 
 alter table public.pain_logs enable row level security;
 
+drop policy if exists pain_logs_select_own on public.pain_logs;
 create policy pain_logs_select_own on public.pain_logs
   for select to authenticated using (user_id = (select auth.uid()));
+drop policy if exists pain_logs_insert_own on public.pain_logs;
 create policy pain_logs_insert_own on public.pain_logs
   for insert to authenticated with check (user_id = (select auth.uid()));
+drop policy if exists pain_logs_update_own on public.pain_logs;
 create policy pain_logs_update_own on public.pain_logs
   for update to authenticated
   using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+drop policy if exists pain_logs_delete_own on public.pain_logs;
 create policy pain_logs_delete_own on public.pain_logs
   for delete to authenticated using (user_id = (select auth.uid()));
 
@@ -109,7 +118,7 @@ grant update (intensity, notes, resolved_at) on public.pain_logs to authenticate
 -- generated_workouts: personalized workouts the user generated (rules now,
 -- AI later). Owner only.
 -- -----------------------------------------------------------------------------
-create table public.generated_workouts (
+create table if not exists public.generated_workouts (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references public.profiles (id) on delete cascade,
   generator   text not null check (generator in ('rules', 'ai')),
@@ -118,14 +127,17 @@ create table public.generated_workouts (
   created_at  timestamptz not null default now()
 );
 
-create index generated_workouts_user_idx on public.generated_workouts (user_id, created_at desc);
+create index if not exists generated_workouts_user_idx on public.generated_workouts (user_id, created_at desc);
 
 alter table public.generated_workouts enable row level security;
 
+drop policy if exists generated_workouts_select_own on public.generated_workouts;
 create policy generated_workouts_select_own on public.generated_workouts
   for select to authenticated using (user_id = (select auth.uid()));
+drop policy if exists generated_workouts_insert_own on public.generated_workouts;
 create policy generated_workouts_insert_own on public.generated_workouts
   for insert to authenticated with check (user_id = (select auth.uid()));
+drop policy if exists generated_workouts_delete_own on public.generated_workouts;
 create policy generated_workouts_delete_own on public.generated_workouts
   for delete to authenticated using (user_id = (select auth.uid()));
 
@@ -135,7 +147,7 @@ grant select, insert, delete on public.generated_workouts to authenticated;
 -- Activity list for streaks and the progress dashboard. Raw runs (grouped into
 -- local days/weeks on the device, which knows the user's time zone).
 -- -----------------------------------------------------------------------------
-create function public.list_activity(p_user_id uuid, p_since timestamptz)
+create or replace function public.list_activity(p_user_id uuid, p_since timestamptz)
 returns jsonb
 language sql
 stable
@@ -218,7 +230,7 @@ on conflict (id) do update
       allowed_mime_types = excluded.allowed_mime_types;
 
 -- Safe uuid parse for path segments (a malformed path must not raise in a policy).
-create function public.try_uuid(value text)
+create or replace function public.try_uuid(value text)
 returns uuid
 language plpgsql
 immutable
@@ -233,22 +245,27 @@ $$;
 
 grant execute on function public.try_uuid(text) to authenticated;
 
+drop policy if exists avatars_insert_own on storage.objects;
 create policy avatars_insert_own on storage.objects
   for insert to authenticated
   with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text);
+drop policy if exists avatars_update_own on storage.objects;
 create policy avatars_update_own on storage.objects
   for update to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text);
+drop policy if exists avatars_delete_own on storage.objects;
 create policy avatars_delete_own on storage.objects
   for delete to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = (select auth.uid())::text);
 
+drop policy if exists workout_media_select_visible on storage.objects;
 create policy workout_media_select_visible on storage.objects
   for select to authenticated
   using (
     bucket_id = 'workout-media'
     and public.can_view_run(public.try_uuid((storage.foldername(name))[2]))
   );
+drop policy if exists workout_media_insert_own on storage.objects;
 create policy workout_media_insert_own on storage.objects
   for insert to authenticated
   with check (
@@ -256,6 +273,7 @@ create policy workout_media_insert_own on storage.objects
     and (storage.foldername(name))[1] = (select auth.uid())::text
     and public.owns_run(public.try_uuid((storage.foldername(name))[2]))
   );
+drop policy if exists workout_media_delete_own on storage.objects;
 create policy workout_media_delete_own on storage.objects
   for delete to authenticated
   using (

@@ -103,9 +103,7 @@ export function BodyFields({ values, errors, setField }: FieldsProps) {
                 accessibilityState={{ checked: selected }}
                 onPress={() => setField('sex', option.value)}
                 className={`flex-1 items-center rounded-2xl border-2 px-2 py-3 ${
-                  selected
-                    ? 'border-bolt-500 bg-bolt-50 dark:bg-ink-800'
-                    : 'border-ink-100 bg-white dark:border-ink-700 dark:bg-ink-800'
+                  selected ? 'border-bolt-500 bg-bolt-500/10' : 'border-hairline bg-ink-800'
                 }`}
               >
                 <Text className="text-center text-sm font-semibold text-ink-900 dark:text-ink-50">

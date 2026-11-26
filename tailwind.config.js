@@ -4,7 +4,8 @@ const palette = require('./src/theme/palette');
 module.exports = {
   content: ['./src/**/*.{ts,tsx}'],
   presets: [require('nativewind/preset')],
-  darkMode: 'media',
+  // 'Performance Dark': the app is always dark (set in src/app/_layout.tsx).
+  darkMode: 'class',
   theme: {
     extend: {
       colors: palette,

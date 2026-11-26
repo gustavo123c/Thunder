@@ -236,3 +236,17 @@ sem privilégios padrão, para pegar qualquer permissão faltando.
 | 2026-11 | Tabelas de interação separadas (kudos, comments) | Integridade referencial e índices melhores que uma tabela polimórfica.                                      |
 | 2026-11 | Rotas em `src/app/`                              | Convenção do Expo Router; mantém código não-rota fora da pasta de rotas.                                    |
 | 2026-11 | UI em pt-BR, código em inglês                    | Público brasileiro; código legível para qualquer contribuidor.                                              |
+
+## Design system — "Performance Dark"
+
+The app is dark-only (`userInterfaceStyle: "dark"`, NativeWind `colorScheme.set('dark')`).
+
+- **Surfaces:** background `ink-900` (#090C10); cards `ink-800` (#121721) with
+  `border-hairline` (rgba(255,255,255,0.08)) and 20px radius. Use `components/ui/Card`;
+  `variant="highlight"` adds the subtle gradient (Win Streak, main goal).
+- **Accent:** `bolt-500` (#FACC15) only for CTAs, active states and positive highlights.
+- **Icons:** Ionicons (`@expo/vector-icons`), never emojis in UI copy.
+- **Metrics:** `components/ui/StatBlock` — 28–56px, weight 800, `tabular-nums`; labels 11px uppercase.
+- **Empty states:** `components/ui/EmptyState` (icon in a dashed, glowing ring).
+- **Map fallback:** `components/map/GridBackdrop` draws the dark grid used by `RouteSketch` in Expo Go.
+- Third-party credits (e.g. react-native-body-highlighter, MIT) live in Settings → Sobre.

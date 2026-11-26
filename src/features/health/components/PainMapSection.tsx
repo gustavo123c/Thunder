@@ -67,7 +67,7 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
           ))}
         </View>
       ) : pains.isSuccess ? (
-        <Text className="text-center text-sm text-ink-400">Nenhuma dor registrada. Ótimo! 💪</Text>
+        <Text className="text-center text-sm text-ink-400">Nenhuma dor registrada.</Text>
       ) : null}
 
       <PainSheet

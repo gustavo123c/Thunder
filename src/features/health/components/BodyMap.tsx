@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Pressable, Text, useColorScheme, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import {
@@ -51,7 +51,7 @@ function Toggle<T extends string>({
             accessibilityRole="tab"
             accessibilityState={{ selected }}
             onPress={() => onChange(option.value)}
-            className={`rounded-lg px-3 py-1.5 ${selected ? 'bg-white dark:bg-ink-700' : ''}`}
+            className={`rounded-lg px-3 py-1.5 ${selected ? 'bg-ink-700' : ''}`}
           >
             <Text
               className={`text-sm font-semibold ${selected ? 'text-ink-900 dark:text-ink-50' : 'text-ink-400'}`}
@@ -73,7 +73,6 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
   const [view, setView] = useState<BodyView>('front');
   const [model, setModel] = useState<BodySex>(sex ?? 'male');
   const [showList, setShowList] = useState(false);
-  const scheme = useColorScheme();
 
   const paths = useMemo(() => musclePaths(model, view), [model, view]);
   const regions = useMemo(() => tappableRegions(model, view), [model, view]);
@@ -87,10 +86,10 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
   ];
   const width = (height * vbWidth) / vbHeight;
 
-  // Dark mode needs a light muscle tone, or the body disappears into the card.
-  const muscleFill = scheme === 'dark' ? '#7C889A' : colors.ink[200];
-  const decorFill = scheme === 'dark' ? colors.ink[500] : colors.ink[300];
-  const separator = scheme === 'dark' ? colors.ink[800] : '#FFFFFF';
+  // Light slate muscles on the dark card, so the body reads clearly.
+  const muscleFill = '#7C889A';
+  const decorFill = colors.ink[500];
+  const separator = colors.ink[800];
 
   /** Pain for a region/side; a "center" entry of a bilateral region covers both sides. */
   function painFor(region: BodyRegion, side: BodySide): PainLog | undefined {
@@ -121,7 +120,7 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
         />
       </View>
 
-      <View className="items-center rounded-3xl bg-white py-4 dark:bg-ink-800">
+      <View className="items-center rounded-[20px] border border-hairline bg-ink-800 py-4">
         <Svg
           width={width}
           height={height}
@@ -204,9 +203,6 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
           </View>
         ))}
       </View>
-      <Text className="text-center text-[10px] text-ink-300">
-        Ilustração anatômica: react-native-body-highlighter (MIT)
-      </Text>
     </View>
   );
 }

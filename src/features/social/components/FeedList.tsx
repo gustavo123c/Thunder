@@ -5,6 +5,7 @@ import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } fr
 import { RunMediaGallery } from '@/components/media/RunMediaGallery';
 import { RunCard } from '@/components/run/RunCard';
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { colors } from '@/theme/tokens';
 
@@ -41,28 +42,34 @@ export function FeedList({ viewerId }: { viewerId: string }) {
       contentContainerClassName="gap-4 px-4 pb-8 pt-4"
       ListHeaderComponent={
         <View className="flex-row items-center justify-between">
-          <Text className="text-3xl font-black text-ink-900 dark:text-ink-50">
-            Feed <Text className="text-bolt-500">⚡</Text>
-          </Text>
+          <View className="flex-row items-center gap-2">
+            <Text className="text-3xl font-extrabold text-ink-50">Feed</Text>
+            <Ionicons name="flash" size={22} color={colors.bolt[500]} />
+          </View>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Encontrar corredores"
             hitSlop={8}
             onPress={() => router.push('/people')}
-            className="h-11 w-11 items-center justify-center rounded-full bg-white dark:bg-ink-800"
+            className="h-11 w-11 items-center justify-center rounded-full border border-hairline bg-ink-800"
           >
-            <Ionicons name="person-add-outline" size={20} color={colors.bolt[600]} />
+            <Ionicons name="person-add-outline" size={20} color={colors.bolt[500]} />
           </Pressable>
         </View>
       }
       ListEmptyComponent={
-        <View className="items-center gap-4 py-16">
-          <Text className="text-5xl">👟</Text>
-          <Text className="text-center text-base text-ink-500 dark:text-ink-300">
-            Siga outros corredores para ver os treinos deles aqui — e dar aquele raio de incentivo.
-          </Text>
-          <Button label="Encontrar corredores" onPress={() => router.push('/people')} />
-        </View>
+        <EmptyState
+          icon="people-outline"
+          title="Seu feed está vazio"
+          description="Siga outros corredores para ver os treinos deles aqui e dar aquele Raio de incentivo."
+          action={
+            <Button
+              label="Encontrar corredores"
+              icon="person-add-outline"
+              onPress={() => router.push('/people')}
+            />
+          }
+        />
       }
       renderItem={({ item }) => (
         <RunCard

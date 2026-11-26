@@ -32,9 +32,11 @@ function DeltaBadge({
 function Metric({ label, value, delta }: { label: string; value: string; delta: ReactNode }) {
   return (
     <View className="flex-1 gap-1">
-      <Text className="text-xs text-ink-400">{label}</Text>
+      <Text className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">
+        {label}
+      </Text>
       <Text
-        className="text-lg font-bold text-ink-900 dark:text-ink-50"
+        className="text-[28px] font-extrabold leading-tight text-ink-50"
         style={{ fontVariant: ['tabular-nums'] }}
       >
         {value}
@@ -55,13 +57,10 @@ export function ProgressDashboard({ userId }: { userId: string }) {
   );
 
   return (
-    <View className="gap-4 rounded-3xl bg-white p-4 dark:bg-ink-800">
-      <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">Desempenho</Text>
+    <View className="gap-4 rounded-[20px] border border-hairline bg-ink-800 p-4">
+      <Text className="text-lg font-extrabold text-ink-50">Desempenho</Text>
 
-      <View
-        accessibilityRole="tablist"
-        className="flex-row rounded-2xl bg-ink-100 p-1 dark:bg-ink-900"
-      >
+      <View accessibilityRole="tablist" className="flex-row rounded-2xl bg-ink-900 p-1">
         {PERIODS.map((p) => {
           const selected = p === period;
           return (

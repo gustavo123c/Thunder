@@ -1,5 +1,8 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+
+import { colors } from '@/theme/tokens';
 
 import { Screen } from './Screen';
 
@@ -22,9 +25,12 @@ export function AuthScreenLayout({ title, subtitle, children }: AuthScreenLayout
           keyboardShouldPersistTaps="handled"
         >
           <View className="gap-2">
-            <Text className="text-4xl font-black text-ink-900 dark:text-ink-50">
-              Thunder <Text className="text-bolt-500">⚡</Text>
-            </Text>
+            <View className="flex-row items-center gap-2">
+              <View className="h-11 w-11 items-center justify-center rounded-2xl bg-bolt-500">
+                <Ionicons name="flash" size={24} color={colors.ink[900]} />
+              </View>
+              <Text className="text-4xl font-extrabold text-ink-50">Thunder</Text>
+            </View>
             <Text className="text-2xl font-bold text-ink-900 dark:text-ink-50">{title}</Text>
             <Text className="text-base text-ink-500 dark:text-ink-300">{subtitle}</Text>
           </View>

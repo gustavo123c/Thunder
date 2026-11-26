@@ -107,3 +107,10 @@ export function formatShortDistance(meters: number): string {
   if (!Number.isFinite(meters)) return PLACEHOLDER;
   return Math.abs(meters) < 1000 ? `${Math.round(meters)} m` : formatDistanceKm(meters);
 }
+
+/** Running-watch style pace: 330 → `5'30"`; unknown → `--'--`. */
+export function formatPaceTrack(secondsPerKm: number | null | undefined): string {
+  if (secondsPerKm == null || !Number.isFinite(secondsPerKm) || secondsPerKm <= 0) return "--'--";
+  const rounded = Math.round(secondsPerKm);
+  return `${Math.floor(rounded / 60)}'${pad2(rounded % 60)}"`;
+}

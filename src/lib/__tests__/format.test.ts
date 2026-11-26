@@ -4,6 +4,7 @@ import {
   formatPace,
   formatPaceValue,
   formatPaceDelta,
+  formatPaceTrack,
   formatRunDate,
   formatShortDistance,
   formatWeightKg,
@@ -105,5 +106,13 @@ describe('formatPaceDelta / formatShortDistance', () => {
   it('switches units at 1 km', () => {
     expect(formatShortDistance(850)).toBe('850 m');
     expect(formatShortDistance(5230)).toBe('5,23 km');
+  });
+});
+
+describe('formatPaceTrack', () => {
+  it('uses the running-watch notation', () => {
+    expect(formatPaceTrack(330)).toBe(`5'30"`);
+    expect(formatPaceTrack(605)).toBe(`10'05"`);
+    expect(formatPaceTrack(null)).toBe("--'--");
   });
 });

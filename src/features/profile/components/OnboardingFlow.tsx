@@ -33,7 +33,7 @@ type Step = {
 
 const STEPS: readonly Step[] = [
   {
-    title: 'Bem-vindo ao Thunder ⚡',
+    title: 'Bem-vindo ao Thunder',
     subtitle: 'Como você quer aparecer para outros corredores?',
     fields: ['fullName', 'username'],
     Fields: IdentityFields,

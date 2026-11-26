@@ -14,15 +14,13 @@ export const TextField = forwardRef<TextInputInstance, TextFieldProps>(function 
   { label, error, hint, suffix, ...inputProps },
   ref,
 ) {
-  const borderClass = error
-    ? 'border-danger'
-    : 'border-ink-200 focus:border-bolt-500 dark:border-ink-600';
+  const borderClass = error ? 'border-danger' : 'border-hairline focus:border-bolt-500';
 
   return (
     <View className="gap-1.5">
       <Text className="text-sm font-medium text-ink-700 dark:text-ink-200">{label}</Text>
       <View
-        className={`h-14 flex-row items-center rounded-2xl border bg-white px-4 dark:bg-ink-800 ${borderClass}`}
+        className={`h-14 flex-row items-center rounded-2xl border bg-ink-800 px-4 ${borderClass}`}
       >
         <TextInput
           ref={ref}

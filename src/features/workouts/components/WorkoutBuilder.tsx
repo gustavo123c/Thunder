@@ -153,7 +153,12 @@ export function WorkoutBuilder({
         </Text>
       </View>
 
-      <Button label="⚡ Gerar treino" onPress={handleGenerate} loading={generate.isPending} />
+      <Button
+        label="Gerar treino"
+        icon="flash"
+        onPress={handleGenerate}
+        loading={generate.isPending}
+      />
 
       {plan ? (
         <>
@@ -177,7 +182,7 @@ export function WorkoutBuilder({
                   { text: 'Apagar', style: 'destructive', onPress: () => remove.mutate(saved.id) },
                 ])
               }
-              className="flex-row items-center justify-between rounded-2xl bg-white p-4 active:opacity-80 dark:bg-ink-800"
+              className="flex-row items-center justify-between rounded-[20px] border border-hairline bg-ink-800 p-4 active:opacity-80"
             >
               <View className="flex-1 gap-0.5">
                 <Text className="font-semibold text-ink-900 dark:text-ink-50">

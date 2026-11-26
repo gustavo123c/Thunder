@@ -1,7 +1,14 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
 import type { ComponentProps } from 'react';
-import type { ColorValue } from 'react-native';
+import {
+  type AccessibilityState,
+  type ColorValue,
+  type GestureResponderEvent,
+  Pressable,
+  Text,
+  View,
+} from 'react-native';
 
 import { useUserId } from '@/features/auth';
 import { useRunTrackingBootstrap } from '@/features/run-tracking';
@@ -9,18 +16,57 @@ import { colors } from '@/theme/tokens';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
-type TabIconProps = { name: IconName; color: ColorValue; size: number };
-
-function TabIcon({ name, color, size }: TabIconProps) {
-  // Tab tint colors are always hex strings (see screenOptions below).
-  return <Ionicons name={name} color={typeof color === 'string' ? color : undefined} size={size} />;
-}
-
-function tabIcon(name: IconName) {
-  function Icon({ color, size }: { color: ColorValue; size: number }) {
-    return <TabIcon name={name} color={color} size={size} />;
+function tabIcon(active: IconName, inactive: IconName) {
+  function Icon({ color, focused }: { color: ColorValue; focused: boolean }) {
+    return (
+      <Ionicons
+        name={focused ? active : inactive}
+        size={23}
+        // Tab tint colors are always hex strings (see screenOptions below).
+        color={typeof color === 'string' ? color : undefined}
+      />
+    );
   }
   return Icon;
+}
+
+type TabButtonProps = {
+  onPress?: ((event: GestureResponderEvent) => void) | null;
+  onLongPress?: ((event: GestureResponderEvent) => void) | null;
+  accessibilityState?: AccessibilityState;
+};
+
+/** Elevated circular amber button for the central "Correr" tab. */
+function RecordTabButton({ onPress, onLongPress, accessibilityState }: TabButtonProps) {
+  const selected = accessibilityState?.selected ?? false;
+  return (
+    <View className="flex-1 items-center">
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Correr"
+        accessibilityState={{ selected }}
+        onPress={onPress ?? undefined}
+        onLongPress={onLongPress ?? undefined}
+        className="-mt-6 items-center gap-1"
+      >
+        <View
+          className="h-16 w-16 items-center justify-center rounded-full border-4 border-ink-900 bg-bolt-500"
+          style={{
+            shadowColor: colors.bolt[500],
+            shadowOpacity: 0.35,
+            shadowRadius: 12,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 8,
+          }}
+        >
+          <Ionicons name="play" size={26} color={colors.ink[900]} style={{ marginLeft: 3 }} />
+        </View>
+        <Text className={`text-[11px] font-bold ${selected ? 'text-bolt-500' : 'text-ink-300'}`}>
+          Correr
+        </Text>
+      </Pressable>
+    </View>
+  );
 }
 
 export default function TabsLayout() {
@@ -34,19 +80,45 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.bolt[500],
         tabBarInactiveTintColor: colors.ink[400],
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarStyle: {
+          backgroundColor: colors.ink[900],
+          borderTopColor: colors.hairline,
+          borderTopWidth: 1,
+          height: 84,
+          paddingTop: 8,
+        },
       }}
     >
-      <Tabs.Screen name="feed" options={{ title: 'Feed', tabBarIcon: tabIcon('flash') }} />
-      <Tabs.Screen name="training" options={{ title: 'Treino', tabBarIcon: tabIcon('barbell') }} />
+      <Tabs.Screen
+        name="feed"
+        options={{ title: 'Feed', tabBarIcon: tabIcon('flash', 'flash-outline') }}
+      />
+      <Tabs.Screen
+        name="training"
+        options={{ title: 'Treino', tabBarIcon: tabIcon('barbell', 'barbell-outline') }}
+      />
       <Tabs.Screen
         name="record"
-        options={{ title: 'Correr', tabBarIcon: tabIcon('play-circle') }}
+        options={{
+          title: 'Correr',
+          tabBarButton: (props) => (
+            <RecordTabButton
+              onPress={props.onPress}
+              onLongPress={props.onLongPress}
+              accessibilityState={props.accessibilityState}
+            />
+          ),
+        }}
       />
       <Tabs.Screen
         name="history"
-        options={{ title: 'Histórico', tabBarIcon: tabIcon('stats-chart') }}
+        options={{ title: 'Histórico', tabBarIcon: tabIcon('stats-chart', 'stats-chart-outline') }}
       />
-      <Tabs.Screen name="profile" options={{ title: 'Perfil', tabBarIcon: tabIcon('person') }} />
+      <Tabs.Screen
+        name="profile"
+        options={{ title: 'Perfil', tabBarIcon: tabIcon('person', 'person-outline') }}
+      />
     </Tabs>
   );
 }

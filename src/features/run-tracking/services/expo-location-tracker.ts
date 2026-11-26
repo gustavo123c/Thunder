@@ -35,7 +35,7 @@ export const expoLocationTracker: LocationTracker = {
       pausesUpdatesAutomatically: false,
       showsBackgroundLocationIndicator: true,
       foregroundService: {
-        notificationTitle: 'Thunder ⚡ gravando sua corrida',
+        notificationTitle: 'Thunder · gravando sua corrida',
         notificationBody: 'Distância e pace estão sendo registrados.',
         notificationColor: colors.bolt[500],
         killServiceOnDestroy: false,

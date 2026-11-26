@@ -55,7 +55,7 @@ describe('progress copy', () => {
       now,
     );
     expect(describeProgress(faster)).toEqual({
-      text: 'Você melhorou 10% no seu pace de corrida em relação à semana passada. 🚀',
+      text: 'Você melhorou 10% no seu pace de corrida em relação à semana passada.',
       tone: 'positive',
     });
 

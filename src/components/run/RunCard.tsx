@@ -26,9 +26,11 @@ type RunCardProps = {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-1 gap-0.5">
-      <Text className="text-xs text-ink-400">{label}</Text>
+      <Text className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">
+        {label}
+      </Text>
       <Text
-        className="text-lg font-bold text-ink-900 dark:text-ink-50"
+        className="text-xl font-extrabold text-ink-50"
         style={{ fontVariant: ['tabular-nums'] }}
       >
         {value}
@@ -43,7 +45,7 @@ export function RunCard({ run, onPress, header, footer, onDelete, media }: RunCa
   const thumbnailWidth = Math.min(width - 64, 520);
 
   return (
-    <View className="gap-3 rounded-3xl bg-white p-4 dark:bg-ink-800">
+    <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
       {header}
       <Pressable
         accessibilityRole={onPress ? 'button' : undefined}
@@ -63,7 +65,7 @@ export function RunCard({ run, onPress, header, footer, onDelete, media }: RunCa
               accessibilityLabel={`Apagar corrida ${run.title}`}
               hitSlop={10}
               onPress={onDelete}
-              className="h-9 w-9 items-center justify-center rounded-full active:bg-ink-100 dark:active:bg-ink-700"
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-ink-700"
             >
               <Ionicons name="trash-outline" size={18} color={colors.ink[400]} />
             </Pressable>

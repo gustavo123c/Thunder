@@ -1,11 +1,14 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text, View } from 'react-native';
+
+import { colors } from '@/theme/tokens';
 
 import type { Insight } from '../comparison-copy';
 
-const toneClass: Record<Insight['tone'], string> = {
-  record: 'bg-bolt-50 dark:bg-ink-700',
-  positive: 'bg-green-50 dark:bg-ink-700',
-  neutral: 'bg-ink-100 dark:bg-ink-700',
+const toneStyle: Record<Insight['tone'], { circle: string; icon: string }> = {
+  record: { circle: 'bg-bolt-500', icon: colors.ink[900] },
+  positive: { circle: 'border border-bolt-500/40 bg-bolt-500/10', icon: colors.bolt[500] },
+  neutral: { circle: 'bg-ink-700', icon: colors.ink[300] },
 };
 
 export function InsightsCard({ insights }: { insights: readonly Insight[] }) {
@@ -13,14 +16,18 @@ export function InsightsCard({ insights }: { insights: readonly Insight[] }) {
 
   return (
     <View className="gap-3">
-      <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">Sua evolução</Text>
+      <Text className="text-lg font-extrabold text-ink-50">Sua evolução</Text>
       {insights.map((insight) => (
         <View
           key={insight.text}
-          className={`flex-row items-center gap-3 rounded-2xl p-4 ${toneClass[insight.tone]}`}
+          className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4"
         >
-          <Text className="text-2xl">{insight.emoji}</Text>
-          <Text className="flex-1 text-base text-ink-800 dark:text-ink-100">{insight.text}</Text>
+          <View
+            className={`h-10 w-10 items-center justify-center rounded-full ${toneStyle[insight.tone].circle}`}
+          >
+            <Ionicons name={insight.icon} size={20} color={toneStyle[insight.tone].icon} />
+          </View>
+          <Text className="flex-1 text-base text-ink-100">{insight.text}</Text>
         </View>
       ))}
     </View>

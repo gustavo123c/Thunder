@@ -35,12 +35,17 @@ describe('in Expo Go', () => {
         }}
       />,
     );
-    expect(screen.getByText(/Modo de teste \(Expo Go\)/)).toBeOnTheScreen();
+    expect(screen.queryByText(/Sem trajeto de GPS/)).not.toBeOnTheScreen();
   });
 
-  it('shows a hint before the first GPS fix', async () => {
+  it('renders the live backdrop before the first GPS fix', async () => {
     await render(<RouteMap route={null} followUser />);
-    expect(screen.getByText(/Sua rota aparecerá aqui/)).toBeOnTheScreen();
+    expect(screen.queryByText(/Sem trajeto de GPS/)).not.toBeOnTheScreen();
+  });
+
+  it('explains when a saved run has no route', async () => {
+    await render(<RouteMap route={null} />);
+    expect(screen.getByText('Sem trajeto de GPS nesta corrida.')).toBeOnTheScreen();
   });
 
   it('skips Mapbox initialization', async () => {

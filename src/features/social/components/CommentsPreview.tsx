@@ -31,7 +31,7 @@ export function CommentsPreview({ runId, viewerId }: { runId: string; viewerId: 
             imageUrl={comment.author.avatarUrl}
             size={30}
           />
-          <View className="flex-1 gap-0.5 rounded-2xl bg-white p-3 dark:bg-ink-800">
+          <View className="flex-1 gap-0.5 rounded-2xl border border-hairline bg-ink-800 p-3">
             <View className="flex-row items-baseline justify-between gap-2">
               <Text className="font-semibold text-ink-900 dark:text-ink-50">
                 {comment.author.id === viewerId ? 'Você' : displayName(comment.author)}

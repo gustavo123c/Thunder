@@ -1,8 +1,11 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 
+import { Card } from '@/components/ui/Card';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { computeWinStreak } from '@/domain/insights/activity';
+import { colors } from '@/theme/tokens';
 
 import { useActivity } from '../hooks/useActivity';
 import { describeStreakCounts, describeWeekStreak } from '../progress-copy';
@@ -16,35 +19,42 @@ export function WinStreakCard({ userId }: { userId: string }) {
   );
 
   if (!streak) {
-    return activity.isError ? null : <Skeleton height={96} radius={24} />;
+    return activity.isError ? null : <Skeleton height={112} radius={20} />;
   }
 
   const onFire = streak.weekStreak >= 2;
+  const icon = onFire ? 'flame' : streak.runsThisWeek > 0 ? 'flash' : 'flag-outline';
 
   return (
-    <View
-      accessible
-      accessibilityLabel={`${describeStreakCounts(streak)}. ${describeWeekStreak(streak)}`}
-      className="flex-row items-center gap-4 rounded-3xl bg-ink-900 p-5 dark:bg-ink-800"
-    >
-      <View className="h-16 w-16 items-center justify-center rounded-full bg-bolt-500">
-        <Text className="text-3xl">{onFire ? '🔥' : streak.runsThisWeek > 0 ? '⚡' : '🏁'}</Text>
-      </View>
-      <View className="flex-1 gap-1">
-        <View className="flex-row items-baseline gap-2">
-          <Text
-            className="text-3xl font-black text-ink-50"
-            style={{ fontVariant: ['tabular-nums'] }}
-          >
-            {streak.weekStreak}
-          </Text>
-          <Text className="text-sm font-semibold text-bolt-400">
-            {streak.weekStreak === 1 ? 'semana ativa' : 'semanas seguidas'}
-          </Text>
+    <Card variant="highlight">
+      <View
+        accessible
+        accessibilityLabel={`${describeStreakCounts(streak)}. ${describeWeekStreak(streak)}`}
+        className="flex-row items-center gap-4"
+      >
+        <View
+          className={`h-16 w-16 items-center justify-center rounded-full ${
+            onFire ? 'bg-bolt-500' : 'border border-bolt-500/40 bg-bolt-500/10'
+          }`}
+        >
+          <Ionicons name={icon} size={28} color={onFire ? colors.ink[900] : colors.bolt[500]} />
         </View>
-        <Text className="text-sm text-ink-200">{describeStreakCounts(streak)}</Text>
-        <Text className="text-xs text-ink-400">{describeWeekStreak(streak)}</Text>
+        <View className="flex-1 gap-1">
+          <View className="flex-row items-baseline gap-2">
+            <Text
+              className="text-[36px] font-extrabold leading-[40px] text-ink-50"
+              style={{ fontVariant: ['tabular-nums'] }}
+            >
+              {streak.weekStreak}
+            </Text>
+            <Text className="text-xs font-bold uppercase tracking-[1.5px] text-bolt-500">
+              {streak.weekStreak === 1 ? 'semana ativa' : 'semanas seguidas'}
+            </Text>
+          </View>
+          <Text className="text-sm font-semibold text-ink-100">{describeStreakCounts(streak)}</Text>
+          <Text className="text-xs text-ink-400">{describeWeekStreak(streak)}</Text>
+        </View>
       </View>
-    </View>
+    </Card>
   );
 }

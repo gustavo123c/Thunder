@@ -1,5 +1,5 @@
 import Mapbox, { Camera, LineLayer, LocationPuck, MapView, ShapeSource } from '@rnmapbox/maps';
-import { type StyleProp, useColorScheme, type ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 
 import type { Bounds, LineStringGeometry, MultiLineStringGeometry } from '@/domain/geo/geojson';
 import { mapColors } from '@/theme/tokens';
@@ -25,13 +25,12 @@ export function MapboxRouteMap({
   interactive = true,
   style = { flex: 1 },
 }: RouteMapProps) {
-  const scheme = useColorScheme();
   const hasRoute = route !== null && route.coordinates.length > 0;
 
   return (
     <MapView
       style={style}
-      styleURL={scheme === 'dark' ? Mapbox.StyleURL.Dark : Mapbox.StyleURL.Outdoors}
+      styleURL={Mapbox.StyleURL.Dark}
       scaleBarEnabled={false}
       logoPosition={{ bottom: 8, left: 8 }}
       attributionPosition={{ bottom: 8, right: 8 }}

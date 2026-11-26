@@ -44,7 +44,7 @@ export function PainSheet({
       <Pressable accessibilityLabel="Fechar" className="flex-1 bg-black/40" onPress={onClose} />
       <SafeAreaView
         edges={['bottom']}
-        className="gap-4 rounded-t-3xl bg-white px-5 pb-4 pt-5 dark:bg-ink-800"
+        className="gap-4 rounded-t-[28px] border-t border-hairline bg-ink-800 px-5 pb-4 pt-5"
       >
         {target ? (
           <>
@@ -67,9 +67,7 @@ export function PainSheet({
                   disabled={saving}
                   onPress={() => onChoose(PAIN_PRESETS[level].intensity)}
                   className={`gap-0.5 rounded-2xl border-2 p-3 ${
-                    selected
-                      ? 'border-bolt-500 bg-bolt-50 dark:bg-ink-700'
-                      : 'border-ink-100 dark:border-ink-700'
+                    selected ? 'border-bolt-500 bg-bolt-500/10' : 'border-hairline'
                   }`}
                 >
                   <Text className="text-base font-semibold text-ink-900 dark:text-ink-50">

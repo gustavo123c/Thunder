@@ -48,13 +48,13 @@ describe('WorkoutBuilder', () => {
     expect(screen.getByText('Pace de referência (últimas corridas): 6:30 /km')).toBeOnTheScreen();
     await user.press(screen.getByRole('radio', { name: 'Fortalecimento' }));
     await user.press(screen.getByRole('radio', { name: '20 min' }));
-    await user.press(screen.getByRole('button', { name: '⚡ Gerar treino' }));
+    await user.press(screen.getByRole('button', { name: 'Gerar treino' }));
 
     expect(await screen.findByText('Fortalecimento para corredores')).toBeOnTheScreen();
-    expect(screen.getByText('🔥 Aquecimento')).toBeOnTheScreen();
-    expect(screen.getByText('⚡ Circuito de força')).toBeOnTheScreen();
-    expect(screen.getByText('🧘 Desaquecimento')).toBeOnTheScreen();
-    expect(screen.getByText('Aviso importante sobre sua saúde')).toBeOnTheScreen();
+    expect(screen.getByText('Aquecimento')).toBeOnTheScreen();
+    expect(screen.getByText('Circuito de força')).toBeOnTheScreen();
+    expect(screen.getByText('Desaquecimento')).toBeOnTheScreen();
+    expect(screen.getAllByLabelText('Aviso importante sobre sua saúde').length).toBeGreaterThan(0);
     expect(saveWorkout).toHaveBeenCalledWith(
       'u1',
       expect.objectContaining({ goal: 'strength', durationMin: 20, level: 'beginner' }),
@@ -73,10 +73,12 @@ describe('WorkoutBuilder', () => {
     );
 
     expect(screen.getByText('Dores consideradas: Joelho esquerdo')).toBeOnTheScreen();
-    await userEvent.setup().press(screen.getByRole('button', { name: '⚡ Gerar treino' }));
+    await userEvent.setup().press(screen.getByRole('button', { name: 'Gerar treino' }));
 
     expect(await screen.findByText('Adaptado para você')).toBeOnTheScreen();
     expect(screen.getAllByText('Recuperação ativa').length).toBeGreaterThan(0);
+    // The health notice is a collapsible banner: expand it to read the full text.
+    await userEvent.setup().press(screen.getAllByLabelText('Aviso importante sobre sua saúde')[0]!);
     expect(screen.getByText(/especialmente agora que você relatou dor/)).toBeOnTheScreen();
   });
 });
@@ -88,7 +90,7 @@ describe('PainMapSection', () => {
     jest.mocked(setPain).mockResolvedValue(undefined);
     await renderWithQuery(<PainMapSection userId="u1" sex="female" />);
 
-    expect(await screen.findByText('Nenhuma dor registrada. Ótimo! 💪')).toBeOnTheScreen();
+    expect(await screen.findByText('Nenhuma dor registrada.')).toBeOnTheScreen();
     await user.press(await screen.findByRole('button', { name: 'Escolher pela lista' }));
     await user.press(screen.getByRole('button', { name: 'Joelho esquerdo' }));
     expect(

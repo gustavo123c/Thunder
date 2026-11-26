@@ -6,7 +6,7 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "ios": {
       "bundleIdentifier": "app.thunder.run",
       "supportsTablet": false
@@ -63,6 +63,7 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "backgroundColor": "#090C10"
   }
 }

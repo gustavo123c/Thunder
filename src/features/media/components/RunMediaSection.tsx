@@ -71,7 +71,8 @@ export function RunMediaSection({ runId, media, ownerId }: RunMediaSectionProps)
 
       {isOwner && remaining > 0 ? (
         <Button
-          label={media.length === 0 ? '📷 Adicionar fotos e vídeos' : '📷 Adicionar mais'}
+          icon="camera-outline"
+          label={media.length === 0 ? 'Adicionar fotos e vídeos' : 'Adicionar mais'}
           variant="secondary"
           onPress={() => void pick()}
           loading={add.isPending}

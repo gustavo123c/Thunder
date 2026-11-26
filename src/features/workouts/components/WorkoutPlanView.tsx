@@ -1,11 +1,17 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text, View } from 'react-native';
 
+import { Card } from '@/components/ui/Card';
 import type { WorkoutBlock, WorkoutItem, WorkoutPlan } from '@/domain/training/workout-generator';
+import { colors } from '@/theme/tokens';
 
-const PHASE_STYLE: Record<WorkoutBlock['phase'], { emoji: string; accent: string }> = {
-  warmup: { emoji: '🔥', accent: 'border-bolt-400' },
-  main: { emoji: '⚡', accent: 'border-bolt-600' },
-  cooldown: { emoji: '🧘', accent: 'border-info' },
+const PHASE_STYLE: Record<
+  WorkoutBlock['phase'],
+  { icon: 'flame-outline' | 'flash' | 'leaf-outline'; accent: string; iconColor: string }
+> = {
+  warmup: { icon: 'flame-outline', accent: 'bg-bolt-500/10', iconColor: colors.bolt[500] },
+  main: { icon: 'flash', accent: 'bg-bolt-500', iconColor: colors.ink[900] },
+  cooldown: { icon: 'leaf-outline', accent: 'bg-info/15', iconColor: colors.info },
 };
 
 function itemMeta(item: WorkoutItem): string {
@@ -20,18 +26,24 @@ function itemMeta(item: WorkoutItem): string {
 function Item({ item }: { item: WorkoutItem }) {
   const meta = itemMeta(item);
   return (
-    <View className="gap-1 border-t border-ink-100 py-3 dark:border-ink-700">
+    <View className="gap-1 border-t border-hairline py-3">
       <View className="flex-row items-baseline justify-between gap-2">
-        <Text className="flex-1 text-base font-semibold text-ink-900 dark:text-ink-50">
-          {item.name}
-        </Text>
+        <Text className="flex-1 text-base font-bold text-ink-50">{item.name}</Text>
         {meta ? (
-          <Text className="text-sm font-semibold text-bolt-700 dark:text-bolt-400">{meta}</Text>
+          <Text
+            className="text-sm font-bold text-bolt-500"
+            style={{ fontVariant: ['tabular-nums'] }}
+          >
+            {meta}
+          </Text>
         ) : null}
       </View>
-      <Text className="text-sm text-ink-500 dark:text-ink-300">{item.detail}</Text>
+      <Text className="text-sm leading-5 text-ink-300">{item.detail}</Text>
       {item.target ? (
-        <Text className="text-sm text-ink-700 dark:text-ink-100">🎯 Ritmo alvo: {item.target}</Text>
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons name="speedometer-outline" size={14} color={colors.ink[300]} />
+          <Text className="text-sm text-ink-100">Ritmo alvo: {item.target}</Text>
+        </View>
       ) : null}
     </View>
   );
@@ -42,45 +54,48 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
   return (
     <View className="gap-4">
       <View className="gap-1">
-        <Text className="text-2xl font-black text-ink-900 dark:text-ink-50">{plan.title}</Text>
-        <Text className="text-sm text-ink-500 dark:text-ink-300">{plan.summary}</Text>
+        <Text className="text-2xl font-extrabold text-ink-50">{plan.title}</Text>
+        <Text className="text-sm text-ink-400">{plan.summary}</Text>
       </View>
 
       {plan.adaptations.length > 0 ? (
-        <View className="gap-2 rounded-2xl bg-bolt-50 p-4 dark:bg-ink-700">
-          <Text className="text-sm font-bold text-ink-900 dark:text-ink-50">
-            Adaptado para você
-          </Text>
+        <Card className="gap-2 border-bolt-500/30">
+          <View className="flex-row items-center gap-2">
+            <Ionicons name="shield-checkmark-outline" size={16} color={colors.bolt[500]} />
+            <Text className="text-sm font-bold text-ink-50">Adaptado para você</Text>
+          </View>
           {plan.adaptations.map((text) => (
-            <Text key={text} className="text-sm text-ink-700 dark:text-ink-100">
+            <Text key={text} className="text-sm leading-5 text-ink-200">
               • {text}
             </Text>
           ))}
-        </View>
+        </Card>
       ) : null}
 
-      {plan.blocks.map((block) => (
-        <View
-          key={block.phase}
-          className={`rounded-2xl border-l-4 bg-white px-4 py-2 dark:bg-ink-800 ${PHASE_STYLE[block.phase].accent}`}
-        >
-          <View className="flex-row items-center justify-between pt-2">
-            <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">
-              {PHASE_STYLE[block.phase].emoji} {block.title}
-            </Text>
-            <Text className="text-sm text-ink-400">{block.minutes} min</Text>
-          </View>
-          {block.items.map((item) => (
-            <Item key={`${block.phase}-${item.name}`} item={item} />
-          ))}
-        </View>
-      ))}
+      {plan.blocks.map((block) => {
+        const style = PHASE_STYLE[block.phase];
+        return (
+          <Card key={block.phase} className="pb-1">
+            <View className="flex-row items-center gap-3 pb-2">
+              <View className={`h-9 w-9 items-center justify-center rounded-full ${style.accent}`}>
+                <Ionicons name={style.icon} size={18} color={style.iconColor} />
+              </View>
+              <Text className="flex-1 text-lg font-extrabold text-ink-50">{block.title}</Text>
+              <Text className="text-sm font-semibold text-ink-400">{block.minutes} min</Text>
+            </View>
+            {block.items.map((item) => (
+              <Item key={`${block.phase}-${item.name}`} item={item} />
+            ))}
+          </Card>
+        );
+      })}
 
-      <View className="gap-1.5 rounded-2xl bg-ink-100 p-4 dark:bg-ink-800">
+      <View className="gap-2 px-1">
         {plan.safetyNotes.map((note) => (
-          <Text key={note} className="text-xs text-ink-600 dark:text-ink-300">
-            ⚠️ {note}
-          </Text>
+          <View key={note} className="flex-row gap-2">
+            <Ionicons name="alert-circle-outline" size={14} color={colors.ink[400]} />
+            <Text className="flex-1 text-xs leading-4 text-ink-400">{note}</Text>
+          </View>
         ))}
       </View>
     </View>

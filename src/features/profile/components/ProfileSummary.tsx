@@ -1,8 +1,12 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 
+import { Card } from '@/components/ui/Card';
+import { StatBlock } from '@/components/ui/StatBlock';
 import type { Profile } from '@/domain/types/profile';
-import { formatPace, formatWeightKg } from '@/lib/format';
+import { formatPaceValue } from '@/lib/format';
+import { colors } from '@/theme/tokens';
 
 import { GOAL_COPY, LEVEL_COPY } from '../labels';
 
@@ -14,15 +18,6 @@ function initialsOf(profile: Profile): string {
   return `${first}${last}`.toUpperCase();
 }
 
-function StatTile({ label, value }: { label: string; value: string }) {
-  return (
-    <View className="flex-1 gap-1 rounded-2xl bg-white p-4 dark:bg-ink-800">
-      <Text className="text-sm text-ink-400">{label}</Text>
-      <Text className="text-xl font-bold text-ink-900 dark:text-ink-50">{value}</Text>
-    </View>
-  );
-}
-
 type ProfileSummaryProps = {
   profile: Profile;
   /** Replaces the initials avatar (e.g. an editable avatar). */
@@ -31,24 +26,28 @@ type ProfileSummaryProps = {
 
 export function ProfileSummary({ profile, avatarSlot }: ProfileSummaryProps) {
   const goal = profile.mainGoal ? GOAL_COPY[profile.mainGoal] : null;
+  const weight =
+    profile.weightKg === null
+      ? '--'
+      : (Math.round(profile.weightKg * 10) / 10).toString().replace('.', ',');
 
   return (
-    <View className="gap-6">
+    <View className="gap-5">
       <View className="items-center gap-2">
         {avatarSlot ?? (
           <View className="h-24 w-24 items-center justify-center rounded-full bg-bolt-500">
-            <Text className="text-3xl font-bold text-ink-900">{initialsOf(profile)}</Text>
+            <Text className="text-3xl font-extrabold text-ink-900">{initialsOf(profile)}</Text>
           </View>
         )}
-        <Text className="text-2xl font-bold text-ink-900 dark:text-ink-50">
+        <Text className="text-2xl font-extrabold text-ink-50">
           {profile.fullName ?? profile.username}
         </Text>
         {profile.username ? (
-          <Text className="text-base text-ink-500 dark:text-ink-300">@{profile.username}</Text>
+          <Text className="text-base text-ink-400">@{profile.username}</Text>
         ) : null}
         {profile.level ? (
-          <View className="rounded-full bg-ink-900 px-3 py-1 dark:bg-bolt-500">
-            <Text className="text-sm font-semibold text-bolt-400 dark:text-ink-900">
+          <View className="rounded-full border border-bolt-500/40 bg-bolt-500/10 px-3 py-1">
+            <Text className="text-xs font-bold uppercase tracking-wider text-bolt-500">
               {LEVEL_COPY[profile.level].title}
             </Text>
           </View>
@@ -56,25 +55,44 @@ export function ProfileSummary({ profile, avatarSlot }: ProfileSummaryProps) {
       </View>
 
       <View className="flex-row gap-3">
-        <StatTile label="Peso" value={formatWeightKg(profile.weightKg)} />
-        <StatTile
-          label="Altura"
-          value={profile.heightCm === null ? '--' : `${profile.heightCm} cm`}
-        />
+        <Card className="flex-1">
+          <StatBlock size="medium" align="left" label="Peso" value={weight} unit="kg" />
+        </Card>
+        <Card className="flex-1">
+          <StatBlock
+            size="medium"
+            align="left"
+            label="Altura"
+            value={profile.heightCm === null ? '--' : String(profile.heightCm)}
+            unit="cm"
+          />
+        </Card>
       </View>
 
       {goal ? (
-        <View className="gap-1 rounded-2xl border-2 border-bolt-500 bg-bolt-50 p-4 dark:bg-ink-800">
-          <Text className="text-sm font-medium text-bolt-700 dark:text-bolt-400">
-            Meta principal
-          </Text>
-          <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">{goal.title}</Text>
-          <Text className="text-sm text-ink-500 dark:text-ink-300">
-            {profile.goalTargetPaceSPerKm
-              ? `Pace alvo: ${formatPace(profile.goalTargetPaceSPerKm)}`
-              : goal.description}
-          </Text>
-        </View>
+        <Card variant="highlight" className="gap-2">
+          <View className="flex-row items-center gap-2">
+            <Ionicons name="flag" size={14} color={colors.bolt[500]} />
+            <Text className="text-[11px] font-semibold uppercase tracking-[1.5px] text-bolt-500">
+              Meta principal
+            </Text>
+          </View>
+          <Text className="text-xl font-extrabold text-ink-50">{goal.title}</Text>
+          {profile.goalTargetPaceSPerKm ? (
+            <View className="flex-row items-baseline gap-1.5">
+              <Text className="text-sm text-ink-300">Pace alvo</Text>
+              <Text
+                className="text-[28px] font-extrabold text-ink-50"
+                style={{ fontVariant: ['tabular-nums'] }}
+              >
+                {formatPaceValue(profile.goalTargetPaceSPerKm)}
+              </Text>
+              <Text className="text-sm font-semibold text-ink-400">/km</Text>
+            </View>
+          ) : (
+            <Text className="text-sm text-ink-300">{goal.description}</Text>
+          )}
+        </Card>
       ) : null}
     </View>
   );

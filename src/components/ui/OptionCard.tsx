@@ -16,9 +16,7 @@ export function OptionCard({ title, description, selected, onPress }: OptionCard
       accessibilityLabel={description ? `${title}. ${description}` : title}
       onPress={onPress}
       className={`flex-row items-center gap-3 rounded-2xl border-2 p-4 ${
-        selected
-          ? 'border-bolt-500 bg-bolt-50 dark:bg-ink-800'
-          : 'border-ink-100 bg-white dark:border-ink-700 dark:bg-ink-800'
+        selected ? 'border-bolt-500 bg-bolt-500/10' : 'border-hairline bg-ink-800'
       }`}
     >
       <View

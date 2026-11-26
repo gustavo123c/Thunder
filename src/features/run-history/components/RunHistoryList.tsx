@@ -4,6 +4,7 @@ import { ActivityIndicator, Alert, FlatList, RefreshControl, Text, View } from '
 
 import { RunCard } from '@/components/run/RunCard';
 import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { colors } from '@/theme/tokens';
 
@@ -49,22 +50,29 @@ export function RunHistoryList({ userId, header = null, variant = 'own' }: RunHi
       contentContainerClassName="gap-4 px-4 pb-8 pt-4"
       ListHeaderComponent={
         <View className="gap-4">
-          {isOwn ? (
-            <Text className="text-3xl font-black text-ink-900 dark:text-ink-50">Histórico</Text>
-          ) : null}
+          {isOwn ? <Text className="text-3xl font-extrabold text-ink-50">Histórico</Text> : null}
           {header}
         </View>
       }
       ListEmptyComponent={
-        <View className="items-center gap-4 py-16">
-          <Text className="text-5xl">🏃</Text>
-          <Text className="text-center text-base text-ink-500 dark:text-ink-300">
-            {isOwn ? 'Nenhuma corrida ainda. Que tal a primeira hoje?' : 'Nenhuma corrida visível.'}
-          </Text>
-          {isOwn ? (
-            <Button label="Começar a correr" onPress={() => router.navigate('/record')} />
-          ) : null}
-        </View>
+        <EmptyState
+          icon={isOwn ? 'walk-outline' : 'eye-off-outline'}
+          title={isOwn ? 'Nenhuma corrida ainda' : 'Nenhuma corrida visível'}
+          description={
+            isOwn
+              ? 'Sua primeira corrida aparece aqui com mapa, splits e evolução.'
+              : 'Este atleta ainda não tem corridas que você possa ver.'
+          }
+          action={
+            isOwn ? (
+              <Button
+                label="Começar a correr"
+                icon="play"
+                onPress={() => router.navigate('/record')}
+              />
+            ) : undefined
+          }
+        />
       }
       renderItem={({ item }) => (
         <RunCard

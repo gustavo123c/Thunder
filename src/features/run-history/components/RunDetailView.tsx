@@ -68,7 +68,7 @@ function OwnerActions({ detail }: { detail: RunDetail }) {
 
   function chooseVisibility() {
     const options = (Object.keys(VISIBILITY_COPY) as RunRecord['visibility'][]).map((value) => ({
-      text: `${VISIBILITY_COPY[value].icon} ${VISIBILITY_COPY[value].label}`,
+      text: VISIBILITY_COPY[value].label,
       onPress: () => updateRun.mutate({ visibility: value }),
     }));
     Alert.alert('Quem pode ver esta corrida?', undefined, [
@@ -90,7 +90,8 @@ function OwnerActions({ detail }: { detail: RunDetail }) {
   return (
     <View className="gap-3">
       <Button
-        label={`${visibility.icon} Visível para: ${visibility.label}`}
+        icon={visibility.icon}
+        label={`Visível para: ${visibility.label}`}
         variant="secondary"
         onPress={chooseVisibility}
         loading={updateRun.isPending}
@@ -165,7 +166,7 @@ export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: Ru
           <Text className="text-3xl font-black text-ink-900 dark:text-ink-50">{detail.title}</Text>
         </View>
 
-        <View className="flex-row justify-around rounded-3xl bg-white py-5 dark:bg-ink-800">
+        <View className="flex-row justify-around rounded-[20px] border border-hairline bg-ink-800 py-5">
           <StatBlock label="Distância" value={formatDistanceKm(detail.distanceM)} />
           <StatBlock label="Pace" value={formatPaceValue(detail.avgPaceSPerKm)} />
         </View>

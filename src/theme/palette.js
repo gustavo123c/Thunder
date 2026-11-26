@@ -4,17 +4,18 @@
  * (for places that cannot use className, e.g. Mapbox layer styles).
  */
 module.exports = {
+  // Amber — primary actions, active states and positive evolution only.
   bolt: {
-    50: '#FFFBEB',
-    100: '#FEF3C7',
-    200: '#FDE68A',
-    300: '#FCD34D',
-    400: '#FBBF24',
-    500: '#F5B400',
-    600: '#D99A00',
-    700: '#A86F00',
-    800: '#7A5000',
-    900: '#4D3200',
+    50: '#FEFCE8',
+    100: '#FEF9C3',
+    200: '#FEF08A',
+    300: '#FDE047',
+    400: '#FDE047',
+    500: '#FACC15',
+    600: '#EAB308',
+    700: '#CA8A04',
+    800: '#854D0E',
+    900: '#422006',
   },
   ink: {
     50: '#F5F7FA',
@@ -24,10 +25,12 @@ module.exports = {
     400: '#6B7889',
     500: '#4A5667',
     600: '#333D4B',
-    700: '#222A35',
-    800: '#151B23',
-    900: '#0B0F14',
+    700: '#1C2331', // raised elements inside cards
+    800: '#121721', // card surface
+    900: '#090C10', // app background
   },
+  /** Hairline border for cards on the dark background. */
+  hairline: 'rgba(255, 255, 255, 0.08)',
   success: '#22C55E',
   danger: '#EF4444',
   info: '#38BDF8',

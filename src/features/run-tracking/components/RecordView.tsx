@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useEffect, useMemo } from 'react';
-import { Alert, View } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Alert, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RouteMap } from '@/components/map/RouteMap';
@@ -9,6 +10,7 @@ import { FormMessage } from '@/components/ui/FormMessage';
 import { samplesToMultiLineString } from '@/domain/geo/geojson';
 import { isActive } from '@/domain/run-session/run-session';
 import { isExpoGo } from '@/lib/runtime';
+import { colors } from '@/theme/tokens';
 
 import { useLiveMetrics } from '../hooks/useLiveMetrics';
 import { useLocationPermission, useRunControls } from '../hooks/useRunTracking';
@@ -93,21 +95,28 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
   if (!ready) return null;
 
   return (
-    <View className="flex-1 bg-ink-50 dark:bg-ink-900">
-      <View className={active ? 'h-[38%]' : 'flex-1'}>
+    <View className="flex-1 bg-ink-900">
+      <View className="flex-1">
         <RouteMap route={active ? route : null} followUser />
+        {isExpoGo ? (
+          <SafeAreaView edges={['top']} className="absolute left-0 right-0 top-0 items-center">
+            <View className="mt-2 flex-row items-center gap-1.5 rounded-full border border-hairline bg-ink-900/80 px-3 py-1.5">
+              <Ionicons name="flask-outline" size={12} color={colors.ink[400]} />
+              <Text className="text-[11px] text-ink-300">
+                Modo de teste · mantenha o app aberto durante a corrida
+              </Text>
+            </View>
+          </SafeAreaView>
+        ) : null}
       </View>
 
-      <SafeAreaView edges={['bottom']} className="gap-6 px-4 pb-4 pt-6">
-        {active ? <LiveStats metrics={metrics} paused={status === 'paused'} /> : null}
+      <View className="-mt-6 gap-5 rounded-t-[28px] border-t border-hairline bg-ink-800 px-4 pb-6 pt-6">
+        <LiveStats
+          metrics={metrics}
+          status={active ? (status === 'paused' ? 'paused' : 'running') : 'idle'}
+        />
         {!active ? (
           <PermissionNotice permission={permission} onRequest={() => void request()} />
-        ) : null}
-        {isExpoGo ? (
-          <FormMessage
-            tone="info"
-            message="Modo de teste (Expo Go): mantenha o app aberto na tela durante a corrida. A tela não vai apagar."
-          />
         ) : null}
         <FormMessage message={controls.error} />
         <RunControls
@@ -118,7 +127,7 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
           onResume={() => void controls.resume()}
           onFinish={confirmFinish}
         />
-      </SafeAreaView>
+      </View>
     </View>
   );
 }

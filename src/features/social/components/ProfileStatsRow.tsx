@@ -13,8 +13,15 @@ type ProfileStatsRowProps = {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-1 items-center gap-0.5">
-      <Text className="text-xl font-bold text-ink-900 dark:text-ink-50">{value}</Text>
-      <Text className="text-xs text-ink-400">{label}</Text>
+      <Text
+        className="text-xl font-extrabold text-ink-50"
+        style={{ fontVariant: ['tabular-nums'] }}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        {value}
+      </Text>
+      <Text className="text-[11px] uppercase tracking-wider text-ink-400">{label}</Text>
     </View>
   );
 }
@@ -26,7 +33,7 @@ export function ProfileStatsRow({ userId, viewerId }: ProfileStatsRowProps) {
 
   return (
     <View className="gap-4">
-      <View className="flex-row rounded-2xl bg-white py-4 dark:bg-ink-800">
+      <View className="flex-row rounded-[20px] border border-hairline bg-ink-800 py-4">
         <Stat label="Seguidores" value={stats ? String(stats.followersCount) : '–'} />
         <Stat label="Seguindo" value={stats ? String(stats.followingCount) : '–'} />
         <Stat label="Corridas" value={stats ? String(stats.runsCount) : '–'} />

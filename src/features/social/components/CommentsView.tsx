@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/components/ui/Avatar';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { FormMessage } from '@/components/ui/FormMessage';
 import { formatRunDate } from '@/lib/format';
 import { colors } from '@/theme/tokens';
@@ -60,11 +61,12 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
           keyExtractor={(comment) => comment.id}
           contentContainerClassName="gap-4 p-4"
           ListEmptyComponent={
-            <Text className="py-10 text-center text-base text-ink-500 dark:text-ink-300">
-              {comments.isError
-                ? 'Não foi possível carregar os comentários.'
-                : 'Nenhum comentário ainda. Mande um incentivo! 💬'}
-            </Text>
+            <EmptyState
+              compact
+              icon={comments.isError ? 'cloud-offline-outline' : 'chatbubbles-outline'}
+              title={comments.isError ? 'Não foi possível carregar' : 'Nenhum comentário ainda'}
+              description={comments.isError ? undefined : 'Mande um incentivo ou deixe uma nota.'}
+            />
           }
           renderItem={({ item }) => {
             const own = item.author.id === viewerId;
@@ -79,7 +81,7 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
                   imageUrl={item.author.avatarUrl}
                   size={34}
                 />
-                <View className="flex-1 gap-1 rounded-2xl bg-white p-3 dark:bg-ink-800">
+                <View className="flex-1 gap-1 rounded-2xl border border-hairline bg-ink-800 p-3">
                   <View className="flex-row items-baseline justify-between gap-2">
                     <Text className="font-semibold text-ink-900 dark:text-ink-50">
                       {own ? 'Você' : displayName(item.author)}
@@ -108,7 +110,7 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
 
       <SafeAreaView
         edges={['bottom']}
-        className="gap-2 border-t border-ink-100 bg-white px-4 pt-3 dark:border-ink-700 dark:bg-ink-800"
+        className="gap-2 border-t border-hairline bg-ink-800 px-4 pt-3"
       >
         <FormMessage
           message={addComment.isError ? 'Não foi possível enviar. Tente novamente.' : null}

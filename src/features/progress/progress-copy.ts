@@ -39,7 +39,7 @@ export function describeStreakCounts(streak: WinStreak): string {
 export function describeWeekStreak(streak: WinStreak): string {
   if (streak.weekStreak === 0) return 'Corra esta semana para começar uma sequência!';
   if (streak.weekStreak === 1) return '1 semana ativa — continue assim!';
-  return `${streak.weekStreak} semanas seguidas treinando 🔥`;
+  return `${streak.weekStreak} semanas seguidas treinando`;
 }
 
 /** Formats a signed percentage: 12 → "+12%", -3.5 → "-3,5%". */
@@ -58,7 +58,7 @@ export function describeProgress(comparison: PeriodComparison): ProgressMessage 
 
   if (current.runs === 0) {
     return {
-      text: `Nenhuma corrida ${CURRENT_LABEL[period]} ainda. Bora mudar isso? ⚡`,
+      text: `Nenhuma corrida ${CURRENT_LABEL[period]} ainda. Bora mudar isso?`,
       tone: 'neutral',
     };
   }
@@ -66,7 +66,7 @@ export function describeProgress(comparison: PeriodComparison): ProgressMessage 
   if (paceImprovementPct !== null) {
     if (paceImprovementPct >= 1) {
       return {
-        text: `Você melhorou ${formatPercent(paceImprovementPct).slice(1)} no seu pace de corrida em relação ${RELATIVE_LABEL[period]}. 🚀`,
+        text: `Você melhorou ${formatPercent(paceImprovementPct).slice(1)} no seu pace de corrida em relação ${RELATIVE_LABEL[period]}.`,
         tone: 'positive',
       };
     }
@@ -77,7 +77,7 @@ export function describeProgress(comparison: PeriodComparison): ProgressMessage 
       };
     }
     return {
-      text: `Pace estável em relação ${RELATIVE_LABEL[period]}. Consistência é tudo! 🎯`,
+      text: `Pace estável em relação ${RELATIVE_LABEL[period]}. Consistência é tudo!`,
       tone: 'neutral',
     };
   }

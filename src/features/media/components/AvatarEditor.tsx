@@ -1,8 +1,10 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { Pressable, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/Avatar';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { colors } from '@/theme/tokens';
 
 import { useUploadAvatar } from '../hooks/useMedia';
 import { describeMediaError } from '../media-errors';
@@ -43,11 +45,11 @@ export function AvatarEditor({ userId, name, avatarUrl }: AvatarEditorProps) {
         ) : (
           <Avatar name={name} imageUrl={avatarUrl} size={SIZE} />
         )}
-        <View className="absolute bottom-0 right-0 h-8 w-8 items-center justify-center rounded-full border-2 border-ink-50 bg-bolt-500 dark:border-ink-900">
-          <Text className="text-sm">📷</Text>
+        <View className="absolute bottom-0 right-0 h-8 w-8 items-center justify-center rounded-full border-2 border-ink-900 bg-bolt-500">
+          <Ionicons name="camera" size={15} color={colors.ink[900]} />
         </View>
       </Pressable>
-      <Text className="text-sm font-semibold text-bolt-600">
+      <Text className="text-sm font-semibold text-bolt-500">
         {upload.isPending ? 'Enviando foto…' : 'Alterar foto'}
       </Text>
       {upload.isError ? (

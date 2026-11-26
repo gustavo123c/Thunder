@@ -15,7 +15,7 @@ export function PermissionNotice({ permission, onRequest }: PermissionNoticeProp
 
   if (permission === 'foreground_only') {
     return (
-      <View className="gap-2 rounded-2xl bg-bolt-50 p-4 dark:bg-ink-800">
+      <View className="gap-2 rounded-[20px] border border-bolt-500/30 bg-bolt-500/10 p-4">
         <Text className="text-sm font-semibold text-ink-900 dark:text-ink-50">
           Permita a localização &quot;sempre&quot;
         </Text>
@@ -32,7 +32,7 @@ export function PermissionNotice({ permission, onRequest }: PermissionNoticeProp
   }
 
   return (
-    <View className="gap-3 rounded-2xl bg-white p-4 dark:bg-ink-800">
+    <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
       <Text className="text-base font-semibold text-ink-900 dark:text-ink-50">
         Precisamos da sua localização
       </Text>

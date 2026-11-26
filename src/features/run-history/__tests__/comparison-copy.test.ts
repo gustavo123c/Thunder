@@ -42,7 +42,7 @@ describe('describeComparison', () => {
     ]);
     const [insight] = describeComparison(comparison);
     expect(insight).toEqual({
-      emoji: '🧘',
+      icon: 'leaf',
       text: '40 s/km mais lento que a média de 2 corridas parecidas.',
       tone: 'neutral',
     });

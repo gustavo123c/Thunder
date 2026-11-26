@@ -46,7 +46,7 @@ export function PeopleSearch({ viewerId }: { viewerId: string }) {
           )
         }
         renderItem={({ item }) => (
-          <View className="flex-row items-center gap-3 rounded-2xl bg-white p-3 dark:bg-ink-800">
+          <View className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-ink-800 p-3">
             <Pressable
               accessibilityRole="link"
               accessibilityLabel={`Perfil de ${displayName(item)}`}

@@ -1,42 +1,62 @@
 import { Text, View } from 'react-native';
 
 import { StatBlock } from '@/components/ui/StatBlock';
-import { formatDistanceKm, formatDuration, formatPaceValue } from '@/lib/format';
+import { formatDistanceKm, formatDuration, formatPaceTrack } from '@/lib/format';
 
 import type { LiveMetrics } from '../hooks/useLiveMetrics';
 
-export function LiveStats({ metrics, paused }: { metrics: LiveMetrics; paused: boolean }) {
+type LiveStatsProps = {
+  metrics: LiveMetrics;
+  /** 'idle' shows the ready indicators (00:00 · 0,00 km · --'--). */
+  status: 'idle' | 'running' | 'paused';
+};
+
+/** Run metrics panel: big tabular numbers, labels small and muted. */
+export function LiveStats({ metrics, status }: LiveStatsProps) {
+  const distance = formatDistanceKm(metrics.distanceM).replace(' km', '');
+
+  if (status === 'idle') {
+    return (
+      <View className="flex-row justify-between px-2">
+        <StatBlock size="medium" label="Tempo" value="00:00" />
+        <StatBlock size="medium" label="Distância" value={distance} unit="km" />
+        <StatBlock size="medium" label="Pace" value={formatPaceTrack(null)} />
+      </View>
+    );
+  }
+
   return (
     <View className="gap-5">
-      {paused ? (
-        <View className="self-center rounded-full bg-bolt-500 px-3 py-1">
-          <Text className="text-xs font-bold uppercase tracking-wider text-ink-900">Pausado</Text>
+      {status === 'paused' ? (
+        <View className="self-center rounded-full border border-bolt-500/40 bg-bolt-500/10 px-3 py-1">
+          <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-bolt-500">
+            Pausado
+          </Text>
         </View>
       ) : null}
 
-      <StatBlock
-        size="hero"
-        label="Distância (km)"
-        value={formatDistanceKm(metrics.distanceM).replace(' km', '')}
-      />
+      <StatBlock size="hero" label="Distância" value={distance} unit="km" />
 
-      <View className="flex-row justify-around">
-        <StatBlock label="Tempo" value={formatDuration(metrics.activeTimeS)} />
-        <StatBlock label="Pace atual" value={formatPaceValue(metrics.currentPaceSPerKm)} />
-      </View>
-
-      <View className="flex-row justify-around">
+      <View className="flex-row justify-between px-2">
+        <StatBlock size="medium" label="Tempo" value={formatDuration(metrics.activeTimeS)} />
+        <StatBlock
+          size="medium"
+          label="Pace atual"
+          value={formatPaceTrack(metrics.currentPaceSPerKm)}
+          accent
+        />
         <StatBlock
           size="medium"
           label="Pace médio"
-          value={formatPaceValue(metrics.avgPaceSPerKm)}
-        />
-        <StatBlock
-          size="medium"
-          label="Calorias"
-          value={metrics.caloriesKcal === null ? '--' : Math.round(metrics.caloriesKcal).toString()}
+          value={formatPaceTrack(metrics.avgPaceSPerKm)}
         />
       </View>
+
+      <Text className="text-center text-xs text-ink-400">
+        {metrics.caloriesKcal === null
+          ? 'Calorias: informe seu peso no perfil'
+          : `${Math.round(metrics.caloriesKcal)} kcal estimadas`}
+      </Text>
     </View>
   );
 }

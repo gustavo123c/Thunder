@@ -14,7 +14,7 @@ export function FormMessage({ message, tone = 'error' }: FormMessageProps) {
   return (
     <View
       accessibilityLiveRegion="polite"
-      className={`rounded-xl px-4 py-3 dark:bg-ink-800 ${isError ? 'bg-red-50' : 'bg-bolt-50'}`}
+      className={`rounded-xl border px-4 py-3 ${isError ? 'border-danger/30 bg-danger/10' : 'border-bolt-500/30 bg-bolt-500/10'}`}
     >
       <Text className={`text-sm ${isError ? 'text-danger' : 'text-ink-700 dark:text-ink-100'}`}>
         {message}

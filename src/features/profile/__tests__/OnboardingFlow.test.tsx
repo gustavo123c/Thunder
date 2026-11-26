@@ -121,7 +121,7 @@ it('blocks the first step when the username is taken', async () => {
   await user.press(screen.getByRole('button', { name: 'Continuar' }));
 
   expect(await screen.findByText('Este nome de usuário já está em uso.')).toBeOnTheScreen();
-  expect(screen.getByText('Bem-vindo ao Thunder ⚡')).toBeOnTheScreen();
+  expect(screen.getByText('Bem-vindo ao Thunder')).toBeOnTheScreen();
   expect(mockedUpdateProfile).not.toHaveBeenCalled();
 });
 

@@ -114,3 +114,29 @@ export function formatPaceTrack(secondsPerKm: number | null | undefined): string
   const rounded = Math.round(secondsPerKm);
   return `${Math.floor(rounded / 60)}'${pad2(rounded % 60)}"`;
 }
+
+const MONTHS_LONG = [
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+];
+
+/** "Novembro de 2026" (local time). */
+export function formatMonthYear(date: Date): string {
+  return `${MONTHS_LONG[date.getMonth()]} de ${date.getFullYear()}`;
+}
+
+/** 22.94 → "22,9" (pt-BR, fixed decimals); unknown → "--". */
+export function formatDecimal(value: number | null | undefined, decimals = 1): string {
+  if (value == null || !Number.isFinite(value)) return PLACEHOLDER;
+  return value.toFixed(decimals).replace('.', ',');
+}

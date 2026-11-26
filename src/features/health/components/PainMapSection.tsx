@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -11,9 +12,10 @@ import {
   painLevel,
 } from '@/domain/health/body-regions';
 import type { BodySex } from '@/domain/types/profile';
+import { colors } from '@/theme/tokens';
 
 import { useOpenPains, useResolvePain, useSetPain } from '../hooks/usePains';
-import { BodyMap } from './BodyMap';
+import { BodyMap, PAIN_COLORS } from './BodyMap';
 import { PainSheet } from './PainSheet';
 
 /** "Como está seu corpo hoje?" — body map, active pains and the health notice. */
@@ -32,12 +34,11 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
   return (
     <View className="gap-4">
       <View className="gap-1">
-        <Text className="text-xl font-bold text-ink-900 dark:text-ink-50">
+        <Text accessibilityRole="header" className="text-2xl font-extrabold text-ink-50">
           Como está seu corpo hoje?
         </Text>
-        <Text className="text-sm text-ink-500 dark:text-ink-300">
-          Toque onde sente dor ou desconforto. O treino gerado vai evitar sobrecarregar essas
-          regiões.
+        <Text className="text-sm leading-5 text-ink-400">
+          Toque onde sente dor. O treino vai poupar essas regiões.
         </Text>
       </View>
 
@@ -51,20 +52,42 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
 
       {list.length > 0 ? (
         <View className="flex-row flex-wrap gap-2">
-          {list.map((pain) => (
-            <Pressable
-              key={pain.id}
-              accessibilityRole="button"
-              accessibilityLabel={`Editar dor: ${describeRegion(pain.region, pain.side)}`}
-              onPress={() => setTarget({ region: pain.region, side: pain.side })}
-              className="flex-row items-center gap-1.5 rounded-full bg-ink-100 px-3 py-1.5 dark:bg-ink-700"
-            >
-              <Text className="text-sm text-ink-800 dark:text-ink-100">
-                {describeRegion(pain.region, pain.side)} ·{' '}
-                {PAIN_PRESETS[painLevel(pain.intensity)].label.toLowerCase()}
-              </Text>
-            </Pressable>
-          ))}
+          {list.map((pain) => {
+            const name = describeRegion(pain.region, pain.side);
+            const level = painLevel(pain.intensity);
+            return (
+              <View
+                key={pain.id}
+                className="flex-row items-center rounded-full border border-hairline bg-ink-800"
+              >
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Editar dor: ${name}`}
+                  onPress={() => setTarget({ region: pain.region, side: pain.side })}
+                  className="flex-row items-center gap-2 py-2 pl-3 pr-1 active:opacity-70"
+                >
+                  <View
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: PAIN_COLORS[level] }}
+                  />
+                  <Text className="text-sm font-semibold text-ink-100">{name}</Text>
+                  <Text className="text-sm text-ink-400">
+                    {PAIN_PRESETS[level].label.toLowerCase()}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remover dor: ${name}`}
+                  hitSlop={6}
+                  disabled={saving}
+                  onPress={() => resolve.mutate(pain.id)}
+                  className="h-8 w-8 items-center justify-center rounded-full active:bg-ink-700"
+                >
+                  <Ionicons name="close" size={16} color={colors.ink[400]} />
+                </Pressable>
+              </View>
+            );
+          })}
         </View>
       ) : pains.isSuccess ? (
         <Text className="text-center text-sm text-ink-400">Nenhuma dor registrada.</Text>

@@ -1,8 +1,11 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { router } from 'expo-router';
 import { type ReactNode, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { HealthDisclaimer } from '@/components/ui/HealthDisclaimer';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { describeRegion, type PainEntry } from '@/domain/health/body-regions';
 import {
   WORKOUT_DURATIONS,
@@ -13,55 +16,85 @@ import {
 } from '@/domain/training/workout-generator';
 import type { RunnerLevel } from '@/domain/types/profile';
 import { formatPace, formatRunDate } from '@/lib/format';
+import { colors } from '@/theme/tokens';
 
 import { useDeleteWorkout, useGenerateWorkout, useRecentWorkouts } from '../hooks/useWorkouts';
 import { WorkoutPlanView } from './WorkoutPlanView';
 
-const GOAL_LABELS: Record<WorkoutGoal, { label: string; hint: string }> = {
-  pace: { label: 'Melhorar pace', hint: 'Intervalados para correr mais rápido' },
-  endurance: { label: 'Resistência', hint: 'Correr por mais tempo, ritmo confortável' },
-  strength: { label: 'Fortalecimento', hint: 'Força e core para prevenir lesões' },
+type IconName = keyof typeof Ionicons.glyphMap;
+
+const GOALS: Record<WorkoutGoal, { label: string; hint: string; icon: IconName }> = {
+  pace: { label: 'Pace', hint: 'Intervalados para ganhar velocidade', icon: 'speedometer' },
+  endurance: { label: 'Resistência', hint: 'Mais tempo em ritmo confortável', icon: 'infinite' },
+  strength: { label: 'Fortalecimento', hint: 'Força e core contra lesões', icon: 'barbell' },
 };
 
-const LEVEL_LABELS: Record<RunnerLevel, string> = {
-  beginner: 'Iniciante',
-  intermediate: 'Intermediário',
-};
+const LEVEL_OPTIONS = [
+  { value: 'beginner', label: 'Iniciante' },
+  { value: 'intermediate', label: 'Intermediário' },
+] as const satisfies readonly { value: RunnerLevel; label: string }[];
 
-function Chip({
-  label,
+const DURATION_OPTIONS = WORKOUT_DURATIONS.map((d) => ({ value: d, label: `${d} min` }));
+
+function GoalCard({
+  goal,
   selected,
   onPress,
 }: {
-  label: string;
+  goal: WorkoutGoal;
   selected: boolean;
   onPress: () => void;
 }) {
+  const copy = GOALS[goal];
   return (
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ checked: selected }}
+      accessibilityLabel={copy.label}
+      accessibilityHint={copy.hint}
       onPress={onPress}
-      className={`rounded-full border-2 px-4 py-2 ${
-        selected ? 'border-bolt-500 bg-bolt-500' : 'border-ink-200 dark:border-ink-600'
+      className={`flex-1 gap-3 rounded-[20px] border p-3.5 active:opacity-80 ${
+        selected ? 'border-bolt-500 bg-bolt-500/10' : 'border-hairline bg-ink-800'
       }`}
     >
-      <Text
-        className={`text-sm font-semibold ${selected ? 'text-ink-900' : 'text-ink-600 dark:text-ink-200'}`}
+      <View
+        className={`h-10 w-10 items-center justify-center rounded-full ${
+          selected ? 'bg-bolt-500' : 'bg-ink-700'
+        }`}
       >
-        {label}
-      </Text>
+        <Ionicons name={copy.icon} size={20} color={selected ? colors.ink[900] : colors.ink[200]} />
+      </View>
+      <View className="gap-1">
+        <Text
+          className="text-[15px] font-extrabold text-ink-50"
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
+          {copy.label}
+        </Text>
+        <Text className="text-xs leading-4 text-ink-400">{copy.hint}</Text>
+      </View>
     </Pressable>
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View className="gap-2">
-      <Text className="text-sm font-semibold text-ink-700 dark:text-ink-200">{label}</Text>
-      <View accessibilityRole="radiogroup" className="flex-row flex-wrap gap-2">
-        {children}
-      </View>
+    <View className="gap-2.5">
+      <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400">{title}</Text>
+      {children}
+    </View>
+  );
+}
+
+function ContextRow({ icon, label, value }: { icon: IconName; label: string; value: string }) {
+  return (
+    <View className="flex-row items-center gap-3">
+      <Ionicons name={icon} size={16} color={colors.ink[300]} />
+      <Text className="text-sm text-ink-400">{label}</Text>
+      <Text className="flex-1 text-right text-sm font-semibold text-ink-100" numberOfLines={2}>
+        {value}
+      </Text>
     </View>
   );
 }
@@ -71,14 +104,17 @@ type WorkoutBuilderProps = {
   defaultLevel: RunnerLevel;
   pains: readonly PainEntry[];
   recentPaceSPerKm: number | null;
+  /** Goes back to the body check-up step. */
+  onEditPains?: () => void;
 };
 
-/** Personalized workout form + generated plan + recently generated workouts. */
+/** Step 2 of the training tab: workout settings → structured workout sheet. */
 export function WorkoutBuilder({
   userId,
   defaultLevel,
   pains,
   recentPaceSPerKm,
+  onEditPains,
 }: WorkoutBuilderProps) {
   const [goal, setGoal] = useState<WorkoutGoal>('pace');
   const [level, setLevel] = useState<RunnerLevel>(defaultLevel);
@@ -95,62 +131,88 @@ export function WorkoutBuilder({
     );
   }
 
+  if (plan) {
+    return (
+      <View className="gap-5">
+        <WorkoutPlanView plan={plan} />
+        <Button
+          label="Iniciar este treino"
+          icon="play"
+          onPress={() => router.navigate('/record')}
+        />
+        <Button
+          label="Montar outro treino"
+          icon="options-outline"
+          variant="secondary"
+          onPress={() => setPlan(null)}
+        />
+        <HealthDisclaimer withPain={pains.length > 0} />
+      </View>
+    );
+  }
+
   return (
-    <View className="gap-5">
+    <View className="gap-6">
       <View className="gap-1">
-        <Text className="text-xl font-bold text-ink-900 dark:text-ink-50">
-          Treino personalizado
+        <Text accessibilityRole="header" className="text-2xl font-extrabold text-ink-50">
+          Monte seu treino
         </Text>
-        <Text className="text-sm text-ink-500 dark:text-ink-300">
-          Escolha seu objetivo e tempo. Consideramos seu nível, suas dores e seu pace recente.
+        <Text className="text-sm text-ink-400">
+          Consideramos seu nível, suas dores e seu pace recente.
         </Text>
       </View>
 
-      <Field label="Objetivo">
-        {WORKOUT_GOALS.map((g) => (
-          <Chip
-            key={g}
-            label={GOAL_LABELS[g].label}
-            selected={g === goal}
-            onPress={() => setGoal(g)}
-          />
-        ))}
-      </Field>
-      <Text className="-mt-3 text-xs text-ink-400">{GOAL_LABELS[goal].hint}</Text>
+      <Section title="Objetivo">
+        <View accessibilityRole="radiogroup" className="flex-row gap-2.5">
+          {WORKOUT_GOALS.map((g) => (
+            <GoalCard key={g} goal={g} selected={g === goal} onPress={() => setGoal(g)} />
+          ))}
+        </View>
+      </Section>
 
-      <Field label="Nível">
-        {(Object.keys(LEVEL_LABELS) as RunnerLevel[]).map((l) => (
-          <Chip
-            key={l}
-            label={LEVEL_LABELS[l]}
-            selected={l === level}
-            onPress={() => setLevel(l)}
-          />
-        ))}
-      </Field>
+      <Section title="Nível">
+        <SegmentedControl
+          accessibilityLabel="Nível"
+          options={LEVEL_OPTIONS}
+          value={level}
+          onChange={setLevel}
+        />
+      </Section>
 
-      <Field label="Tempo disponível">
-        {WORKOUT_DURATIONS.map((d) => (
-          <Chip
-            key={d}
-            label={`${d} min`}
-            selected={d === duration}
-            onPress={() => setDuration(d)}
-          />
-        ))}
-      </Field>
+      <Section title="Tempo disponível">
+        <SegmentedControl
+          accessibilityLabel="Tempo disponível"
+          options={DURATION_OPTIONS}
+          value={duration}
+          onChange={setDuration}
+        />
+      </Section>
 
-      <View className="gap-1 rounded-2xl bg-ink-100 p-3 dark:bg-ink-800">
-        <Text className="text-xs text-ink-500 dark:text-ink-300">
-          {pains.length > 0
-            ? `Dores consideradas: ${pains.map((p) => describeRegion(p.region, p.side)).join(', ')}`
-            : 'Nenhuma dor registrada no mapa corporal.'}
-        </Text>
-        <Text className="text-xs text-ink-500 dark:text-ink-300">
-          {recentPaceSPerKm
-            ? `Pace de referência (últimas corridas): ${formatPace(recentPaceSPerKm)}`
-            : 'Sem corridas recentes: usaremos o esforço percebido como guia.'}
-        </Text>
+      <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
+        <ContextRow
+          icon="body-outline"
+          label="Dores"
+          value={
+            pains.length > 0
+              ? pains.map((p) => describeRegion(p.region, p.side)).join(', ')
+              : 'Nenhuma'
+          }
+        />
+        <ContextRow
+          icon="speedometer-outline"
+          label="Pace de referência"
+          value={recentPaceSPerKm ? formatPace(recentPaceSPerKm) : 'Esforço percebido'}
+        />
+        {onEditPains ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={onEditPains}
+            hitSlop={8}
+            className="self-start"
+          >
+            <Text className="text-sm font-semibold text-bolt-500">Revisar check-up corporal</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       <Button
@@ -160,21 +222,13 @@ export function WorkoutBuilder({
         loading={generate.isPending}
       />
 
-      {plan ? (
-        <>
-          <WorkoutPlanView plan={plan} />
-          <HealthDisclaimer withPain={pains.length > 0} />
-        </>
-      ) : null}
-
       {(recent.data ?? []).length > 0 ? (
-        <View className="gap-2">
-          <Text className="text-lg font-bold text-ink-900 dark:text-ink-50">Treinos recentes</Text>
+        <Section title="Treinos recentes">
           {recent.data?.map((saved) => (
             <Pressable
               key={saved.id}
               accessibilityRole="button"
-              accessibilityHint="Toque e segure para apagar"
+              accessibilityHint="Toque para abrir, segure para apagar"
               onPress={() => setPlan(saved.plan)}
               onLongPress={() =>
                 Alert.alert('Apagar treino salvo?', undefined, [
@@ -182,20 +236,21 @@ export function WorkoutBuilder({
                   { text: 'Apagar', style: 'destructive', onPress: () => remove.mutate(saved.id) },
                 ])
               }
-              className="flex-row items-center justify-between rounded-[20px] border border-hairline bg-ink-800 p-4 active:opacity-80"
+              className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4 active:opacity-80"
             >
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-ink-700">
+                <Ionicons name="document-text-outline" size={18} color={colors.ink[200]} />
+              </View>
               <View className="flex-1 gap-0.5">
-                <Text className="font-semibold text-ink-900 dark:text-ink-50">
-                  {saved.plan.title}
-                </Text>
+                <Text className="font-bold text-ink-50">{saved.plan.title}</Text>
                 <Text className="text-xs text-ink-400">
-                  {saved.plan.summary} · {formatRunDate(saved.createdAt)}
+                  {saved.plan.totalMinutes} min · {formatRunDate(saved.createdAt)}
                 </Text>
               </View>
-              <Text className="text-bolt-600">Ver</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.ink[400]} />
             </Pressable>
           ))}
-        </View>
+        </Section>
       ) : null}
     </View>
   );

@@ -14,6 +14,9 @@ export const surfaces = {
 /** Subtle dark gradient for highlight cards (streak, main goal). */
 export const highlightGradient = ['#1D2535', '#121721', '#0E131B'] as const;
 
+/** Profile cover: a faint amber glow fading into the background. */
+export const bannerGradient = ['#3A3112', '#1A1F2B', '#090C10'] as const;
+
 /** Route line colors used on maps (live tracking and post-run summary). */
 export const mapColors = {
   route: palette.bolt[500],

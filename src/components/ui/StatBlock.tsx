@@ -41,7 +41,9 @@ export function StatBlock({
       <View className="flex-row items-baseline gap-1">
         <Text
           className={`${valueSize[size]} font-extrabold ${accent ? 'text-bolt-500' : 'text-ink-50'}`}
-          style={{ fontVariant: ['tabular-nums'] }}
+          style={{ fontVariant: ['tabular-nums'], flexShrink: 1 }}
+          numberOfLines={1}
+          adjustsFontSizeToFit
         >
           {value}
         </Text>

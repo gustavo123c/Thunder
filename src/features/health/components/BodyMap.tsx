@@ -16,7 +16,7 @@ import { colors } from '@/theme/tokens';
 import type { PainLog } from '../api/pain.api';
 import { DRAWINGS, musclePaths, tappableRegions } from '../muscle-map';
 
-const PAIN_COLORS: Record<PainLevel, string> = {
+export const PAIN_COLORS: Record<PainLevel, string> = {
   mild: colors.bolt[400],
   moderate: '#F97316',
   severe: colors.danger,
@@ -39,10 +39,7 @@ function Toggle<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <View
-      accessibilityRole="tablist"
-      className="flex-row rounded-xl bg-ink-100 p-1 dark:bg-ink-900"
-    >
+    <View accessibilityRole="tablist" className="flex-row rounded-full bg-ink-900 p-1">
       {options.map((option) => {
         const selected = option.value === value;
         return (
@@ -51,10 +48,10 @@ function Toggle<T extends string>({
             accessibilityRole="tab"
             accessibilityState={{ selected }}
             onPress={() => onChange(option.value)}
-            className={`rounded-lg px-3 py-1.5 ${selected ? 'bg-ink-700' : ''}`}
+            className={`rounded-full px-3.5 py-1.5 ${selected ? 'bg-ink-700' : ''}`}
           >
             <Text
-              className={`text-sm font-semibold ${selected ? 'text-ink-900 dark:text-ink-50' : 'text-ink-400'}`}
+              className={`text-[13px] font-semibold ${selected ? 'text-ink-50' : 'text-ink-400'}`}
             >
               {option.label}
             </Text>
@@ -101,26 +98,25 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
 
   return (
     <View className="gap-3">
-      <View className="flex-row flex-wrap items-center justify-between gap-2">
-        <Toggle
-          options={[
-            { value: 'front', label: 'Frente' },
-            { value: 'back', label: 'Costas' },
-          ]}
-          value={view}
-          onChange={setView}
-        />
-        <Toggle
-          options={[
-            { value: 'male', label: 'Masculino' },
-            { value: 'female', label: 'Feminino' },
-          ]}
-          value={model}
-          onChange={setModel}
-        />
-      </View>
-
-      <View className="items-center rounded-[20px] border border-hairline bg-ink-800 py-4">
+      <View className="items-center rounded-[20px] border border-hairline bg-ink-800 pb-4 pt-3">
+        <View className="w-full flex-row flex-wrap items-center justify-between gap-2 px-3 pb-2">
+          <Toggle
+            options={[
+              { value: 'front', label: 'Frente' },
+              { value: 'back', label: 'Costas' },
+            ]}
+            value={view}
+            onChange={setView}
+          />
+          <Toggle
+            options={[
+              { value: 'male', label: 'Masculino' },
+              { value: 'female', label: 'Feminino' },
+            ]}
+            value={model}
+            onChange={setModel}
+          />
+        </View>
         <Svg
           width={width}
           height={height}
@@ -163,7 +159,7 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
         onPress={() => setShowList((v) => !v)}
         className="self-center"
       >
-        <Text className="text-sm font-semibold text-bolt-600">
+        <Text className="text-sm font-semibold text-bolt-500">
           {showList ? 'Ocultar lista de regiões' : 'Escolher pela lista'}
         </Text>
       </Pressable>
@@ -177,13 +173,11 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
                 accessibilityRole="button"
                 accessibilityLabel={describeRegion(region, side)}
                 onPress={() => onSelect(region, side)}
-                className={`rounded-full px-3 py-1.5 ${
-                  pain ? 'bg-bolt-100 dark:bg-ink-600' : 'bg-ink-100 dark:bg-ink-700'
+                className={`rounded-full border px-3 py-1.5 ${
+                  pain ? 'border-bolt-500/40 bg-bolt-500/10' : 'border-hairline bg-ink-800'
                 }`}
               >
-                <Text className="text-sm text-ink-800 dark:text-ink-100">
-                  {describeRegion(region, side)}
-                </Text>
+                <Text className="text-sm text-ink-100">{describeRegion(region, side)}</Text>
               </Pressable>
             );
           })}

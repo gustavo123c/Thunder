@@ -76,6 +76,10 @@ function RootNavigator() {
           options={{ headerShown: true, title: 'Atleta', headerBackTitle: 'Voltar' }}
         />
         <Stack.Screen
+          name="retrospective"
+          options={{ headerShown: true, title: 'Retrospectiva', headerBackTitle: 'Histórico' }}
+        />
+        <Stack.Screen
           name="settings"
           options={{ headerShown: true, title: 'Configurações', headerBackTitle: 'Perfil' }}
         />

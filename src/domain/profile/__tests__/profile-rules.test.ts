@@ -1,5 +1,6 @@
 import { isOnboarded } from '../../types/profile';
 import {
+  bodyMassIndex,
   parseDecimal,
   parsePaceInput,
   validateFullName,
@@ -97,5 +98,15 @@ describe('isOnboarded', () => {
     expect(isOnboarded(null)).toBe(false);
     expect(isOnboarded({ onboardedAt: null })).toBe(false);
     expect(isOnboarded({ onboardedAt: '2026-11-25T10:00:00Z' })).toBe(true);
+  });
+});
+
+describe('bodyMassIndex', () => {
+  it('computes kg/m² with one decimal', () => {
+    expect(bodyMassIndex(70, 175)).toBe(22.9);
+  });
+  it('is null without both measurements', () => {
+    expect(bodyMassIndex(null, 175)).toBeNull();
+    expect(bodyMassIndex(70, null)).toBeNull();
   });
 });

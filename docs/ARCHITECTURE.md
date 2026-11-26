@@ -250,3 +250,16 @@ The app is dark-only (`userInterfaceStyle: "dark"`, NativeWind `colorScheme.set(
 - **Empty states:** `components/ui/EmptyState` (icon in a dashed, glowing ring).
 - **Map fallback:** `components/map/GridBackdrop` draws the dark grid used by `RouteSketch` in Expo Go.
 - Third-party credits (e.g. react-native-body-highlighter, MIT) live in Settings → Sobre.
+
+### Tab structure (v3)
+
+- **Histórico:** only the run list, grouped by month (`features/run-history/group-by-month.ts`).
+  The "Retrospectiva" pill opens `app/retrospective.tsx` (win streak + period dashboard).
+- **Treino:** two steps (`TrainingStepper`): 1) body check-up (map, bottom sheet, removable pain
+  chips); 2) workout settings (goal cards, `SegmentedControl` for level/time) → structured workout
+  sheet with "Iniciar este treino" (opens the record tab).
+- **Perfil:** `ProfileHeader` (cover, ringed avatar, edit/settings) + tabs Resumo | Recordes |
+  Conquistas. Records, achievements and goal progress are pure functions in
+  `domain/insights/records.ts` over the `list_activity` window (since Jan 1 of last year);
+  achievement totals use the all-time `get_profile_stats`. "Melhor 5K" is projected from the
+  average pace of runs ≥ 5 km.

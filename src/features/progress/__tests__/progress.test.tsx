@@ -5,12 +5,16 @@ import { comparePeriods, computeWinStreak } from '@/domain/insights/activity';
 import type { ActivityItem } from '@/services/supabase/run-json';
 
 import { fetchActivity } from '../api/activity.api';
+import { AchievementsGrid } from '../components/AchievementsGrid';
+import { GoalProgressCard } from '../components/GoalProgressCard';
+import { PersonalRecords } from '../components/PersonalRecords';
 import { ProgressDashboard } from '../components/ProgressDashboard';
 import { WinStreakCard } from '../components/WinStreakCard';
 import { describeProgress, describeStreakCounts, formatPercent } from '../progress-copy';
 
 jest.mock('@/services/supabase/client', () => ({ supabase: {} }));
 jest.mock('../api/activity.api', () => ({ fetchActivity: jest.fn() }));
+jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
 
 const daysAgo = (days: number, paceS = 360, km = 5): ActivityItem => {
   const date = new Date();
@@ -106,5 +110,43 @@ describe('progress components', () => {
     expect(
       await screen.findByText(/no seu pace de corrida em relação ao ano passado/),
     ).toBeOnTheScreen();
+  });
+
+  it('shows personal records', async () => {
+    jest
+      .mocked(fetchActivity)
+      .mockResolvedValue([daysAgo(1, 300, 3), daysAgo(3, 330, 10), daysAgo(5, 320, 5)]);
+    await renderWithQuery(<PersonalRecords userId="u1" />);
+
+    expect(await screen.findByText('Melhor pace')).toBeOnTheScreen();
+    expect(screen.getByText('5:00')).toBeOnTheScreen(); // 3 km at 5:00
+    expect(screen.getByText('10,00')).toBeOnTheScreen(); // longest run
+    expect(screen.getByText('26:40')).toBeOnTheScreen(); // 5 km at 5:20
+  });
+
+  it('counts unlocked achievements', async () => {
+    jest.mocked(fetchActivity).mockResolvedValue([daysAgo(0), daysAgo(7), daysAgo(14)]);
+    await renderWithQuery(<AchievementsGrid userId="u1" totals={{ runs: 3, distanceM: 15_000 }} />);
+    // first run, first 5K, 3-week streak
+    expect(await screen.findByText(/de 9 conquistas desbloqueadas/)).toBeOnTheScreen();
+    expect(screen.getByText('3')).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^Primeira corrida\. Desbloqueada/)).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^50 km acumulados\. 30% concluída/)).toBeOnTheScreen();
+  });
+
+  it('shows the main goal progress bar', async () => {
+    jest.mocked(fetchActivity).mockResolvedValue([daysAgo(2, 360, 2.5)]);
+    await renderWithQuery(
+      <GoalProgressCard
+        userId="u1"
+        goal="complete_5k"
+        goalTitle="Completar 5 km"
+        goalDescription=""
+        targetPaceSPerKm={null}
+      />,
+    );
+    expect(await screen.findByText('50%')).toBeOnTheScreen();
+    expect(screen.getByRole('progressbar')).toBeOnTheScreen();
+    expect(screen.getByText('Maior corrida: 2,50 km de 5,00 km')).toBeOnTheScreen();
   });
 });

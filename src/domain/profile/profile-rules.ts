@@ -95,3 +95,10 @@ export function validateTargetPace(input: string): ValidationResult<number, Numb
   if (seconds < min || seconds > max) return fail('out_of_range');
   return ok(seconds);
 }
+
+/** Body mass index (kg/m²), one decimal; null without both measurements. */
+export function bodyMassIndex(weightKg: number | null, heightCm: number | null): number | null {
+  if (!weightKg || !heightCm || weightKg <= 0 || heightCm <= 0) return null;
+  const meters = heightCm / 100;
+  return Math.round((weightKg / (meters * meters)) * 10) / 10;
+}

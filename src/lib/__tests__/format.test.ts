@@ -1,4 +1,6 @@
 import {
+  formatDecimal,
+  formatMonthYear,
   formatDistanceKm,
   formatDuration,
   formatPace,
@@ -114,5 +116,15 @@ describe('formatPaceTrack', () => {
     expect(formatPaceTrack(330)).toBe(`5'30"`);
     expect(formatPaceTrack(605)).toBe(`10'05"`);
     expect(formatPaceTrack(null)).toBe("--'--");
+  });
+});
+
+describe('formatMonthYear / formatDecimal', () => {
+  it('formats month and year in pt-BR', () => {
+    expect(formatMonthYear(new Date(2026, 10, 3))).toBe('Novembro de 2026');
+  });
+  it('formats decimals with a comma', () => {
+    expect(formatDecimal(22.94)).toBe('22,9');
+    expect(formatDecimal(null)).toBe('--');
   });
 });

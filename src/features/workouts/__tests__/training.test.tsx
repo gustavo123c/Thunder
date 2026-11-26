@@ -1,13 +1,15 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, userEvent, waitFor } from '@testing-library/react-native';
+import { router } from 'expo-router';
 
 import { PainMapSection } from '@/features/health';
-import { fetchOpenPains, setPain } from '@/features/health/api/pain.api';
+import { fetchOpenPains, resolvePain, setPain } from '@/features/health/api/pain.api';
 
 import { fetchRecentWorkouts, saveWorkout } from '../api/workouts.api';
 import { WorkoutBuilder } from '../components/WorkoutBuilder';
 
 jest.mock('@/services/supabase/client', () => ({ supabase: {} }));
+jest.mock('expo-router', () => ({ router: { navigate: jest.fn(), push: jest.fn() } }));
 jest.mock('../api/workouts.api', () => ({
   saveWorkout: jest.fn(),
   fetchRecentWorkouts: jest.fn(),
@@ -45,7 +47,7 @@ describe('WorkoutBuilder', () => {
       <WorkoutBuilder userId="u1" defaultLevel="beginner" pains={[]} recentPaceSPerKm={390} />,
     );
 
-    expect(screen.getByText('Pace de referência (últimas corridas): 6:30 /km')).toBeOnTheScreen();
+    expect(screen.getByText('6:30 /km')).toBeOnTheScreen();
     await user.press(screen.getByRole('radio', { name: 'Fortalecimento' }));
     await user.press(screen.getByRole('radio', { name: '20 min' }));
     await user.press(screen.getByRole('button', { name: 'Gerar treino' }));
@@ -60,6 +62,13 @@ describe('WorkoutBuilder', () => {
       expect.objectContaining({ goal: 'strength', durationMin: 20, level: 'beginner' }),
       expect.objectContaining({ title: 'Fortalecimento para corredores' }),
     );
+
+    expect(screen.getByText('Ficha de treino')).toBeOnTheScreen();
+    await user.press(screen.getByRole('button', { name: 'Iniciar este treino' }));
+    expect(router.navigate).toHaveBeenCalledWith('/record');
+
+    await user.press(screen.getByRole('button', { name: 'Montar outro treino' }));
+    expect(screen.getByRole('button', { name: 'Gerar treino' })).toBeOnTheScreen();
   });
 
   it('adapts the workout to pain from the body map', async () => {
@@ -72,7 +81,7 @@ describe('WorkoutBuilder', () => {
       />,
     );
 
-    expect(screen.getByText('Dores consideradas: Joelho esquerdo')).toBeOnTheScreen();
+    expect(screen.getByText('Joelho esquerdo')).toBeOnTheScreen();
     await userEvent.setup().press(screen.getByRole('button', { name: 'Gerar treino' }));
 
     expect(await screen.findByText('Adaptado para você')).toBeOnTheScreen();
@@ -112,5 +121,19 @@ describe('PainMapSection', () => {
 
     await user.press(await screen.findByRole('button', { name: 'Editar dor: Lombar' }));
     expect(screen.getByRole('button', { name: 'Não sinto mais dor aqui' })).toBeOnTheScreen();
+  });
+
+  it('removes a pain straight from its chip', async () => {
+    const user = userEvent.setup();
+    jest
+      .mocked(fetchOpenPains)
+      .mockResolvedValue([
+        { id: 'p1', region: 'lower_back', side: 'center', intensity: 6, createdAt: '' },
+      ]);
+    jest.mocked(resolvePain).mockResolvedValue(undefined);
+    await renderWithQuery(<PainMapSection userId="u1" sex={null} />);
+
+    await user.press(await screen.findByRole('button', { name: 'Remover dor: Lombar' }));
+    await waitFor(() => expect(resolvePain).toHaveBeenCalledWith('p1'));
   });
 });

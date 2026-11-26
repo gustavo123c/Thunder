@@ -4,9 +4,10 @@ import { BackHandler, KeyboardAvoidingView, ScrollView, View } from 'react-nativ
 
 import { Button } from '@/components/ui/Button';
 import { Screen } from '@/components/ui/Screen';
+import { recurringPains } from '@/domain/health/pain-history';
 import { recentAveragePace } from '@/domain/insights/activity';
 import { useUserId } from '@/features/auth';
-import { PainMapSection, useOpenPains } from '@/features/health';
+import { PainMapSection, useOpenPains, usePainHistory } from '@/features/health';
 import { useProfile } from '@/features/profile';
 import { useActivity } from '@/features/progress';
 import { type TrainingStep, TrainingStepper, WorkoutBuilder } from '@/features/workouts';
@@ -15,6 +16,7 @@ export default function TrainingScreen() {
   const userId = useUserId();
   const { data: profile } = useProfile(userId);
   const pains = useOpenPains(userId);
+  const painHistory = usePainHistory(userId);
   const activity = useActivity(userId);
   const [step, setStep] = useState<TrainingStep>('body');
 
@@ -28,6 +30,11 @@ export default function TrainingScreen() {
       });
       return () => subscription.remove();
     }, [step]),
+  );
+
+  const recurring = useMemo(
+    () => (painHistory.data ? recurringPains(painHistory.data, new Date()) : []),
+    [painHistory.data],
   );
 
   const recentPace = useMemo(
@@ -69,6 +76,7 @@ export default function TrainingScreen() {
             defaultLevel={profile.level ?? 'beginner'}
             pains={pains.data ?? []}
             recentPaceSPerKm={recentPace}
+            recurring={recurring}
             onEditPains={() => setStep('body')}
           />
         </ScrollView>

@@ -114,6 +114,19 @@ export default function SettingsScreen() {
         <Row icon="log-out-outline" label="Sair" onPress={confirmSignOut} destructive />
       </Section>
 
+      <Section title="Ajuda">
+        <Row
+          icon="help-circle-outline"
+          label="Central de ajuda"
+          onPress={() => router.push('/help')}
+        />
+        <Row
+          icon="library-outline"
+          label="Base científica e fontes"
+          onPress={() => router.push('/sources')}
+        />
+      </Section>
+
       <Section title="Saúde">
         <View className="px-3 py-2">
           <HealthDisclaimer variant="full" />

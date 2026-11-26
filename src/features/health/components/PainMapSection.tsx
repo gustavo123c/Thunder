@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useState } from 'react';
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { HealthDisclaimer } from '@/components/ui/HealthDisclaimer';
@@ -11,10 +12,11 @@ import {
   PAIN_PRESETS,
   painLevel,
 } from '@/domain/health/body-regions';
+import { returningPainCount } from '@/domain/health/pain-history';
 import type { BodySex } from '@/domain/types/profile';
 import { useThemeColors } from '@/theme/theme';
 
-import { useOpenPains, useResolvePain, useSetPain } from '../hooks/usePains';
+import { useOpenPains, usePainHistory, useResolvePain, useSetPain } from '../hooks/usePains';
 import { BodyMap, PAIN_COLORS } from './BodyMap';
 import { PainSheet } from './PainSheet';
 
@@ -24,6 +26,7 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
   const pains = useOpenPains(userId);
   const setPain = useSetPain(userId);
   const resolve = useResolvePain(userId);
+  const history = usePainHistory(userId);
   const [target, setTarget] = useState<{ region: BodyRegion; side: BodySide } | null>(null);
 
   const list = pains.data ?? [];
@@ -31,13 +34,32 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
     ? list.find((p) => p.region === target.region && p.side === target.side)
     : undefined;
   const saving = setPain.isPending || resolve.isPending;
+  const returning = useMemo(
+    () =>
+      target && history.data
+        ? returningPainCount(history.data, target.region, target.side, new Date())
+        : 0,
+    [history.data, target],
+  );
 
   return (
     <View className="gap-4">
       <View className="gap-1">
-        <Text accessibilityRole="header" className="text-2xl font-extrabold text-ink-50">
-          Como está seu corpo hoje?
-        </Text>
+        <View className="flex-row items-center justify-between gap-3">
+          <Text accessibilityRole="header" className="flex-1 text-2xl font-extrabold text-ink-50">
+            Como está seu corpo hoje?
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Histórico de dores"
+            hitSlop={8}
+            onPress={() => router.push('/pain-history')}
+            className="flex-row items-center gap-1.5 rounded-full border border-hairline bg-ink-800 px-3 py-1.5 active:bg-ink-700"
+          >
+            <Ionicons name="time-outline" size={14} color={theme.ink[200]} />
+            <Text className="text-xs font-semibold text-ink-200">Histórico</Text>
+          </Pressable>
+        </View>
         <Text className="text-sm leading-5 text-ink-400">
           Toque onde sente dor. O treino vai poupar essas regiões.
         </Text>
@@ -97,6 +119,7 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
       <PainSheet
         target={target}
         existing={existing}
+        returningCount={returning}
         saving={saving}
         onClose={() => setTarget(null)}
         onChoose={(intensity) => {

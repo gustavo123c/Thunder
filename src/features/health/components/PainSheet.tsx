@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,12 +12,16 @@ import {
   painLevel,
 } from '@/domain/health/body-regions';
 
+import { useThemeColors } from '@/theme/theme';
+
 import type { PainLog } from '../api/pain.api';
 import { PAIN_COLORS } from './BodyMap';
 
 type PainSheetProps = {
   target: { region: BodyRegion; side: BodySide } | null;
   existing: PainLog | undefined;
+  /** Past episodes of this region in the last 30 days (0 = not a returning pain). */
+  returningCount?: number;
   saving: boolean;
   onChoose: (intensity: number) => void;
   onResolve: () => void;
@@ -33,11 +38,13 @@ const LEVEL_HINT: Record<PainLevel, string> = {
 export function PainSheet({
   target,
   existing,
+  returningCount = 0,
   saving,
   onChoose,
   onResolve,
   onClose,
 }: PainSheetProps) {
+  const theme = useThemeColors();
   const current = existing ? painLevel(existing.intensity) : null;
 
   return (
@@ -58,6 +65,21 @@ export function PainSheet({
                 Como está a dor ou desconforto nesta região?
               </Text>
             </View>
+
+            {returningCount > 0 ? (
+              <View
+                accessibilityLiveRegion="polite"
+                className="flex-row gap-3 rounded-2xl border border-bolt-500/30 bg-bolt-500/10 p-3"
+              >
+                <Ionicons name="repeat" size={18} color={theme.accent} />
+                <Text className="flex-1 text-sm leading-5 text-ink-100">
+                  Essa dor em {describeRegion(target.region, target.side).toLowerCase()} voltou —
+                  você já a relatou {returningCount} {returningCount === 1 ? 'vez' : 'vezes'} nos
+                  últimos 30 dias. No treino, você pode repetir o treino de recuperação anterior ou
+                  gerar um novo.
+                </Text>
+              </View>
+            ) : null}
 
             {(Object.keys(PAIN_PRESETS) as PainLevel[]).map((level) => {
               const selected = current === level;

@@ -1,5 +1,8 @@
 import {
+  achievementInput,
+  bestMonthRuns,
   computeAchievements,
+  longestDayStreak,
   computePersonalRecords,
   goalProgress,
   longestEfforts,
@@ -56,19 +59,63 @@ describe('longestWeekStreak', () => {
 });
 
 describe('computeAchievements', () => {
+  const input = {
+    totalRuns: 4,
+    totalDistanceM: 25_000,
+    longestRunM: 6000,
+    longestWeekStreak: 3,
+    longestDayStreak: 2,
+    bestMonthRuns: 4,
+  };
+
   it('unlocks and reports progress', () => {
-    const list = computeAchievements({
-      totalRuns: 4,
-      totalDistanceM: 25_000,
-      longestRunM: 6000,
-      longestWeekStreak: 3,
-    });
-    const byId = Object.fromEntries(list.map((a) => [a.id, a]));
+    const byId = Object.fromEntries(computeAchievements(input).map((a) => [a.id, a]));
     expect(byId.first_run?.unlocked).toBe(true);
     expect(byId.first_5k?.unlocked).toBe(true);
     expect(byId.streak_3?.unlocked).toBe(true);
     expect(byId.first_10k).toMatchObject({ unlocked: false, progress: 0.6 });
     expect(byId.km_50).toMatchObject({ unlocked: false, progress: 0.5 });
+  });
+
+  it('includes the half marathon, 7-day and 12-runs-a-month medals', () => {
+    const byId = Object.fromEntries(
+      computeAchievements({
+        ...input,
+        longestRunM: 21_100,
+        longestDayStreak: 7,
+        bestMonthRuns: 12,
+      }).map((a) => [a.id, a]),
+    );
+    expect(byId.half_marathon?.unlocked).toBe(true);
+    expect(byId.days_7?.unlocked).toBe(true);
+    expect(byId.month_12?.unlocked).toBe(true);
+    expect(computeAchievements(input)).toHaveLength(12);
+  });
+});
+
+describe('consistency helpers', () => {
+  it('counts consecutive days and the best month', () => {
+    const entries = [
+      new Date(2026, 0, 30, 7),
+      new Date(2026, 0, 31, 7),
+      new Date(2026, 1, 1, 7), // crosses the month boundary
+      new Date(2026, 1, 1, 18), // same day twice
+      new Date(2026, 1, 3, 7),
+    ].map((d, i) => run(String(i), d, 5, 360));
+    expect(longestDayStreak(entries)).toBe(3);
+    expect(bestMonthRuns(entries)).toBe(3);
+    expect(longestDayStreak([])).toBe(0);
+    expect(bestMonthRuns([])).toBe(0);
+  });
+
+  it('builds the medal input, preferring larger all-time totals', () => {
+    const entries = [run('a', new Date(2026, 0, 5), 5, 360)];
+    expect(achievementInput(entries)).toMatchObject({ totalRuns: 1, totalDistanceM: 5000 });
+    expect(achievementInput(entries, { runs: 40, distanceM: 200_000 })).toMatchObject({
+      totalRuns: 40,
+      totalDistanceM: 200_000,
+      longestRunM: 5000,
+    });
   });
 });
 

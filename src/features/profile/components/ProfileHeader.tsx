@@ -36,6 +36,22 @@ function ActionButton({
   );
 }
 
+/** Round "?" button that opens the help center. */
+function HelpButton() {
+  const theme = useThemeColors();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Ajuda"
+      hitSlop={6}
+      onPress={() => router.push('/help')}
+      className="h-10 w-10 items-center justify-center rounded-full border border-hairline bg-ink-800 active:bg-ink-700"
+    >
+      <Ionicons name="help" size={20} color={theme.ink[100]} />
+    </Pressable>
+  );
+}
+
 type ProfileHeaderProps = {
   profile: Profile;
   /** Replaces the plain avatar (e.g. an editable avatar). */
@@ -95,6 +111,7 @@ export function ProfileHeader({ profile, avatarSlot }: ProfileHeaderProps) {
             label="Configurações"
             onPress={() => router.push('/settings')}
           />
+          <HelpButton />
         </View>
       </View>
     </View>

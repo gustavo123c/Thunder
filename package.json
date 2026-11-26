@@ -83,6 +83,9 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "<rootDir>/supabase/"
+    ],
+    "setupFiles": [
+      "<rootDir>/jest.setup.js"
     ]
   }
 }

@@ -6,6 +6,8 @@
  * once Docker/Supabase is running. PostGIS geography columns are `unknown`.
  */
 
+export type WorkoutFeedback = 'helped' | 'neutral' | 'discomfort';
+
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 type Timestamp = string;
@@ -104,8 +106,51 @@ export type Database = {
           request: Json;
           plan: Json;
           created_at: Timestamp;
+          feedback: WorkoutFeedback | null;
+          feedback_at: Timestamp | null;
+          run_id: string | null;
         };
-        Insert: { user_id: string; generator: 'rules' | 'ai'; request: Json; plan: Json };
+        Insert: {
+          id?: string;
+          user_id: string;
+          generator: 'rules' | 'ai';
+          request: Json;
+          plan: Json;
+        };
+        Update: { feedback?: WorkoutFeedback; feedback_at?: Timestamp; run_id?: string | null };
+        Relationships: [];
+      };
+      groups: {
+        Row: {
+          id: string;
+          name: string;
+          invite_code: string;
+          owner_id: string;
+          created_at: Timestamp;
+        };
+        Insert: { name: string; owner_id: string };
+        Update: { name?: string };
+        Relationships: [];
+      };
+      group_members: {
+        Row: { group_id: string; user_id: string; role: 'owner' | 'member'; joined_at: Timestamp };
+        Insert: { group_id: string; user_id: string; role?: 'owner' | 'member' };
+        Update: { [_ in never]: never };
+        Relationships: [];
+      };
+      user_achievements: {
+        Row: {
+          user_id: string;
+          achievement_id: string;
+          unlocked_at: Timestamp;
+          run_id: string | null;
+        };
+        Insert: {
+          user_id: string;
+          achievement_id: string;
+          unlocked_at?: Timestamp;
+          run_id?: string | null;
+        };
         Update: { [_ in never]: never };
         Relationships: [];
       };
@@ -319,6 +364,14 @@ export type Database = {
       get_profile_stats: { Args: { p_user_id: string }; Returns: Json };
       list_activity: { Args: { p_user_id: string; p_since: string }; Returns: Json };
       owns_run: { Args: { target_run_id: string }; Returns: boolean };
+      create_group: { Args: { p_name: string }; Returns: string };
+      join_group: { Args: { p_code: string }; Returns: string };
+      list_my_groups: { Args: Record<string, never>; Returns: Json };
+      group_leaderboard: { Args: { p_group_id: string; p_since: string }; Returns: Json };
+      get_group_feed: {
+        Args: { p_group_id: string; p_before?: string; p_before_id?: string; p_limit?: number };
+        Returns: Json;
+      };
     };
     Enums: {
       runner_level: 'beginner' | 'intermediate';

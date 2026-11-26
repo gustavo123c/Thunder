@@ -12,7 +12,7 @@ type HealthDisclaimerProps = {
 };
 
 const BODY =
-  'Os treinos sugeridos são gerados automaticamente. Inteligência artificial e algoritmos não são uma ciência exata e não substituem avaliação clínica nem prescrição individual.';
+  'Os treinos sugeridos são gerados automaticamente por regras. Algoritmos não são uma ciência exata e não substituem avaliação clínica nem prescrição individual.';
 
 function recommendation(withPain: boolean) {
   return `Procure um profissional de Educação Física, treinador ou médico especialista antes de iniciar ou adaptar sua rotina de treinos${

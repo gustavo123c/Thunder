@@ -60,7 +60,7 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
     const outcome = await controls.finish();
     if (!outcome) return;
     if (outcome.status === 'uploaded') {
-      router.push(`/run/${outcome.runId}`);
+      router.push({ pathname: '/run/[id]', params: { id: outcome.runId, celebrate: '1' } });
     } else {
       Alert.alert(
         'Corrida salva no aparelho',

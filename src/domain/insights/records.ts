@@ -70,26 +70,40 @@ export function longestWeekStreak(entries: readonly ActivityEntry[]): number {
 // Achievements
 // ---------------------------------------------------------------------------
 
-export type AchievementId =
-  | 'first_run'
-  | 'runs_10'
-  | 'first_5k'
-  | 'first_10k'
-  | 'streak_3'
-  | 'streak_8'
-  | 'km_50'
-  | 'km_100'
-  | 'km_250';
+export const ACHIEVEMENT_IDS = [
+  'first_run',
+  'first_5k',
+  'first_10k',
+  'half_marathon',
+  'days_7',
+  'month_12',
+  'streak_3',
+  'streak_8',
+  'runs_10',
+  'km_50',
+  'km_100',
+  'km_250',
+] as const;
+export type AchievementId = (typeof ACHIEVEMENT_IDS)[number];
 
 export type AchievementInput = {
   totalRuns: number;
   totalDistanceM: number;
   longestRunM: number;
   longestWeekStreak: number;
+  /** Most consecutive calendar days with a run. */
+  longestDayStreak: number;
+  /** Most runs in a single calendar month. */
+  bestMonthRuns: number;
 };
+
+/** How the medal is measured, for "Faltam …" messages. */
+export type AchievementUnit =
+  'runs' | 'meters_single' | 'meters_total' | 'weeks' | 'days' | 'month_runs';
 
 export type Achievement = {
   id: AchievementId;
+  unit: AchievementUnit;
   current: number;
   target: number;
   unlocked: boolean;
@@ -97,27 +111,83 @@ export type Achievement = {
   progress: number;
 };
 
-const ACHIEVEMENT_RULES: readonly {
-  id: AchievementId;
-  target: number;
-  value: (input: AchievementInput) => number;
-}[] = [
-  { id: 'first_run', target: 1, value: (i) => i.totalRuns },
-  { id: 'first_5k', target: 5000, value: (i) => i.longestRunM },
-  { id: 'streak_3', target: 3, value: (i) => i.longestWeekStreak },
-  { id: 'runs_10', target: 10, value: (i) => i.totalRuns },
-  { id: 'km_50', target: 50_000, value: (i) => i.totalDistanceM },
-  { id: 'first_10k', target: 10_000, value: (i) => i.longestRunM },
-  { id: 'streak_8', target: 8, value: (i) => i.longestWeekStreak },
-  { id: 'km_100', target: 100_000, value: (i) => i.totalDistanceM },
-  { id: 'km_250', target: 250_000, value: (i) => i.totalDistanceM },
-];
+export const HALF_MARATHON_M = 21_097;
+
+const ACHIEVEMENT_RULES: Record<
+  AchievementId,
+  { target: number; unit: AchievementUnit; value: (input: AchievementInput) => number }
+> = {
+  first_run: { target: 1, unit: 'runs', value: (i) => i.totalRuns },
+  first_5k: { target: 5000, unit: 'meters_single', value: (i) => i.longestRunM },
+  first_10k: { target: 10_000, unit: 'meters_single', value: (i) => i.longestRunM },
+  half_marathon: { target: HALF_MARATHON_M, unit: 'meters_single', value: (i) => i.longestRunM },
+  days_7: { target: 7, unit: 'days', value: (i) => i.longestDayStreak },
+  month_12: { target: 12, unit: 'month_runs', value: (i) => i.bestMonthRuns },
+  streak_3: { target: 3, unit: 'weeks', value: (i) => i.longestWeekStreak },
+  streak_8: { target: 8, unit: 'weeks', value: (i) => i.longestWeekStreak },
+  runs_10: { target: 10, unit: 'runs', value: (i) => i.totalRuns },
+  km_50: { target: 50_000, unit: 'meters_total', value: (i) => i.totalDistanceM },
+  km_100: { target: 100_000, unit: 'meters_total', value: (i) => i.totalDistanceM },
+  km_250: { target: 250_000, unit: 'meters_total', value: (i) => i.totalDistanceM },
+};
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function localDayNumber(iso: string): number {
+  const d = new Date(iso);
+  // Days since epoch in local time (DST-safe: built from the local calendar date).
+  return Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY_MS);
+}
+
+/** Most consecutive local calendar days with at least one run. */
+export function longestDayStreak(entries: readonly ActivityEntry[]): number {
+  const days = [...new Set(entries.map((e) => localDayNumber(e.startedAt)))].sort((a, b) => a - b);
+  let best = 0;
+  let current = 0;
+  days.forEach((day, i) => {
+    current = i > 0 && day - days[i - 1]! === 1 ? current + 1 : 1;
+    best = Math.max(best, current);
+  });
+  return best;
+}
+
+/** Most runs in one local calendar month. */
+export function bestMonthRuns(entries: readonly ActivityEntry[]): number {
+  const counts = new Map<string, number>();
+  for (const e of entries) {
+    const d = new Date(e.startedAt);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return Math.max(0, ...counts.values());
+}
+
+/**
+ * Medal inputs from the activity window. `allTime` (profile stats) replaces the window's
+ * run count and distance when larger, since the window only covers recent years.
+ */
+export function achievementInput(
+  entries: readonly ActivityEntry[],
+  allTime?: { runs: number; distanceM: number },
+): AchievementInput {
+  const windowDistance = entries.reduce((sum, e) => sum + e.distanceM, 0);
+  return {
+    totalRuns: Math.max(entries.length, allTime?.runs ?? 0),
+    totalDistanceM: Math.max(windowDistance, allTime?.distanceM ?? 0),
+    longestRunM: longestEfforts(entries).longestRunM,
+    longestWeekStreak: longestWeekStreak(entries),
+    longestDayStreak: longestDayStreak(entries),
+    bestMonthRuns: bestMonthRuns(entries),
+  };
+}
 
 export function computeAchievements(input: AchievementInput): Achievement[] {
-  return ACHIEVEMENT_RULES.map(({ id, target, value }) => {
+  return ACHIEVEMENT_IDS.map((id) => {
+    const { target, unit, value } = ACHIEVEMENT_RULES[id];
     const current = Math.max(0, value(input));
     return {
       id,
+      unit,
       current,
       target,
       unlocked: current >= target,

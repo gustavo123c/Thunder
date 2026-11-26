@@ -22,7 +22,7 @@ const profile: Profile = {
   sex: null,
 };
 
-it('opens edit profile and settings from the header', async () => {
+it('opens edit profile, settings and help from the header', async () => {
   const user = userEvent.setup();
   await render(<ProfileHeader profile={profile} />);
 
@@ -31,4 +31,6 @@ it('opens edit profile and settings from the header', async () => {
   expect(router.push).toHaveBeenCalledWith('/settings');
   await user.press(screen.getByRole('button', { name: 'Editar perfil' }));
   expect(router.push).toHaveBeenCalledWith('/profile/edit');
+  await user.press(screen.getByRole('button', { name: 'Ajuda' }));
+  expect(router.push).toHaveBeenCalledWith('/help');
 });

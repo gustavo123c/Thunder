@@ -6,11 +6,14 @@
  * Target paces come from the runner's recent average pace (P, s/km):
  *   recovery P+75 · easy P+40 · long P+50 · moderate P+15 · threshold P-15 ·
  *   1 km reps P-30 · 400 m reps P-45 · 200 m reps P-55.
- * Without recent runs, targets are given as perceived effort.
- * Pain on the body map reduces the load (see pain-load.ts).
+ *   VO2max reps (advanced) P-40.
+ * Without recent runs, targets are given as perceived effort. Advanced runners also
+ * get heart-rate zones (Z1–Z5).
+ * Pain on the body map reduces the load (see pain-load.ts); a free-text goal ("Outro")
+ * is read by custom-goal.ts.
  */
-import type { PainEntry } from '../health/body-regions';
-import type { RunnerLevel } from '../types/profile';
+import type { BodyRegion, PainEntry } from '../health/body-regions';
+import { interpretCustomGoal } from './custom-goal';
 import {
   adjustForPain,
   type Intensity,
@@ -25,13 +28,21 @@ export { RUN_WORKOUT_TYPES, type RunWorkoutType };
 export const WORKOUT_DURATIONS = [20, 30, 45, 60, 90] as const;
 export type WorkoutDuration = (typeof WORKOUT_DURATIONS)[number];
 
+export const TRAINING_LEVELS = ['beginner', 'intermediate', 'advanced'] as const;
+export type TrainingLevel = (typeof TRAINING_LEVELS)[number];
+
 export type WorkoutRequest = {
-  type: RunWorkoutType;
-  level: RunnerLevel;
+  /** 'custom' = "Outro": the session is read from `customGoal`. */
+  type: RunWorkoutType | 'custom';
+  level: TrainingLevel;
   durationMin: WorkoutDuration;
   pains: readonly PainEntry[];
   /** Recent average pace (s/km); null = targets by perceived effort. */
   recentPaceSPerKm: number | null;
+  /** Free text typed under "Outro". */
+  customGoal?: string;
+  /** Regions where the last workout left the runner uncomfortable (check-in feedback). */
+  discomfortRegions?: readonly BodyRegion[];
 };
 
 export type WorkoutPhase = 'warmup' | 'main' | 'cooldown';
@@ -72,7 +83,8 @@ export type WorkoutPlan = {
 // Paces and efforts
 // ---------------------------------------------------------------------------
 
-type Zone = 'recovery' | 'easy' | 'long' | 'moderate' | 'threshold' | 'rep1k' | 'rep400' | 'rep200';
+type Zone =
+  'recovery' | 'easy' | 'long' | 'moderate' | 'threshold' | 'vo2' | 'rep1k' | 'rep400' | 'rep200';
 
 const ZONE_OFFSET: Record<Zone, number> = {
   recovery: 75,
@@ -80,6 +92,7 @@ const ZONE_OFFSET: Record<Zone, number> = {
   long: 50,
   moderate: 15,
   threshold: -15,
+  vo2: -40,
   rep1k: -30,
   rep400: -45,
   rep200: -55,
@@ -91,6 +104,7 @@ const ZONE_INTENSITY: Record<Zone, Intensity> = {
   long: 'easy',
   moderate: 'moderate',
   threshold: 'threshold',
+  vo2: 'hard',
   rep1k: 'hard',
   rep400: 'hard',
   rep200: 'hard',
@@ -105,7 +119,23 @@ const EFFORT: Record<Intensity, string> = {
 };
 
 /** Typical recent pace when the runner has no data (only for time estimates). */
-const DEFAULT_PACE: Record<RunnerLevel, number> = { beginner: 420, intermediate: 345 };
+const DEFAULT_PACE: Record<TrainingLevel, number> = {
+  beginner: 420,
+  intermediate: 345,
+  advanced: 300,
+};
+
+/** Heart-rate zones shown to advanced runners (≈ % of max heart rate). */
+const HR_ZONE: Record<Intensity, string> = {
+  recovery: 'Z1',
+  easy: 'Z2',
+  moderate: 'Z3',
+  threshold: 'Z4',
+  hard: 'Z5',
+};
+
+export const HR_ZONES_NOTE =
+  'Zonas de frequência cardíaca (aprox., % da FC máxima): Z1 50–60% · Z2 60–70% · Z3 70–80% · Z4 80–90% · Z5 90–100%. Use um relógio ou cinta com FC.';
 
 const INTENSITY_ZONE: Record<Intensity, Zone> = {
   recovery: 'recovery',
@@ -126,7 +156,7 @@ function formatClock(seconds: number): string {
 }
 
 type Context = {
-  level: RunnerLevel;
+  level: TrainingLevel;
   recentPace: number | null;
   load: LoadAdjustment;
 };
@@ -146,11 +176,13 @@ function paceFor(zone: Zone, ctx: Context): number {
 /** "4:30 /km (forte)" or the effort description when there's no recent pace. */
 function target(zone: Zone, ctx: Context, repDistanceM?: number): string {
   const effective = capped(zone, ctx);
-  const effort = EFFORT[ZONE_INTENSITY[effective]];
-  if (ctx.recentPace === null) return `Esforço ${effort}`;
+  const intensity = ZONE_INTENSITY[effective];
+  const effort = EFFORT[intensity];
+  const hr = ctx.level === 'advanced' ? ` · ${HR_ZONE[intensity]}` : '';
+  if (ctx.recentPace === null) return `Esforço ${effort}${hr}`;
   const pace = paceFor(effective, ctx);
   const perRep = repDistanceM ? ` · ≈ ${formatClock((pace * repDistanceM) / 1000)} por tiro` : '';
-  return `${formatPace(pace)} /km${perRep} (${effort.split(' — ')[0]!.split(' (')[0]})`;
+  return `${formatPace(pace)} /km${perRep} (${effort.split(' — ')[0]!.split(' (')[0]})${hr}`;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -263,6 +295,30 @@ function intervals(ctx: Context, budget: number): MainSet {
       detail: 'Corra 200 m forte, com passadas soltas e braços ativos.',
     });
   }
+  if (ctx.level === 'advanced' && !ctx.load.noSpeed) {
+    if (budget <= 25) {
+      return repeats(ctx, budget, {
+        name: 'Tiros de 400 m (VO2máx)',
+        distanceM: 400,
+        zone: 'rep400',
+        restS: 60,
+        restHow: 'trotando',
+        min: 8,
+        max: 12,
+        detail: 'Corra 400 m bem forte, com recuperação curta para manter o coração alto.',
+      });
+    }
+    return repeats(ctx, budget, {
+      name: 'Tiros de 1 km (VO2máx)',
+      distanceM: 1000,
+      zone: 'vo2',
+      restS: 150,
+      restHow: 'trotando',
+      min: 4,
+      max: 6,
+      detail: 'Ritmo de 3 a 5 km de prova. Mantenha todos os tiros iguais.',
+    });
+  }
   if (budget <= 30) {
     return repeats(ctx, budget, {
       name: 'Tiros de 400 m',
@@ -289,11 +345,14 @@ function intervals(ctx: Context, budget: number): MainSet {
 
 function fartlek(ctx: Context, budget: number): MainSet {
   const beginner = ctx.level === 'beginner';
+  const advanced = ctx.level === 'advanced';
+  const workMin = beginner ? 1 : advanced ? 3 : 2;
+  const easyMin = beginner ? 2 : 1;
   return cycles(ctx, budget, {
-    name: beginner ? 'Fartlek 1 min / 2 min' : 'Fartlek 2 min / 1 min',
+    name: `Fartlek ${workMin} min / ${easyMin} min`,
     title: 'Fartlek',
-    workMin: beginner ? 1 : 2,
-    easyMin: beginner ? 2 : 1,
+    workMin,
+    easyMin,
     work: 'rep1k',
     easy: 'easy',
     workLabel: 'forte',
@@ -321,6 +380,21 @@ function tempo(ctx: Context, budget: number): MainSet {
       max: 6,
     });
   }
+  if (ctx.level === 'advanced') {
+    const minutes = clamp(Math.round(budget * 0.75 * ctx.load.volumeFactor), 12, 40);
+    return {
+      title: 'Tempo run',
+      minutes,
+      items: [
+        {
+          name: 'Tempo run contínuo',
+          detail: 'Ritmo de limiar sustentado: forte, mas controlado do primeiro ao último minuto.',
+          durationMin: minutes,
+          target: target('threshold', ctx),
+        },
+      ],
+    };
+  }
   return repeats(ctx, budget, {
     name: 'Repetições de 600 m no limiar',
     distanceM: 600,
@@ -335,8 +409,8 @@ function tempo(ctx: Context, budget: number): MainSet {
 
 function hills(ctx: Context, budget: number): MainSet {
   const beginner = ctx.level === 'beginner';
-  const upS = beginner ? 30 : 60;
-  const downS = beginner ? 90 : 120;
+  const upS = beginner ? 30 : ctx.level === 'advanced' ? 90 : 60;
+  const downS = beginner ? 90 : ctx.level === 'advanced' ? 150 : 120;
   const fit = Math.floor((budget * 60 * ctx.load.volumeFactor) / (upS + downS));
   const sets = clamp(fit, Math.min(4, Math.max(3, fit)), beginner ? 8 : 10);
   return {
@@ -349,7 +423,9 @@ function hills(ctx: Context, budget: number): MainSet {
         sets,
         reps: `${upS} s`,
         restS: downS,
-        target: `Esforço ${EFFORT[ZONE_INTENSITY[capped('rep1k', ctx)]]}`,
+        target: `Esforço ${EFFORT[ZONE_INTENSITY[capped('rep1k', ctx)]]}${
+          ctx.level === 'advanced' ? ` · ${HR_ZONE[ZONE_INTENSITY[capped('rep1k', ctx)]]}` : ''
+        }`,
       },
     ],
   };
@@ -416,7 +492,7 @@ function long(ctx: Context, budget: number): MainSet {
       max: 10,
     });
   }
-  return continuous(
+  const base = continuous(
     ctx,
     budget,
     'Longão',
@@ -424,6 +500,23 @@ function long(ctx: Context, budget: number): MainSet {
     'long',
     'Ritmo lento e constante. Hidrate-se a cada 20–30 min se passar de 1 hora.',
   );
+  if (ctx.level !== 'advanced' || ctx.load.maxIntensity === 'easy' || base.minutes < 50)
+    return base;
+  // Advanced: finish the long run at a stronger, race-like effort.
+  const finish = Math.round(base.minutes * 0.25);
+  return {
+    title: 'Longão',
+    minutes: base.minutes,
+    items: [
+      { ...base.items[0]!, durationMin: base.minutes - finish },
+      {
+        name: 'Final em ritmo forte',
+        detail: 'Termine o longão acelerando para um ritmo moderado/forte, sem chegar ao limite.',
+        durationMin: finish,
+        target: target('moderate', ctx),
+      },
+    ],
+  };
 }
 
 function recovery(ctx: Context, budget: number): MainSet {
@@ -598,15 +691,28 @@ function restPlan(request: WorkoutRequest, load: LoadAdjustment): WorkoutPlan {
   };
 }
 
+const LEVEL_LABEL: Record<TrainingLevel, string> = {
+  beginner: 'iniciante',
+  intermediate: 'intermediário',
+  advanced: 'avançado',
+};
+
 export function generateWorkout(request: WorkoutRequest): WorkoutPlan {
-  const load = adjustForPain(request.type, request.pains);
+  // "Outro": read the free-text goal (session type and, if any, target race pace).
+  const custom = request.type === 'custom' ? interpretCustomGoal(request.customGoal ?? '') : null;
+  const requestedType: RunWorkoutType = custom ? custom.type : (request.type as RunWorkoutType);
+  // A race goal sets the reference: its pace becomes the threshold target.
+  const referencePace =
+    custom?.racePaceSPerKm != null ? custom.racePaceSPerKm + 15 : request.recentPaceSPerKm;
+
+  const load = adjustForPain(requestedType, request.pains, request.discomfortRegions ?? []);
   if (load.volumeFactor === 0) return restPlan(request, load);
 
   // A long run needs time: under 45 min it is just an easy run.
   let type = load.type;
   if (type === 'long' && request.durationMin < 45) type = 'easy';
 
-  const ctx: Context = { level: request.level, recentPace: request.recentPaceSPerKm, load };
+  const ctx: Context = { level: request.level, recentPace: referencePace, load };
   const warm = warmup(type, ctx, request.durationMin);
   const cool = cooldown(type, request.durationMin);
   const budget = Math.max(8, request.durationMin - warm.minutes - cool.minutes);
@@ -625,9 +731,22 @@ export function generateWorkout(request: WorkoutRequest): WorkoutPlan {
   }
 
   const adaptations: string[] = [];
-  if (type !== request.type && load.type === type) {
+  if (custom) {
+    const goal = (request.customGoal ?? '').trim();
     adaptations.push(
-      `${SESSION_TITLES[request.type]} trocado por ${SESSION_TITLES[type].toLowerCase()} por causa das dores marcadas.`,
+      custom.recognized
+        ? `Seu objetivo “${goal}” foi lido como: ${SESSION_TITLES[custom.type].toLowerCase()}.`
+        : `Não reconhecemos um tipo de treino em “${goal}”: montamos uma rodagem leve. Tente palavras como tiros, subida, limiar, longão ou “10 km em 50 min”.`,
+    );
+    if (custom.racePaceSPerKm !== null) {
+      adaptations.push(
+        `Pace de prova: ${formatPace(custom.racePaceSPerKm)} /km (${custom.raceDistanceKm} km). Os ritmos do treino partem dele.`,
+      );
+    }
+  }
+  if (type !== requestedType && load.type === type) {
+    adaptations.push(
+      `${SESSION_TITLES[requestedType]} trocado por ${SESSION_TITLES[type].toLowerCase()} por causa das dores marcadas.`,
     );
   }
   const reduction = Math.round((1 - load.volumeFactor) * 100);
@@ -642,14 +761,15 @@ export function generateWorkout(request: WorkoutRequest): WorkoutPlan {
   if (request.pains.length > 0) {
     safetyNotes.push('Se a dor aumentar durante o treino, reduza para caminhada e encerre.');
   }
-  if (request.recentPaceSPerKm === null) {
+  if (request.level === 'advanced') safetyNotes.push(HR_ZONES_NOTE);
+  if (referencePace === null) {
     safetyNotes.push(
       'Sem corridas recentes, os ritmos estão por esforço percebido (escala de 0 a 10).',
     );
   }
 
   const totalMinutes = warm.minutes + main.minutes + cool.minutes;
-  const levelLabel = request.level === 'beginner' ? 'iniciante' : 'intermediário';
+  const levelLabel = LEVEL_LABEL[request.level];
 
   return {
     title: type === 'intervals' ? main.title : SESSION_TITLES[type],

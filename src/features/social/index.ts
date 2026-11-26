@@ -6,3 +6,6 @@ export { PeopleSearch } from './components/PeopleSearch';
 export { ProfileStatsRow } from './components/ProfileStatsRow';
 export { SocialBar } from './components/SocialBar';
 export { useProfileStats } from './hooks/useSocial';
+export { GroupDetailView } from './components/GroupDetailView';
+export { CreateGroupForm, JoinGroupForm } from './components/GroupForms';
+export { GroupsPanel } from './components/GroupsPanel';

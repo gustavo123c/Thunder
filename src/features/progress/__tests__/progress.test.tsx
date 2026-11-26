@@ -1,11 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, userEvent } from '@testing-library/react-native';
+import { render, screen, userEvent, waitFor } from '@testing-library/react-native';
 
 import { comparePeriods, computeWinStreak } from '@/domain/insights/activity';
 import type { ActivityItem } from '@/services/supabase/run-json';
 
 import { fetchActivity } from '../api/activity.api';
+import { fetchUnlockedAchievements, unlockAchievements } from '../api/achievements.api';
 import { AchievementsGrid } from '../components/AchievementsGrid';
+import { RunCelebration } from '../components/RunCelebration';
 import { GoalProgressCard } from '../components/GoalProgressCard';
 import { PersonalRecords } from '../components/PersonalRecords';
 import { ProgressDashboard } from '../components/ProgressDashboard';
@@ -14,6 +16,10 @@ import { describeProgress, describeStreakCounts, formatPercent } from '../progre
 
 jest.mock('@/services/supabase/client', () => ({ supabase: {} }));
 jest.mock('../api/activity.api', () => ({ fetchActivity: jest.fn() }));
+jest.mock('../api/achievements.api', () => ({
+  fetchUnlockedAchievements: jest.fn().mockResolvedValue([]),
+  unlockAchievements: jest.fn().mockResolvedValue(undefined),
+}));
 jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
 
 const daysAgo = (days: number, paceS = 360, km = 5): ActivityItem => {
@@ -124,14 +130,38 @@ describe('progress components', () => {
     expect(screen.getByText('26:40')).toBeOnTheScreen(); // 5 km at 5:20
   });
 
-  it('counts unlocked achievements', async () => {
+  it('shows medals, locked ones with progress, and stores newly earned ones', async () => {
     jest.mocked(fetchActivity).mockResolvedValue([daysAgo(0), daysAgo(7), daysAgo(14)]);
+    jest
+      .mocked(fetchUnlockedAchievements)
+      .mockResolvedValue([{ id: 'first_run', unlockedAt: '2026-01-01T00:00:00Z' }]);
     await renderWithQuery(<AchievementsGrid userId="u1" totals={{ runs: 3, distanceM: 15_000 }} />);
     // first run, first 5K, 3-week streak
-    expect(await screen.findByText(/de 9 conquistas desbloqueadas/)).toBeOnTheScreen();
-    expect(screen.getByText('3')).toBeOnTheScreen();
-    expect(screen.getByLabelText(/^Primeira corrida\. Desbloqueada/)).toBeOnTheScreen();
-    expect(screen.getByLabelText(/^50 km acumulados\. 30% concluída/)).toBeOnTheScreen();
+    expect(await screen.findByText(/de 12 medalhas conquistadas/)).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^Primeira corrida\. Conquistada/)).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^50 km acumulados\. Bloqueada, 30% concluída/)).toBeOnTheScreen();
+    expect(screen.getByLabelText(/^Meia maratona\. Bloqueada/)).toBeOnTheScreen();
+    await waitFor(() =>
+      expect(unlockAchievements).toHaveBeenCalledWith('u1', ['first_5k', 'streak_3'], null),
+    );
+  });
+
+  it('celebrates a finished run with new medals and highlights', async () => {
+    jest.mocked(unlockAchievements).mockClear();
+    jest.mocked(fetchUnlockedAchievements).mockResolvedValue([]);
+    jest.mocked(fetchActivity).mockResolvedValue([daysAgo(0, 330, 8)]);
+    await renderWithQuery(<RunCelebration userId="u1" runId="r0" visible onClose={jest.fn()} />);
+
+    expect(await screen.findByText('Corrida concluída!')).toBeOnTheScreen();
+    expect(await screen.findByText('Novas medalhas')).toBeOnTheScreen();
+    expect(screen.getByText('Primeira corrida')).toBeOnTheScreen();
+    expect(screen.getByText('Primeiros 5 km')).toBeOnTheScreen();
+    expect(
+      screen.getByText('Faltam 2,0 km na sua maior corrida para a medalha Primeiros 10 km!'),
+    ).toBeOnTheScreen();
+    await waitFor(() =>
+      expect(unlockAchievements).toHaveBeenCalledWith('u1', ['first_run', 'first_5k'], 'r0'),
+    );
   });
 
   it('shows the main goal progress bar', async () => {

@@ -6,7 +6,14 @@ import {
   type WorkoutRequest,
 } from '@/domain/training/workout-generator';
 
-import { deleteWorkout, fetchRecentWorkouts, saveWorkout } from '../api/workouts.api';
+import {
+  deleteWorkout,
+  fetchRecentWorkouts,
+  newWorkoutId,
+  saveWorkout,
+  saveWorkoutFeedback,
+  type WorkoutFeedback,
+} from '../api/workouts.api';
 
 const workoutKeys = { recent: (userId: string) => ['workouts', userId] as const };
 
@@ -24,12 +31,13 @@ export function useRecentWorkouts(userId: string) {
 export function useGenerateWorkout(userId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (request: WorkoutRequest): Promise<WorkoutPlan> => {
+    mutationFn: async (request: WorkoutRequest): Promise<{ id: string; plan: WorkoutPlan }> => {
       const plan = generateWorkout(request);
-      saveWorkout(userId, request, plan)
+      const id = newWorkoutId();
+      saveWorkout(userId, request, plan, id)
         .then(() => queryClient.invalidateQueries({ queryKey: workoutKeys.recent(userId) }))
         .catch((error: unknown) => console.warn('[workouts] save failed', error));
-      return plan;
+      return { id, plan };
     },
   });
 }
@@ -38,6 +46,22 @@ export function useDeleteWorkout(userId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteWorkout,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: workoutKeys.recent(userId) }),
+  });
+}
+
+export function useWorkoutFeedback(userId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      workoutId,
+      feedback,
+      runId,
+    }: {
+      workoutId: string;
+      feedback: WorkoutFeedback;
+      runId: string | null;
+    }) => saveWorkoutFeedback(workoutId, feedback, runId),
     onSettled: () => queryClient.invalidateQueries({ queryKey: workoutKeys.recent(userId) }),
   });
 }

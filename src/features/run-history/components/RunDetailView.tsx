@@ -71,10 +71,11 @@ function OwnerActions({ detail }: { detail: RunDetail }) {
       text: VISIBILITY_COPY[value].label,
       onPress: () => updateRun.mutate({ visibility: value }),
     }));
-    Alert.alert('Quem pode ver esta corrida?', undefined, [
-      ...options,
-      { text: 'Cancelar', style: 'cancel' },
-    ]);
+    Alert.alert(
+      'Quem pode ver esta corrida?',
+      '"Seguidores e grupos": quem te segue e quem está nos seus grupos. "Só eu" nunca aparece em grupos.',
+      [...options, { text: 'Cancelar', style: 'cancel' }],
+    );
   }
 
   function confirmDelete() {

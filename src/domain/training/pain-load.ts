@@ -146,9 +146,14 @@ function capIntensity(current: Intensity, cap: Intensity): Intensity {
   return INTENSITY_ORDER.indexOf(current) > INTENSITY_ORDER.indexOf(cap) ? cap : current;
 }
 
+/**
+ * @param discomfortRegions regions where the last workout still left discomfort
+ *   (post-workout check-in): their pain counts one level higher.
+ */
 export function adjustForPain(
   requested: RunWorkoutType,
-  pains: readonly PainEntry[],
+  rawPains: readonly PainEntry[],
+  discomfortRegions: readonly BodyRegion[] = [],
 ): LoadAdjustment {
   const result: LoadAdjustment = {
     type: requested,
@@ -160,6 +165,13 @@ export function adjustForPain(
     stop: false,
     notes: [],
   };
+
+  const escalated: string[] = [];
+  const pains = rawPains.map((pain) => {
+    if (!discomfortRegions.includes(pain.region)) return pain;
+    escalated.push(describeRegion(pain.region, pain.side));
+    return { ...pain, intensity: Math.min(10, pain.intensity + 3) };
+  });
 
   const avoid = new Set<RunWorkoutType>();
   let worstRunning: PainLevel | null = null;
@@ -196,6 +208,12 @@ export function adjustForPain(
     if (level !== 'mild')
       result.notes.push(`${where} (${level === 'severe' ? 'forte' : 'moderada'}): ${rule.reason}.`);
     else result.notes.push(`${where} (leve): ${rule.reason} — carga um pouco menor.`);
+  }
+
+  if (escalated.length > 0) {
+    result.notes.unshift(
+      `Você relatou desconforto após o último treino (${escalated.join(', ')}): a carga caiu mais um nível.`,
+    );
   }
 
   if (result.stop) {

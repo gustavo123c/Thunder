@@ -78,6 +78,30 @@ function RootNavigator() {
           options={{ headerShown: true, title: 'Retrospectiva', headerBackTitle: 'Histórico' }}
         />
         <Stack.Screen
+          name="pain-history"
+          options={{ headerShown: true, title: 'Histórico de dores', headerBackTitle: 'Treino' }}
+        />
+        <Stack.Screen
+          name="group/[id]"
+          options={{ headerShown: true, title: 'Grupo', headerBackTitle: 'Grupos' }}
+        />
+        <Stack.Screen
+          name="group/new"
+          options={{ headerShown: true, title: 'Novo grupo', presentation: 'modal' }}
+        />
+        <Stack.Screen
+          name="group/join"
+          options={{ headerShown: true, title: 'Entrar em um grupo', presentation: 'modal' }}
+        />
+        <Stack.Screen
+          name="help"
+          options={{ headerShown: true, title: 'Ajuda', headerBackTitle: 'Voltar' }}
+        />
+        <Stack.Screen
+          name="sources"
+          options={{ headerShown: true, title: 'Base científica', headerBackTitle: 'Voltar' }}
+        />
+        <Stack.Screen
           name="settings"
           options={{ headerShown: true, title: 'Configurações', headerBackTitle: 'Perfil' }}
         />

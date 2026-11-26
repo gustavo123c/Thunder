@@ -4,6 +4,7 @@ import {
   BASE_SAFETY_NOTES,
   generateWorkout,
   RUN_WORKOUT_TYPES,
+  TRAINING_LEVELS,
   WORKOUT_DURATIONS,
   type WorkoutPlan,
   type WorkoutRequest,
@@ -28,9 +29,7 @@ const main = (plan: WorkoutPlan) => plan.blocks.find((b) => b.phase === 'main')!
 describe('generateWorkout', () => {
   it.each(
     RUN_WORKOUT_TYPES.flatMap((type) =>
-      (['beginner', 'intermediate'] as const).flatMap((level) =>
-        WORKOUT_DURATIONS.map((d) => [type, level, d] as const),
-      ),
+      TRAINING_LEVELS.flatMap((level) => WORKOUT_DURATIONS.map((d) => [type, level, d] as const)),
     ),
   )(
     '%s / %s / %i min is a running session close to the requested time',
@@ -137,5 +136,77 @@ describe('pain lowers the running load', () => {
   it('severe upper-body pain caps the intensity', () => {
     const load = adjustForPain('intervals', [pain('shoulder', 9)]);
     expect(load.maxIntensity).toBe('moderate');
+  });
+});
+
+describe('advanced level', () => {
+  const adv = { ...base, level: 'advanced' as const };
+
+  it('prescribes VO2max 1 km reps with heart-rate zones', () => {
+    const plan = generateWorkout({ ...adv, durationMin: 60 });
+    const item = main(plan).items[0]!;
+    expect(plan.title).toBe('Tiros de 1 km (VO2máx)');
+    expect(item).toMatchObject({ reps: '1 km', restS: 150 });
+    // 5:30 - 40 s = 4:50 /km
+    expect(item.target).toBe('4:50 /km · ≈ 4:50 por tiro (forte) · Z5');
+    expect(plan.safetyNotes.join(' ')).toMatch(/Zonas de frequência cardíaca/);
+  });
+
+  it('runs a continuous tempo run and finishes long runs stronger', () => {
+    expect(main(generateWorkout({ ...adv, type: 'tempo' })).items[0]!.name).toBe(
+      'Tempo run contínuo',
+    );
+    const long = main(generateWorkout({ ...adv, type: 'long', durationMin: 90 }));
+    expect(long.items.map((i) => i.name)).toEqual(['Longão', 'Final em ritmo forte']);
+    expect(long.items[1]!.target).toMatch(/Z3$/);
+  });
+
+  it('only advanced runners get heart-rate zones', () => {
+    const plan = generateWorkout({ ...base, type: 'easy' });
+    expect(main(plan).items[0]!.target).not.toMatch(/Z\d/);
+  });
+});
+
+describe('custom goal ("Outro")', () => {
+  it('builds the session the text asks for', () => {
+    const plan = generateWorkout({ ...base, type: 'custom', customGoal: 'Foco em subida' });
+    expect(plan.sessionType).toBe('hills');
+    expect(plan.adaptations[0]).toBe(
+      'Seu objetivo “Foco em subida” foi lido como: treino de subidas.',
+    );
+  });
+
+  it('anchors paces on the race goal', () => {
+    const plan = generateWorkout({
+      ...base,
+      type: 'custom',
+      customGoal: 'Preparação para 10 km em 45 min',
+    });
+    expect(plan.sessionType).toBe('tempo');
+    expect(plan.adaptations.join(' ')).toMatch(/Pace de prova: 4:30 \/km \(10 km\)/);
+    // Threshold target = race pace.
+    expect(main(plan).items[0]!.target).toMatch(/^4:30 \/km/);
+  });
+
+  it('explains when the text is not understood', () => {
+    const plan = generateWorkout({ ...base, type: 'custom', customGoal: 'algo diferente' });
+    expect(plan.sessionType).toBe('easy');
+    expect(plan.adaptations[0]).toMatch(/Não reconhecemos/);
+  });
+});
+
+describe('post-workout check-in feedback', () => {
+  it('lowers the load one more level where the last workout left discomfort', () => {
+    const withoutFeedback = generateWorkout({ ...base, pains: [pain('knee', 3)] });
+    const withDiscomfort = generateWorkout({
+      ...base,
+      pains: [pain('knee', 3)],
+      discomfortRegions: ['knee'],
+    });
+    expect(withoutFeedback.loadReductionPct).toBe(15);
+    expect(withDiscomfort.loadReductionPct).toBe(40);
+    expect(withDiscomfort.adaptations.join(' ')).toMatch(
+      /desconforto após o último treino \(Joelho esquerdo\)/,
+    );
   });
 });

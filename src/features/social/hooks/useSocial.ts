@@ -70,6 +70,9 @@ export function useToggleKudo(userId: string) {
       queryClient.setQueryData(socialKeys.feed, context?.previousFeed);
       queryClient.setQueryData(socialKeys.runDetail(runId), context?.previousDetail);
     },
+
+    // Group feeds show the same runs: refresh their Raio state too.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['groups'] }),
   });
 }
 

@@ -286,3 +286,26 @@ stored in AsyncStorage by `src/theme/AppThemeProvider.tsx`, which also calls Nat
   `domain/insights/records.ts` over the `list_activity` window (since Jan 1 of last year);
   achievement totals use the all-time `get_profile_stats`. "Melhor 5K" is projected from the
   average pace of runs ≥ 5 km.
+
+## v4 — Ajuda, histórico de dores, treino avançado, medalhas e grupos
+
+Migração `20261127000000_groups_medals_feedback.sql` (idempotente; colar no SQL Editor).
+
+| Funcionalidade                       | Onde                                                                                                                                                                                                                                                                          |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Central de ajuda (busca + tutoriais) | `features/help` (`help-content.ts`) · rota `/help` (Perfil → `?`, Configurações)                                                                                                                                                                                              |
+| Base científica e fontes             | `features/help/sources.ts` (links verificados; aviso de que as regras não foram validadas pelos autores) · rota `/sources`                                                                                                                                                    |
+| Histórico de dores e recorrência     | `domain/health/pain-history.ts` (episódios por região em 30 dias) · `features/health/PainHistoryView` · rota `/pain-history` · aviso "essa dor voltou" no `PainSheet`                                                                                                         |
+| Repetir treino de dor recorrente     | `features/workouts/feedback.ts` (`findReturningPain`)                                                                                                                                                                                                                         |
+| Check-in pós-treino                  | `generated_workouts.feedback/feedback_at/run_id` · `WorkoutCheckIn` (na celebração) · "Ainda sinto desconforto" sobe um nível a dor da região no próximo treino (`adjustForPain(..., discomfortRegions)`)                                                                     |
+| Treino ativo                         | `features/workouts/active-workout.store.ts` (zustand + AsyncStorage; ID do treino gerado no app)                                                                                                                                                                              |
+| Nível Avançado                       | `TRAINING_LEVELS` em `domain/training/workout-generator.ts`: tiros de VO2máx, tempo run, longão com final forte, zonas Z1–Z5                                                                                                                                                  |
+| Objetivo "Outro"                     | `domain/training/custom-goal.ts`: palavras-chave → tipo de treino; "10 km em 45 min" → pace de prova (vira o alvo do limiar). Sem IA.                                                                                                                                         |
+| Medalhas                             | `domain/insights/records.ts` (12 medalhas, incl. meia maratona, 7 dias seguidos, 12 treinos no mês) · tabela `user_achievements` · grade no Perfil (bloqueadas em cinza)                                                                                                      |
+| Celebração                           | `domain/insights/celebration.ts` (medalhas novas, pace vs. semana, recordes, "faltam X km") · `features/progress/RunCelebration` · `/run/[id]?celebrate=1`                                                                                                                    |
+| Grupos                               | tabelas `groups`, `group_members`; RPCs `create_group`, `join_group` (SECURITY DEFINER, só adiciona o próprio usuário, máx. 50), `list_my_groups`, `group_leaderboard`, `get_group_feed` · `features/social` (`GroupsPanel`, `GroupDetailView`, `GroupForms`) · Feed → Grupos |
+
+**Privacidade nos grupos:** corridas "Só eu" nunca entram no ranking nem no feed do grupo.
+Corridas "Seguidores" passam a ser visíveis também para quem compartilha um grupo
+(`can_view_run_row` usa `shares_group_with`), para que detalhe, Raio e comentários funcionem
+entre membros.

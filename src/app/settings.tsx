@@ -94,7 +94,12 @@ export default function SettingsScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-ink-900" contentContainerClassName="gap-6 px-4 pb-12 pt-4">
+    <ScrollView
+      testID="settings-scroll"
+      className="flex-1 bg-ink-900"
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerClassName="gap-6 px-4 pb-12 pt-4"
+    >
       <Section title="Aparência">
         <AppearancePicker />
       </Section>

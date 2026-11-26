@@ -66,6 +66,7 @@ export function EditProfileForm({ profile }: { profile: Profile }) {
     >
       <ScrollView
         className="flex-1"
+        contentInsetAdjustmentBehavior="automatic"
         contentContainerClassName="gap-8 px-4 py-6"
         keyboardShouldPersistTaps="handled"
       >

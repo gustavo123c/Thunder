@@ -9,7 +9,10 @@ export default function RetrospectiveScreen() {
 
   return (
     <SafeAreaView edges={['bottom']} className="flex-1 bg-ink-900">
-      <ScrollView contentContainerClassName="gap-5 px-4 pb-10 pt-4">
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerClassName="gap-5 px-4 pb-10 pt-4"
+      >
         <RetrospectiveView userId={userId} />
       </ScrollView>
     </SafeAreaView>

@@ -152,7 +152,11 @@ export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: Ru
   const authorName = detail.author.fullName ?? detail.author.username ?? 'Corredor';
 
   return (
-    <ScrollView className="flex-1 bg-ink-900" contentContainerClassName="pb-10">
+    <ScrollView
+      className="flex-1 bg-ink-900"
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerClassName="pb-10"
+    >
       {route ? (
         <View style={{ height: 280 }}>
           <RouteMap route={route} bounds={boundsOf(detail.route)} interactive={false} />

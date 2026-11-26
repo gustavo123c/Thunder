@@ -59,6 +59,7 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
         </View>
       ) : (
         <FlatList
+          contentInsetAdjustmentBehavior="automatic"
           data={comments.data ?? []}
           keyExtractor={(comment) => comment.id}
           contentContainerClassName="gap-4 p-4"

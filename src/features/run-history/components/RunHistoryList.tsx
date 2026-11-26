@@ -56,6 +56,8 @@ export function RunHistoryList({
 
   return (
     <SectionList
+      // Under a stack header (athlete page) iOS must inset the list below the bar.
+      contentInsetAdjustmentBehavior={isOwn ? 'never' : 'automatic'}
       sections={sections}
       keyExtractor={(run) => run.id}
       stickySectionHeadersEnabled={false}

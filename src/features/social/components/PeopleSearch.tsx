@@ -17,55 +17,59 @@ export function PeopleSearch({ viewerId }: { viewerId: string }) {
   const tooShort = query.trim().length < 2;
 
   return (
-    <View className="flex-1 gap-4 px-4 pt-4">
-      <TextField
-        label="Buscar corredores"
-        value={query}
-        onChangeText={setQuery}
-        placeholder="Nome ou @usuário"
-        autoCapitalize="none"
-        autoCorrect={false}
-        autoFocus
-        returnKeyType="search"
-      />
-      <FlatList
-        data={tooShort ? [] : (search.data ?? [])}
-        keyExtractor={(profile) => profile.id}
-        keyboardShouldPersistTaps="handled"
-        contentContainerClassName="gap-3 pb-8"
-        ListEmptyComponent={
-          search.isFetching ? (
-            <ActivityIndicator color={theme.accent} />
-          ) : (
-            <Text className="py-6 text-center text-base text-ink-300">
-              {tooShort
-                ? 'Digite pelo menos 2 letras.'
-                : search.isError
-                  ? 'Não foi possível buscar agora.'
-                  : 'Ninguém encontrado com esse nome.'}
-            </Text>
-          )
-        }
-        renderItem={({ item }) => (
-          <View className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-ink-800 p-3">
-            <Pressable
-              accessibilityRole="link"
-              accessibilityLabel={`Perfil de ${displayName(item)}`}
-              onPress={() => router.push(`/user/${item.id}`)}
-              className="flex-1 flex-row items-center gap-3"
-            >
-              <Avatar name={displayName(item)} imageUrl={item.avatarUrl} size={44} />
-              <View className="flex-1">
-                <Text className="text-base font-semibold text-ink-50">{displayName(item)}</Text>
-                {item.username ? (
-                  <Text className="text-sm text-ink-400">@{item.username}</Text>
-                ) : null}
-              </View>
-            </Pressable>
-            <FollowButton viewerId={viewerId} targetId={item.id} isFollowing={item.isFollowing} />
-          </View>
-        )}
-      />
-    </View>
+    <FlatList
+      className="flex-1"
+      contentInsetAdjustmentBehavior="automatic"
+      ListHeaderComponent={
+        <View className="pb-4">
+          <TextField
+            label="Buscar corredores"
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Nome ou @usuário"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoFocus
+            returnKeyType="search"
+          />
+        </View>
+      }
+      data={tooShort ? [] : (search.data ?? [])}
+      keyExtractor={(profile) => profile.id}
+      keyboardShouldPersistTaps="handled"
+      contentContainerClassName="gap-3 px-4 pb-8 pt-4"
+      ListEmptyComponent={
+        search.isFetching ? (
+          <ActivityIndicator color={theme.accent} />
+        ) : (
+          <Text className="py-6 text-center text-base text-ink-300">
+            {tooShort
+              ? 'Digite pelo menos 2 letras.'
+              : search.isError
+                ? 'Não foi possível buscar agora.'
+                : 'Ninguém encontrado com esse nome.'}
+          </Text>
+        )
+      }
+      renderItem={({ item }) => (
+        <View className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-ink-800 p-3">
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel={`Perfil de ${displayName(item)}`}
+            onPress={() => router.push(`/user/${item.id}`)}
+            className="flex-1 flex-row items-center gap-3"
+          >
+            <Avatar name={displayName(item)} imageUrl={item.avatarUrl} size={44} />
+            <View className="flex-1">
+              <Text className="text-base font-semibold text-ink-50">{displayName(item)}</Text>
+              {item.username ? (
+                <Text className="text-sm text-ink-400">@{item.username}</Text>
+              ) : null}
+            </View>
+          </Pressable>
+          <FollowButton viewerId={viewerId} targetId={item.id} isFollowing={item.isFollowing} />
+        </View>
+      )}
+    />
   );
 }

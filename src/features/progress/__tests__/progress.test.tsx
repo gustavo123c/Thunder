@@ -97,7 +97,7 @@ describe('progress components', () => {
   });
 
   it('switches dashboard periods', async () => {
-    jest.mocked(fetchActivity).mockResolvedValue([daysAgo(0, 300), daysAgo(400, 330)]);
+    jest.mocked(fetchActivity).mockResolvedValue([daysAgo(0, 300), daysAgo(365, 330)]);
     await renderWithQuery(<ProgressDashboard userId="u1" />);
 
     expect(await screen.findByText('Desempenho')).toBeOnTheScreen();

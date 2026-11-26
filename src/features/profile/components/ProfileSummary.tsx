@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 
 import type { Profile } from '@/domain/types/profile';
@@ -22,15 +23,23 @@ function StatTile({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function ProfileSummary({ profile }: { profile: Profile }) {
+type ProfileSummaryProps = {
+  profile: Profile;
+  /** Replaces the initials avatar (e.g. an editable avatar). */
+  avatarSlot?: ReactNode;
+};
+
+export function ProfileSummary({ profile, avatarSlot }: ProfileSummaryProps) {
   const goal = profile.mainGoal ? GOAL_COPY[profile.mainGoal] : null;
 
   return (
     <View className="gap-6">
       <View className="items-center gap-2">
-        <View className="h-24 w-24 items-center justify-center rounded-full bg-bolt-500">
-          <Text className="text-3xl font-bold text-ink-900">{initialsOf(profile)}</Text>
-        </View>
+        {avatarSlot ?? (
+          <View className="h-24 w-24 items-center justify-center rounded-full bg-bolt-500">
+            <Text className="text-3xl font-bold text-ink-900">{initialsOf(profile)}</Text>
+          </View>
+        )}
         <Text className="text-2xl font-bold text-ink-900 dark:text-ink-50">
           {profile.fullName ?? profile.username}
         </Text>

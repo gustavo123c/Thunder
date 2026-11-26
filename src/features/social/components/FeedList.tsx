@@ -2,6 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 
+import { RunMediaGallery } from '@/components/media/RunMediaGallery';
 import { RunCard } from '@/components/run/RunCard';
 import { Button } from '@/components/ui/Button';
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -68,6 +69,11 @@ export function FeedList({ viewerId }: { viewerId: string }) {
           run={item}
           onPress={() => router.push(`/run/${item.id}`)}
           header={<AuthorRow author={item.author} isViewer={item.userId === viewerId} />}
+          media={
+            item.media.length > 0 ? (
+              <RunMediaGallery media={item.media} size={84} maxVisible={4} />
+            ) : undefined
+          }
           footer={<SocialBar run={item} viewerId={viewerId} />}
         />
       )}

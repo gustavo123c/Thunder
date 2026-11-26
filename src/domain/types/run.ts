@@ -70,6 +70,17 @@ export type RunRecord = {
   commentsCount: number;
   /** Simplified route as [lon, lat] positions; empty when the run had no GPS track. */
   route: [number, number][];
+  /** Photos/videos attached to the run (paths in the workout-media bucket). */
+  media: RunMediaItem[];
+};
+
+export type RunMediaItem = {
+  id: string;
+  path: string;
+  type: 'image' | 'video';
+  width: number | null;
+  height: number | null;
+  durationS: number | null;
 };
 
 /** Minimal fields needed to compare a run with earlier ones. */

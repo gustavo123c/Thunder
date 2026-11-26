@@ -4,7 +4,7 @@
  * schema drift fails loudly here instead of rendering NaN in the UI.
  */
 import type { Position } from '@/domain/geo/geojson';
-import type { RunHistoryEntry, RunRecord, Split } from '@/domain/types/run';
+import type { RunHistoryEntry, RunMediaItem, RunRecord, Split } from '@/domain/types/run';
 
 export class RunJsonError extends Error {
   constructor(field: string) {
@@ -71,6 +71,20 @@ function parseRoute(value: unknown): Position[] {
   });
 }
 
+function parseMediaItem(value: unknown): RunMediaItem {
+  const obj = asObject(value, 'media');
+  const type = str(obj, 'type');
+  if (type !== 'image' && type !== 'video') throw new RunJsonError('media.type');
+  return {
+    id: str(obj, 'id'),
+    path: str(obj, 'path'),
+    type,
+    width: numOrNull(obj, 'width'),
+    height: numOrNull(obj, 'height'),
+    durationS: numOrNull(obj, 'duration_s'),
+  };
+}
+
 export function parseRunRecord(value: unknown): RunRecord {
   const obj = asObject(value, 'run');
   const visibility = str(obj, 'visibility');
@@ -95,6 +109,7 @@ export function parseRunRecord(value: unknown): RunRecord {
     kudosCount: num(obj, 'kudos_count'),
     commentsCount: num(obj, 'comments_count'),
     route: parseRoute(obj.route),
+    media: asArray(obj.media ?? [], 'media').map(parseMediaItem),
   };
 }
 

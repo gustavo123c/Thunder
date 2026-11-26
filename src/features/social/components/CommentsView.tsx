@@ -87,6 +87,18 @@ export function CommentsView({ runId, viewerId }: { runId: string; viewerId: str
                     <Text className="text-xs text-ink-400">{formatRunDate(item.createdAt)}</Text>
                   </View>
                   <Text className="text-base text-ink-700 dark:text-ink-100">{item.body}</Text>
+                  {own ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel="Apagar comentário"
+                      hitSlop={8}
+                      onPress={() => confirmDelete(item.id)}
+                      className="flex-row items-center gap-1 self-end"
+                    >
+                      <Ionicons name="trash-outline" size={14} color={colors.ink[400]} />
+                      <Text className="text-xs text-ink-400">Apagar</Text>
+                    </Pressable>
+                  ) : null}
                 </View>
               </Pressable>
             );

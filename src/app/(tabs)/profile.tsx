@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/Button';
 import { Screen } from '@/components/ui/Screen';
 import { useSignOut, useUserId } from '@/features/auth';
+import { AvatarEditor } from '@/features/media';
 import { ProfileSummary, useProfile } from '@/features/profile';
 import { WinStreakCard } from '@/features/progress';
 import { ProfileStatsRow } from '@/features/social';
@@ -18,7 +19,16 @@ export default function ProfileScreen() {
   return (
     <Screen>
       <ScrollView contentContainerClassName="gap-8 py-6">
-        <ProfileSummary profile={profile} />
+        <ProfileSummary
+          profile={profile}
+          avatarSlot={
+            <AvatarEditor
+              userId={userId}
+              name={profile.fullName ?? profile.username}
+              avatarUrl={profile.avatarUrl}
+            />
+          }
+        />
         <ProfileStatsRow userId={userId} viewerId={userId} />
         <WinStreakCard userId={userId} />
         <View className="gap-3">

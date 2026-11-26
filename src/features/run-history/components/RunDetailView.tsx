@@ -32,6 +32,8 @@ type RunDetailViewProps = {
   viewerId: string;
   /** Social section (kudos, comments) supplied by the screen. */
   renderSocial?: (detail: RunDetail) => ReactNode;
+  /** Photos/videos section supplied by the screen. */
+  renderMedia?: (detail: RunDetail) => ReactNode;
 };
 
 function StatsGrid({ detail }: { detail: RunDetail }) {
@@ -103,7 +105,7 @@ function OwnerActions({ detail }: { detail: RunDetail }) {
   );
 }
 
-export function RunDetailView({ runId, viewerId, renderSocial }: RunDetailViewProps) {
+export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: RunDetailViewProps) {
   const query = useRunDetail(runId);
   const detail = query.data;
 
@@ -169,6 +171,8 @@ export function RunDetailView({ runId, viewerId, renderSocial }: RunDetailViewPr
         </View>
 
         <StatsGrid detail={detail} />
+
+        {renderMedia ? renderMedia(detail) : null}
 
         {renderSocial ? renderSocial(detail) : null}
 

@@ -193,6 +193,10 @@ Migration: `supabase/migrations/20261125000000_initial_schema.sql`.
 | `kudos`      | "Raio" ⚡ — PK `(run_id, user_id)`.                                                                                                                                                 |
 | `comments`   | Até 500 caracteres; soft delete por `deleted_at`.                                                                                                                                   |
 
+**Privilégios explícitos** — `20261126000000_explicit_grants.sql` concede SELECT/INSERT/DELETE ao
+`authenticated` (projetos Supabase novos podem não expor tabelas automaticamente). Os testes SQL rodam
+sem privilégios padrão, para pegar qualquer permissão faltando.
+
 **Segurança (RLS)** — coberta por `supabase/tests/*.sql` (`npm run test:db`)
 
 - `anon` não acessa nada; todas as políticas são `to authenticated`.

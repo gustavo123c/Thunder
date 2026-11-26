@@ -3,5 +3,5 @@ create schema extensions; create schema auth;
 grant usage on schema public, extensions, auth to anon, authenticated;
 create table auth.users (id uuid primary key, raw_user_meta_data jsonb default '{}');
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
-alter default privileges in schema public grant all on tables to anon, authenticated;
-alter default privileges in schema public grant all on functions to anon, authenticated;
+-- Strict mode: NO default table privileges for anon/authenticated (new Supabase
+-- projects may not expose tables automatically). Migrations must grant explicitly.

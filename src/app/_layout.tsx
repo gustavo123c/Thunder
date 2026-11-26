@@ -32,7 +32,11 @@ function RootNavigator() {
     return (
       <ErrorState
         title="Não conseguimos carregar seu perfil"
-        description="Verifique sua conexão e tente novamente."
+        description={
+          __DEV__ && profileQuery.error
+            ? `Verifique sua conexão e tente novamente.\n\n[dev] ${profileQuery.error.message}`
+            : 'Verifique sua conexão e tente novamente.'
+        }
         primaryAction={{
           label: 'Tentar novamente',
           onPress: () => void profileQuery.refetch(),

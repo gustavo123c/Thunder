@@ -1,4 +1,4 @@
-import { Linking, Text, View } from 'react-native';
+import { Linking, Platform, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 
@@ -17,7 +17,9 @@ export function PermissionNotice({ permission, onRequest }: PermissionNoticeProp
     return (
       <View className="gap-2 rounded-[20px] border border-bolt-500/30 bg-bolt-500/10 p-4">
         <Text className="text-sm font-semibold text-ink-50">
-          Permita a localização &quot;sempre&quot;
+          {Platform.OS === 'android'
+            ? 'Permita a localização "o tempo todo"'
+            : 'Permita a localização "sempre"'}
         </Text>
         <Text className="text-sm text-ink-300">
           Sem ela, a gravação pode parar quando a tela bloquear ou você trocar de app.

@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ComponentProps } from 'react';
 import {
   type AccessibilityState,
@@ -79,6 +80,8 @@ export default function TabsLayout() {
   const userId = useUserId();
   // Restores an interrupted run and uploads runs saved while offline.
   useRunTrackingBootstrap(userId);
+  // Android 3-button navigation and the iPhone home indicator both need room below the tabs.
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -91,7 +94,7 @@ export default function TabsLayout() {
           backgroundColor: theme.ink[900],
           borderTopColor: theme.hairline,
           borderTopWidth: 1,
-          height: 84,
+          height: 58 + Math.max(bottom, 8),
           paddingTop: 8,
         },
       }}
@@ -102,7 +105,7 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="training"
-        options={{ title: 'Treino', tabBarIcon: tabIcon('barbell', 'barbell-outline') }}
+        options={{ title: 'Treino', tabBarIcon: tabIcon('stopwatch', 'stopwatch-outline') }}
       />
       <Tabs.Screen
         name="record"

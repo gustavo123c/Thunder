@@ -161,6 +161,8 @@ corrida concorrente, tratando `unique_violation`).
 - Telas: Feed (cards com autor e barra social), comentários (`run/[id]/comments`), busca de pessoas
   (`people`, modal), perfil de atleta (`user/[id]`) e contadores sociais na aba Perfil.
 
+Para gerar builds instaláveis (Android e iOS) com o EAS, veja [BUILD.md](BUILD.md).
+
 ## Modo Expo Go (teste sem build)
 
 `lib/runtime.ts#isExpoGo` detecta o app Expo Go. Nele:

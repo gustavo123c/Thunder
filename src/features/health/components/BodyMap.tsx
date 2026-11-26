@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import Svg, { Circle, Ellipse, Path, Rect } from 'react-native-svg';
+import { Pressable, Text, useColorScheme, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 import {
   type BodyRegion,
@@ -8,21 +8,19 @@ import {
   type BodyView,
   describeRegion,
   painLevel,
+  type PainLevel,
 } from '@/domain/health/body-regions';
 import type { BodySex } from '@/domain/types/profile';
 import { colors } from '@/theme/tokens';
 
 import type { PainLog } from '../api/pain.api';
-import { BODY_VIEWBOX, bodyHotspots, type Hotspot, silhouette } from '../body-geometry';
+import { DRAWINGS, musclePaths, tappableRegions } from '../muscle-map';
 
-const SKIN = colors.ink[100];
-const OUTLINE = colors.ink[300];
-
-const PAIN_COLORS = {
+const PAIN_COLORS: Record<PainLevel, string> = {
   mild: colors.bolt[400],
   moderate: '#F97316',
   severe: colors.danger,
-} as const;
+};
 
 type BodyMapProps = {
   sex: BodySex | null;
@@ -67,50 +65,37 @@ function Toggle<T extends string>({
   );
 }
 
-/** Interactive front/back body map. Tap a region to report pain there. */
-export function BodyMap({ sex, pains, onSelect, height = 380 }: BodyMapProps) {
+/**
+ * Anatomical body map (muscle by muscle, male/female, front/back).
+ * Tap a muscle to report pain there; painful regions are colored by intensity.
+ */
+export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
   const [view, setView] = useState<BodyView>('front');
   const [model, setModel] = useState<BodySex>(sex ?? 'male');
   const [showList, setShowList] = useState(false);
+  const scheme = useColorScheme();
 
-  const hotspots = useMemo(() => bodyHotspots(model, view), [model, view]);
-  const shape = useMemo(() => silhouette(model, view), [model, view]);
-  const painByKey = useMemo(() => new Map(pains.map((p) => [`${p.region}:${p.side}`, p])), [pains]);
+  const paths = useMemo(() => musclePaths(model, view), [model, view]);
+  const regions = useMemo(() => tappableRegions(model, view), [model, view]);
+  const drawing = DRAWINGS[model][view];
 
-  const width = (height * BODY_VIEWBOX.width) / BODY_VIEWBOX.height;
+  const [, , vbWidth, vbHeight] = drawing.viewBox.split(' ').map(Number) as [
+    number,
+    number,
+    number,
+    number,
+  ];
+  const width = (height * vbWidth) / vbHeight;
 
-  function renderHotspot(hotspot: Hotspot) {
-    const pain = painByKey.get(hotspot.key);
-    const fill = pain ? PAIN_COLORS[painLevel(pain.intensity)] : colors.ink[400];
-    const common = {
-      fill,
-      fillOpacity: pain ? 0.85 : 0.06,
-      stroke: pain ? fill : colors.ink[400],
-      strokeOpacity: pain ? 1 : 0.55,
-      strokeWidth: pain ? 1.2 : 0.8,
-      strokeDasharray: pain ? undefined : '2 2',
-      onPress: () => onSelect(hotspot.region, hotspot.side),
-    };
-    const label = `${describeRegion(hotspot.region, hotspot.side)}${pain ? ', com dor registrada' : ''}`;
-    return hotspot.shape.kind === 'circle' ? (
-      <Circle
-        key={hotspot.key}
-        {...common}
-        accessibilityLabel={label}
-        cx={hotspot.shape.cx}
-        cy={hotspot.shape.cy}
-        r={hotspot.shape.r}
-      />
-    ) : (
-      <Ellipse
-        key={hotspot.key}
-        {...common}
-        accessibilityLabel={label}
-        cx={hotspot.shape.cx}
-        cy={hotspot.shape.cy}
-        rx={hotspot.shape.rx}
-        ry={hotspot.shape.ry}
-      />
+  const muscleFill = scheme === 'dark' ? colors.ink[600] : colors.ink[200];
+  const decorFill = scheme === 'dark' ? colors.ink[500] : colors.ink[300];
+  const separator = scheme === 'dark' ? colors.ink[800] : '#FFFFFF';
+
+  /** Pain for a region/side; a "center" entry of a bilateral region covers both sides. */
+  function painFor(region: BodyRegion, side: BodySide): PainLog | undefined {
+    return (
+      pains.find((p) => p.region === region && p.side === side) ??
+      pains.find((p) => p.region === region && p.side === 'center')
     );
   }
 
@@ -127,8 +112,8 @@ export function BodyMap({ sex, pains, onSelect, height = 380 }: BodyMapProps) {
         />
         <Toggle
           options={[
-            { value: 'male', label: 'Masc.' },
-            { value: 'female', label: 'Fem.' },
+            { value: 'male', label: 'Masculino' },
+            { value: 'female', label: 'Feminino' },
           ]}
           value={model}
           onChange={setModel}
@@ -139,40 +124,39 @@ export function BodyMap({ sex, pains, onSelect, height = 380 }: BodyMapProps) {
         <Svg
           width={width}
           height={height}
-          viewBox={`0 0 ${BODY_VIEWBOX.width} ${BODY_VIEWBOX.height}`}
-          accessibilityLabel={`Mapa corporal, vista ${view === 'front' ? 'de frente' : 'de costas'}`}
+          viewBox={drawing.viewBox}
+          accessibilityLabel={`Corpo humano ${model === 'male' ? 'masculino' : 'feminino'}, vista ${
+            view === 'front' ? 'de frente' : 'de costas'
+          }`}
         >
-          {/* Mannequin */}
-          {shape.limbs.map((d, i) => (
-            <Path key={`limb-${i}`} d={d} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
-          ))}
-          {shape.extremities.map((e, i) => (
-            <Ellipse key={`ext-${i}`} {...e} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
-          ))}
-          <Rect {...shape.neck} rx={4} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
-          <Path d={shape.torso} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
-          <Ellipse {...shape.head} fill={SKIN} stroke={OUTLINE} strokeWidth={1} />
-          {shape.details.map((d, i) => (
-            <Path
-              key={`detail-${i}`}
-              d={d}
-              fill="none"
-              stroke={OUTLINE}
-              strokeWidth={0.8}
-              strokeOpacity={0.6}
-            />
-          ))}
-          {/* Tappable regions */}
-          {hotspots.map(renderHotspot)}
+          {paths.map((path, index) => {
+            if (!path.region) {
+              return (
+                <Path key={index} d={path.d} fill={decorFill} stroke={separator} strokeWidth={2} />
+              );
+            }
+            const pain = painFor(path.region, path.side);
+            const region = path.region;
+            return (
+              <Path
+                key={index}
+                d={path.d}
+                fill={pain ? PAIN_COLORS[painLevel(pain.intensity)] : muscleFill}
+                stroke={separator}
+                strokeWidth={2}
+                onPress={() => onSelect(region, path.side)}
+              />
+            );
+          })}
         </Svg>
-        <Text className="mt-2 text-xs text-ink-400">
+        <Text className="mt-2 px-4 text-center text-xs text-ink-400">
           {view === 'front'
-            ? 'Vista de frente: seu lado esquerdo fica à direita da tela'
-            : 'Vista de costas'}
+            ? 'Vista de frente: o seu lado esquerdo aparece à direita da tela.'
+            : 'Vista de costas: os lados coincidem com os seus.'}
         </Text>
       </View>
 
-      {/* Accessible alternative to tapping the drawing (screen readers, small targets). */}
+      {/* Accessible alternative to tapping the drawing (screen readers, small muscles). */}
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ expanded: showList }}
@@ -185,20 +169,20 @@ export function BodyMap({ sex, pains, onSelect, height = 380 }: BodyMapProps) {
       </Pressable>
       {showList ? (
         <View className="flex-row flex-wrap gap-2">
-          {hotspots.map((hotspot) => {
-            const pain = painByKey.get(hotspot.key);
+          {regions.map(({ region, side }) => {
+            const pain = painFor(region, side);
             return (
               <Pressable
-                key={hotspot.key}
+                key={`${region}:${side}`}
                 accessibilityRole="button"
-                accessibilityLabel={describeRegion(hotspot.region, hotspot.side)}
-                onPress={() => onSelect(hotspot.region, hotspot.side)}
+                accessibilityLabel={describeRegion(region, side)}
+                onPress={() => onSelect(region, side)}
                 className={`rounded-full px-3 py-1.5 ${
                   pain ? 'bg-bolt-100 dark:bg-ink-600' : 'bg-ink-100 dark:bg-ink-700'
                 }`}
               >
                 <Text className="text-sm text-ink-800 dark:text-ink-100">
-                  {describeRegion(hotspot.region, hotspot.side)}
+                  {describeRegion(region, side)}
                 </Text>
               </Pressable>
             );
@@ -219,6 +203,9 @@ export function BodyMap({ sex, pains, onSelect, height = 380 }: BodyMapProps) {
           </View>
         ))}
       </View>
+      <Text className="text-center text-[10px] text-ink-300">
+        Ilustração anatômica: react-native-body-highlighter (MIT)
+      </Text>
     </View>
   );
 }

@@ -124,3 +124,14 @@ select pg_temp.as_user('aaaaaaaa-0000-0000-0000-000000000001');
 delete from public.runs where id = '33333333-0000-0000-0000-000000000001';
 select pg_temp.check((select count(*) from public.run_media) = 0, 'deleting a run removes its media rows');
 reset role;
+
+-- Anatomical regions added for the muscle map
+set role authenticated;
+select pg_temp.as_user('aaaaaaaa-0000-0000-0000-000000000001');
+insert into public.pain_logs (user_id, region, side, intensity)
+values ('aaaaaaaa-0000-0000-0000-000000000001', 'forearm', 'right', 3),
+       ('aaaaaaaa-0000-0000-0000-000000000001', 'trapezius', 'center', 6);
+select pg_temp.check(
+  (select count(*) from public.pain_logs where region in ('forearm', 'trapezius')) = 2,
+  'new anatomical regions are accepted');
+reset role;

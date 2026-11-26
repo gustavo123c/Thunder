@@ -42,7 +42,7 @@ export const EXERCISES: readonly Exercise[] = [
     id: 'cat_cow',
     name: 'Gato-camelo',
     category: 'mobility',
-    loads: ['wrist'],
+    loads: ['wrist', 'forearm'],
     cue: 'Em quatro apoios, alterne arredondar e arquear a coluna devagar.',
   },
   {
@@ -150,14 +150,14 @@ export const EXERCISES: readonly Exercise[] = [
     id: 'push_up',
     name: 'Flexão de braços',
     category: 'strength',
-    loads: ['chest', 'shoulder', 'elbow', 'wrist'],
+    loads: ['chest', 'shoulder', 'triceps', 'elbow', 'wrist'],
     cue: 'Corpo alinhado; pode apoiar os joelhos para facilitar.',
   },
   {
     id: 'band_row',
     name: 'Remada com elástico',
     category: 'strength',
-    loads: ['upper_back', 'shoulder', 'elbow'],
+    loads: ['upper_back', 'shoulder', 'biceps', 'forearm', 'elbow'],
     cue: 'Puxe o elástico até a costela, aproximando as escápulas.',
   },
 
@@ -166,14 +166,14 @@ export const EXERCISES: readonly Exercise[] = [
     id: 'plank',
     name: 'Prancha',
     category: 'core',
-    loads: ['abdomen', 'shoulder', 'elbow', 'lower_back'],
+    loads: ['abdomen', 'shoulder', 'forearm', 'elbow', 'lower_back'],
     cue: 'Antebraços no chão, corpo em linha reta, sem deixar o quadril cair.',
   },
   {
     id: 'side_plank',
     name: 'Prancha lateral',
     category: 'core',
-    loads: ['abdomen', 'shoulder', 'elbow'],
+    loads: ['abdomen', 'obliques', 'shoulder', 'forearm', 'elbow'],
     cue: 'Apoie um antebraço, quadril alto e alinhado.',
   },
   {
@@ -227,7 +227,7 @@ export const EXERCISES: readonly Exercise[] = [
     id: 'upper_body_cardio',
     name: 'Circuito de braços e tronco',
     category: 'cardio',
-    loads: ['shoulder', 'elbow'],
+    loads: ['shoulder', 'biceps', 'triceps', 'elbow'],
     cue: 'Socos no ar, polichinelo de braços, sentado se preciso.',
   },
 ];

@@ -37,6 +37,7 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen name="feed" options={{ title: 'Feed', tabBarIcon: tabIcon('flash') }} />
+      <Tabs.Screen name="training" options={{ title: 'Treino', tabBarIcon: tabIcon('barbell') }} />
       <Tabs.Screen
         name="record"
         options={{ title: 'Correr', tabBarIcon: tabIcon('play-circle') }}

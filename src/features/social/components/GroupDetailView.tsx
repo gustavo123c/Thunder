@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { hasRecordedDistance } from '@/domain/metrics/recorded-distance';
 import { formatDecimal } from '@/lib/format';
 import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
@@ -45,7 +46,7 @@ function GroupHeader({ group }: { group: RunGroup }) {
           <Ionicons name="people" size={24} color={colors.onBolt} />
         </View>
         <View className="flex-1">
-          <Text accessibilityRole="header" className="text-2xl font-extrabold text-ink-50">
+          <Text accessibilityRole="header" className="text-2xl font-bold text-ink-50">
             {group.name}
           </Text>
           <Text className="text-xs text-ink-400">
@@ -56,7 +57,7 @@ function GroupHeader({ group }: { group: RunGroup }) {
       <View className="flex-row items-center gap-3 rounded-2xl border border-hairline bg-ink-900 p-3">
         <Ionicons name="key-outline" size={18} color={theme.ink[300]} />
         <View className="flex-1">
-          <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400">
+          <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
             Código de convite
           </Text>
           <Text
@@ -95,7 +96,7 @@ function RankingRow({
         row.distanceM / 1000,
       )} quilômetros em ${row.runs} ${row.runs === 1 ? 'corrida' : 'corridas'}`}
       className={`flex-row items-center gap-3 rounded-[20px] border p-3 ${
-        isViewer ? 'border-bolt-500/40 bg-bolt-500/10' : 'border-hairline bg-ink-800'
+        isViewer ? 'border-hairline bg-bolt-500/10' : 'border-hairline bg-ink-800'
       }`}
     >
       <View
@@ -121,7 +122,7 @@ function RankingRow({
       </View>
       <View className="flex-row items-baseline gap-1">
         <Text
-          className="text-xl font-extrabold text-ink-50"
+          className="text-[22px] font-extrabold text-ink-50"
           style={{ fontVariant: ['tabular-nums'] }}
         >
           {formatDecimal(row.distanceM / 1000)}
@@ -236,7 +237,7 @@ export function GroupDetailView({ groupId, viewerId }: { groupId: string; viewer
       className="flex-1 bg-ink-900"
       contentInsetAdjustmentBehavior="automatic"
       contentContainerClassName="gap-4 px-4 pb-10 pt-4"
-      data={feed.data?.pages.flat() ?? []}
+      data={(feed.data?.pages.flat() ?? []).filter((item) => hasRecordedDistance(item.distanceM))}
       keyExtractor={(item) => item.id}
       ListHeaderComponent={header}
       ListEmptyComponent={

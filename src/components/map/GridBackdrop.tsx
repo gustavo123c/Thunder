@@ -39,8 +39,8 @@ export function GridBackdrop({ showLocation = true, children }: GridBackdropProp
         <Svg width={width} height={height} style={{ position: 'absolute' }}>
           <Defs>
             <RadialGradient id="glow" cx="50%" cy="50%" r="50%">
-              <Stop offset="0" stopColor={colors.bolt[500]} stopOpacity={0.16} />
-              <Stop offset="1" stopColor={colors.bolt[500]} stopOpacity={0} />
+              <Stop offset="0" stopColor={colors.brand} stopOpacity={0.16} />
+              <Stop offset="1" stopColor={colors.brand} stopOpacity={0} />
             </RadialGradient>
           </Defs>
 
@@ -95,16 +95,16 @@ export function GridBackdrop({ showLocation = true, children }: GridBackdropProp
                 cx={cx}
                 cy={cy}
                 r={44}
-                stroke={colors.bolt[500]}
+                stroke={colors.brand}
                 strokeOpacity={0.15}
                 fill="none"
               />
-              <Circle cx={cx} cy={cy} r={24} fill={colors.bolt[500]} fillOpacity={0.15} />
+              <Circle cx={cx} cy={cy} r={24} fill={colors.brand} fillOpacity={0.15} />
               <Circle
                 cx={cx}
                 cy={cy}
                 r={9}
-                fill={colors.bolt[500]}
+                fill={colors.brand}
                 stroke={theme.ink[900]}
                 strokeWidth={3}
               />

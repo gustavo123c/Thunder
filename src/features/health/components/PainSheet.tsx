@@ -58,7 +58,7 @@ export function PainSheet({
         {target ? (
           <>
             <View className="gap-1">
-              <Text className="text-xl font-extrabold text-ink-50">
+              <Text className="text-xl font-bold text-ink-50">
                 {describeRegion(target.region, target.side)}
               </Text>
               <Text className="text-sm text-ink-300">
@@ -69,7 +69,7 @@ export function PainSheet({
             {returningCount > 0 ? (
               <View
                 accessibilityLiveRegion="polite"
-                className="flex-row gap-3 rounded-2xl border border-bolt-500/30 bg-bolt-500/10 p-3"
+                className="flex-row gap-3 rounded-2xl border border-hairline bg-ink-800 p-3"
               >
                 <Ionicons name="repeat" size={18} color={theme.accent} />
                 <Text className="flex-1 text-sm leading-5 text-ink-100">

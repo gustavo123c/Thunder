@@ -28,8 +28,8 @@ export function LiveStats({ metrics, status }: LiveStatsProps) {
   return (
     <View className="gap-5">
       {status === 'paused' ? (
-        <View className="self-center rounded-full border border-bolt-500/40 bg-bolt-500/10 px-3 py-1">
-          <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-accent">
+        <View className="self-center rounded-full border border-hairline bg-bolt-500/10 px-3 py-1">
+          <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
             Pausado
           </Text>
         </View>

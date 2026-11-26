@@ -2,6 +2,7 @@
  * Personal records, achievements and goal progress for the profile screen.
  * Pure functions over the same activity entries used by the streak/dashboard.
  */
+import { hasRecordedDistance } from '../metrics/recorded-distance';
 import type { RunnerGoal } from '../types/profile';
 import { type ActivityEntry, startOfWeek } from './activity';
 
@@ -167,9 +168,11 @@ export function bestMonthRuns(entries: readonly ActivityEntry[]): number {
  * run count and distance when larger, since the window only covers recent years.
  */
 export function achievementInput(
-  entries: readonly ActivityEntry[],
+  allEntries: readonly ActivityEntry[],
   allTime?: { runs: number; distanceM: number },
 ): AchievementInput {
+  // Runs where the GPS recorded nothing don't count for medals.
+  const entries = allEntries.filter((e) => hasRecordedDistance(e.distanceM));
   const windowDistance = entries.reduce((sum, e) => sum + e.distanceM, 0);
   return {
     totalRuns: Math.max(entries.length, allTime?.runs ?? 0),

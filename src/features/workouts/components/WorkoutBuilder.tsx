@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { HealthDisclaimer } from '@/components/ui/HealthDisclaimer';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { TextField } from '@/components/ui/TextField';
+import { Label } from '@/components/ui/Typography';
 import { describeRegion, type PainEntry } from '@/domain/health/body-regions';
 import type { Recurrence } from '@/domain/health/pain-history';
 import { CUSTOM_GOAL_MAX_LENGTH } from '@/domain/training/custom-goal';
@@ -92,7 +93,7 @@ function SessionCard({
         <Ionicons name={copy.icon} size={18} color={selected ? colors.onBolt : theme.ink[200]} />
       </View>
       <View className="flex-1">
-        <Text className="text-[15px] font-extrabold text-ink-50" numberOfLines={1}>
+        <Text className="text-[15px] font-semibold text-ink-50" numberOfLines={1}>
           {copy.label}
         </Text>
         <Text className="text-xs leading-4 text-ink-400" numberOfLines={2}>
@@ -106,7 +107,7 @@ function SessionCard({
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View className="gap-2.5">
-      <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400">{title}</Text>
+      <Label>{title}</Label>
       {children}
     </View>
   );
@@ -138,10 +139,10 @@ function ReturningPainCard({
   const theme = useThemeColors();
   const where = describeRegion(recurrence.region, recurrence.side).toLowerCase();
   return (
-    <View className="gap-3 rounded-[20px] border border-bolt-500/30 bg-bolt-500/10 p-4">
+    <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
       <View className="flex-row items-center gap-2">
         <Ionicons name="repeat" size={16} color={theme.accent} />
-        <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-accent">
+        <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
           Dor recorrente
         </Text>
       </View>
@@ -257,7 +258,7 @@ export function WorkoutBuilder({
   return (
     <View className="gap-6">
       <View className="gap-1">
-        <Text accessibilityRole="header" className="text-2xl font-extrabold text-ink-50">
+        <Text accessibilityRole="header" className="text-2xl font-bold text-ink-50">
           Monte seu treino de corrida
         </Text>
         <Text className="text-sm text-ink-400">

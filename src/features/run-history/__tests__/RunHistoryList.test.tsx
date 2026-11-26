@@ -60,3 +60,33 @@ it('groups the history by month with totals', async () => {
   expect(screen.getByText('Corrida c')).toBeOnTheScreen();
   expect(screen.getByRole('button', { name: 'Apagar corrida Corrida a' })).toBeOnTheScreen();
 });
+
+it('shows a run without recorded distance with its time and a hint', async () => {
+  jest.mocked(fetchUserRuns).mockResolvedValue([run('z', new Date(2026, 10, 20, 7), 0)]);
+  queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: Infinity } },
+  });
+  await render(
+    <QueryClientProvider client={queryClient}>
+      <RunHistoryList userId="u1" />
+    </QueryClientProvider>,
+  );
+
+  expect(await screen.findByText('Sem distância registrada')).toBeOnTheScreen();
+  expect(screen.getByText(/O GPS não registrou o trajeto/)).toBeOnTheScreen();
+  expect(screen.queryByText('Distância')).not.toBeOnTheScreen();
+});
+
+it('shows the illustrated empty state with a call to action', async () => {
+  jest.mocked(fetchUserRuns).mockResolvedValue([]);
+  queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: Infinity } },
+  });
+  await render(
+    <QueryClientProvider client={queryClient}>
+      <RunHistoryList userId="u1" />
+    </QueryClientProvider>,
+  );
+  expect(await screen.findByText('Sua primeira rota começa aqui')).toBeOnTheScreen();
+  expect(screen.getByRole('button', { name: 'Fazer minha primeira corrida' })).toBeOnTheScreen();
+});

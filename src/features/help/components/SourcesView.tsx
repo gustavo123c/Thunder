@@ -14,7 +14,7 @@ export function SourcesView() {
       contentInsetAdjustmentBehavior="automatic"
       contentContainerClassName="gap-6 px-4 pb-12 pt-4"
     >
-      <View className="flex-row gap-3 rounded-[20px] border border-bolt-500/30 bg-bolt-500/10 p-4">
+      <View className="flex-row gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
         <Ionicons name="information-circle" size={20} color={theme.accent} />
         <Text className="flex-1 text-sm leading-5 text-ink-100">{SOURCES_DISCLAIMER}</Text>
       </View>
@@ -23,7 +23,7 @@ export function SourcesView() {
         <View key={group.title} className="gap-3">
           <Text
             accessibilityRole="header"
-            className="px-1 text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400"
+            className="px-1 text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400"
           >
             {group.title}
           </Text>

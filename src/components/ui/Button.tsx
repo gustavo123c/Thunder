@@ -19,7 +19,7 @@ type ButtonProps = {
 };
 
 const containerByVariant: Record<ButtonVariant, string> = {
-  primary: 'bg-bolt-500 active:bg-bolt-600',
+  primary: 'bg-bolt-500 active:opacity-85',
   secondary: 'border border-hairline bg-ink-800 active:bg-ink-700',
   ghost: 'active:bg-ink-800',
 };

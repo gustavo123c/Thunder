@@ -1,11 +1,11 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import type { ReactElement } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
+import { hasRecordedDistance } from '@/domain/metrics/recorded-distance';
 import { useThemeColors } from '@/theme/theme';
 
 import { useFeed } from '../hooks/useSocial';
@@ -13,14 +13,17 @@ import { FeedRunCard } from './FeedRunCard';
 
 type FeedListProps = {
   viewerId: string;
-  /** Rendered above the feed title (e.g. the Feed | Grupos switch). */
+  /** Rendered above the runs (the screen header with the Feed | Grupos switch). */
   header?: ReactElement | null;
 };
 
 export function FeedList({ viewerId, header = null }: FeedListProps) {
   const theme = useThemeColors();
   const feed = useFeed();
-  const items = feed.data?.pages.flat() ?? [];
+  // Runs where the GPS recorded nothing stay in the owner's history, not in feeds.
+  const items = (feed.data?.pages.flat() ?? []).filter((item) =>
+    hasRecordedDistance(item.distanceM),
+  );
 
   if (feed.isPending) {
     return (
@@ -45,37 +48,27 @@ export function FeedList({ viewerId, header = null }: FeedListProps) {
       data={items}
       keyExtractor={(item) => item.id}
       contentContainerClassName="gap-4 px-4 pb-8 pt-4"
-      ListHeaderComponent={
-        <View className="gap-4">
-          {header}
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-2">
-              <Text className="text-3xl font-extrabold text-ink-50">Feed</Text>
-              <Ionicons name="flash" size={22} color={theme.accent} />
-            </View>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Encontrar corredores"
-              hitSlop={8}
-              onPress={() => router.push('/people')}
-              className="h-11 w-11 items-center justify-center rounded-full border border-hairline bg-ink-800"
-            >
-              <Ionicons name="person-add-outline" size={20} color={theme.accent} />
-            </Pressable>
-          </View>
-        </View>
-      }
+      ListHeaderComponent={header ?? undefined}
       ListEmptyComponent={
         <EmptyState
           icon="people-outline"
-          title="Seu feed está vazio"
-          description="Siga outros corredores para ver os treinos deles aqui e dar aquele Raio de incentivo."
+          illustration="route"
+          title="Seu feed está esperando a primeira largada"
+          description="Siga corredores ou crie um grupo com amigos para ver os treinos de todo mundo aqui."
           action={
-            <Button
-              label="Encontrar corredores"
-              icon="person-add-outline"
-              onPress={() => router.push('/people')}
-            />
+            <>
+              <Button
+                label="Encontrar corredores"
+                icon="person-add-outline"
+                onPress={() => router.push('/people')}
+              />
+              <Button
+                label="Criar um grupo"
+                icon="people-outline"
+                variant="secondary"
+                onPress={() => router.push('/group/new')}
+              />
+            </>
           }
         />
       }

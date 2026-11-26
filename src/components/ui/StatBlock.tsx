@@ -13,12 +13,13 @@ type StatBlockProps = {
 
 const valueSize = {
   hero: 'text-[56px] leading-[60px]',
-  large: 'text-[36px] leading-[40px]',
-  medium: 'text-[28px] leading-[32px]',
+  large: 'text-[32px] leading-[36px]',
+  medium: 'text-[22px] leading-[26px]',
 } as const;
 
 /**
- * A labelled metric: small uppercase label, big ExtraBold tabular value — strong
+ * Metric scale: hero 56 · large 32 · medium 22 px, always ExtraBold (800) with tabular
+ * digits — the only place that weight is used. A labelled metric: small uppercase label, big ExtraBold tabular value — strong
  * contrast between the two, so numbers read at a glance mid-run.
  */
 export function StatBlock({
@@ -35,7 +36,7 @@ export function StatBlock({
       accessibilityLabel={`${label}: ${value}${unit ? ` ${unit}` : ''}`}
       className={`gap-1 ${align === 'center' ? 'items-center' : 'items-start'}`}
     >
-      <Text className="text-[11px] font-semibold uppercase tracking-[1.5px] text-ink-400">
+      <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
         {label}
       </Text>
       <View className="flex-row items-baseline gap-1">

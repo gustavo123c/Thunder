@@ -65,3 +65,11 @@ describe('celebrationHighlights', () => {
     expect(celebrationHighlights(entries, 'b', now)).toHaveLength(2);
   });
 });
+
+describe('runs without recorded distance', () => {
+  it('unlock no medals and get no highlights', () => {
+    const entries = [run('gps-off', at(27), 0, 0)];
+    expect(medalsUnlockedBy(entries, 'gps-off')).toEqual([]);
+    expect(celebrationHighlights(entries, 'gps-off', now)).toEqual([]);
+  });
+});

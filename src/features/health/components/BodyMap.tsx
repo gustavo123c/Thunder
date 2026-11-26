@@ -18,7 +18,7 @@ import type { PainLog } from '../api/pain.api';
 import { DRAWINGS, musclePaths, tappableRegions } from '../muscle-map';
 
 export const PAIN_COLORS: Record<PainLevel, string> = {
-  mild: colors.bolt[400],
+  mild: colors.brand,
   moderate: '#F97316',
   severe: colors.danger,
 };
@@ -176,7 +176,7 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
                 accessibilityLabel={describeRegion(region, side)}
                 onPress={() => onSelect(region, side)}
                 className={`rounded-full border px-3 py-1.5 ${
-                  pain ? 'border-bolt-500/40 bg-bolt-500/10' : 'border-hairline bg-ink-800'
+                  pain ? 'border-hairline bg-bolt-500/10' : 'border-hairline bg-ink-800'
                 }`}
               >
                 <Text className="text-sm text-ink-100">{describeRegion(region, side)}</Text>

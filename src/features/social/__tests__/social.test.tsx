@@ -97,6 +97,28 @@ describe('FeedList', () => {
   });
   afterEach(() => queryClient.clear());
 
+  it('leaves runs without recorded distance out of the feed', async () => {
+    jest
+      .mocked(fetchFeed)
+      .mockResolvedValue(
+        parseFeed([
+          ...feedJson,
+          { ...feedJson[0], id: 'run-z', title: 'GPS desligado', distance_m: 0 },
+        ]),
+      );
+    await renderFeed();
+    expect(await screen.findByText('Longão de domingo')).toBeOnTheScreen();
+    expect(screen.queryByText('GPS desligado')).not.toBeOnTheScreen();
+  });
+
+  it('shows the illustrated empty state with two ways in', async () => {
+    jest.mocked(fetchFeed).mockResolvedValue([]);
+    await renderFeed();
+    expect(await screen.findByText('Seu feed está esperando a primeira largada')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Encontrar corredores' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Criar um grupo' })).toBeOnTheScreen();
+  });
+
   it('renders runs with their authors', async () => {
     await renderFeed();
     expect(await screen.findByText('Longão de domingo')).toBeOnTheScreen();

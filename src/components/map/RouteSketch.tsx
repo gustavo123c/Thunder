@@ -71,7 +71,7 @@ export function RouteSketch({ route, followUser, style }: RouteMapProps) {
               cx={last[0]}
               cy={last[1]}
               r={followUser ? 9 : 6}
-              fill={followUser ? colors.bolt[500] : mapColors.finish}
+              fill={followUser ? colors.brand : mapColors.finish}
               stroke={theme.ink[900]}
               strokeWidth={followUser ? 3 : 0}
             />

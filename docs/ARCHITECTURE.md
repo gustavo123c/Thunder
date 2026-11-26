@@ -258,6 +258,17 @@ stored in AsyncStorage by `src/theme/AppThemeProvider.tsx`, which also calls Nat
   (`rgb(var(--ink-800) / <alpha-value>)`). Class names keep their _role_ in both modes — write
   `bg-ink-900` (background), `bg-ink-800` (card), `bg-ink-700` (raised), `text-ink-50` (primary
   text), `text-ink-300/400` (secondary/muted). Never add `dark:` variants.
+- **One brand amber, `#FACC15` (`colors.brand` / `bg-bolt-500`).** Only for primary buttons,
+  active/selected states, key numbers and the bolt. No other amber shades; pressed states use
+  opacity. Decorative borders use `border-hairline`. In light mode amber is only a fill (with
+  dark text on it): `text-accent` / `theme.accent` falls back to primary text there.
+- **Type scale (`components/ui/Typography`, `StatBlock`):** numbers 56 / 32 / 22 px ExtraBold
+  (800, tabular) — the only use of 800; screen titles 28 px bold; card/section titles 16 px
+  semibold; body 400; labels 11 px medium uppercase.
+- **Top-right corner stays free** on tab screens (Expo Go draws its tools button there);
+  screen actions go under the title.
+- **Runs without recorded distance** (< 50 m, `domain/metrics/recorded-distance.ts`) keep their
+  time in the owner's history but stay out of feeds, groups, medals and celebrations.
 - **Fixed colors:** `bolt-*` (amber backgrounds), `onbolt` (text/icons on amber), success,
   danger, info. Amber _text/icons_ on surfaces use `text-accent` / `theme.accent`, which is a
   darker amber in light mode for contrast.

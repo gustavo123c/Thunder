@@ -63,6 +63,18 @@ export const HELP_CATEGORIES: readonly HelpCategory[] = [
         ],
         keywords: 'offline sem sinal internet envio pendente',
       },
+      {
+        id: 'expo-go-button',
+        title: 'Botão azul de engrenagem no modo de teste',
+        summary:
+          'Ele é do Expo Go (o app de testes), não do Thunder, e não aparece no app instalado.',
+        steps: [
+          'Toque e segure o botão azul e arraste para um canto livre da tela.',
+          'Ele abre as ferramentas de desenvolvedor do Expo Go — pode ignorar.',
+          'No app instalado pela loja ou pelo link de instalação, ele não existe.',
+        ],
+        keywords: 'botão azul engrenagem expo go flutuante atrapalha',
+      },
     ],
   },
   {

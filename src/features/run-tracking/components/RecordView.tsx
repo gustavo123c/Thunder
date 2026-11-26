@@ -9,6 +9,7 @@ import { RouteMap } from '@/components/map/RouteMap';
 import { FormMessage } from '@/components/ui/FormMessage';
 import { samplesToMultiLineString } from '@/domain/geo/geojson';
 import { isActive } from '@/domain/run-session/run-session';
+import { hasRecordedDistance } from '@/domain/metrics/recorded-distance';
 import { isExpoGo } from '@/lib/runtime';
 import { useThemeColors } from '@/theme/theme';
 
@@ -20,7 +21,6 @@ import { PermissionNotice } from './PermissionNotice';
 import { RunControls } from './RunControls';
 
 /** Runs shorter than this are probably accidental; offer to discard instead of saving. */
-const MIN_SAVE_DISTANCE_M = 50;
 
 type RecordViewProps = {
   userId: string;
@@ -71,12 +71,22 @@ export function RecordView({ userId, weightKg }: RecordViewProps) {
   }
 
   function confirmFinish() {
-    if (metrics.distanceM < MIN_SAVE_DISTANCE_M) {
-      Alert.alert('Corrida muito curta', 'Deseja descartar esta corrida?', [
-        { text: 'Continuar correndo', style: 'cancel' },
-        { text: 'Descartar', style: 'destructive', onPress: () => void controls.discard() },
-        { text: 'Salvar mesmo assim', onPress: () => void finishAndNavigate() },
-      ]);
+    if (!hasRecordedDistance(metrics.distanceM)) {
+      // Nothing was recorded: discarding is the suggested (emphasized) choice.
+      Alert.alert(
+        'Nenhuma distância registrada',
+        'O GPS registrou menos de 50 m. Descartar esta corrida?',
+        [
+          { text: 'Continuar correndo', style: 'cancel' },
+          { text: 'Salvar mesmo assim', onPress: () => void finishAndNavigate() },
+          {
+            text: 'Descartar',
+            style: 'destructive',
+            isPreferred: true,
+            onPress: () => void controls.discard(),
+          },
+        ],
+      );
       return;
     }
     Alert.alert('Finalizar corrida?', 'Você poderá ver o resumo em seguida.', [

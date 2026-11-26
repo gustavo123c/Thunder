@@ -82,7 +82,7 @@ export function AchievementsGrid({ userId, totals }: AchievementsGridProps) {
                 a.unlocked ? 'Conquistada' : `Bloqueada, ${percent}% concluída`
               }. ${copy.description}`}
               className={`w-[31%] items-center gap-2 rounded-[20px] border px-2 py-4 ${
-                a.unlocked ? 'border-bolt-500/40 bg-bolt-500/10' : 'border-hairline bg-ink-800'
+                a.unlocked ? 'border-hairline bg-bolt-500/10' : 'border-hairline bg-ink-800'
               }`}
             >
               <View>
@@ -113,7 +113,7 @@ export function AchievementsGrid({ userId, totals }: AchievementsGridProps) {
                 {copy.title}
               </Text>
               {a.unlocked ? (
-                <Text className="text-[10px] font-bold uppercase tracking-wider text-accent">
+                <Text className="text-[10px] font-medium uppercase tracking-wider text-accent">
                   Conquistada
                 </Text>
               ) : (

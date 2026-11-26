@@ -43,14 +43,14 @@ export function PainHistoryView({ userId }: { userId: string }) {
 
       {recurring.length > 0 ? (
         <View className="gap-3">
-          <Text className="px-1 text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400">
+          <Text className="px-1 text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
             Dores recorrentes
           </Text>
           {recurring.map((r) => (
             <Card
               key={`${r.region}:${r.side}`}
               variant="highlight"
-              className="flex-row items-center gap-3 border-bolt-500/30"
+              className="flex-row items-center gap-3 border-hairline"
             >
               <View className="h-10 w-10 items-center justify-center rounded-full bg-bolt-500/15">
                 <Ionicons name="repeat" size={20} color={theme.accent} />
@@ -71,7 +71,7 @@ export function PainHistoryView({ userId }: { userId: string }) {
       ) : null}
 
       <View className="gap-3">
-        <Text className="px-1 text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400">
+        <Text className="px-1 text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
           Últimos 90 dias
         </Text>
         {episodes.length === 0 ? (
@@ -109,7 +109,7 @@ export function PainHistoryView({ userId }: { userId: string }) {
                 </View>
                 <View
                   className={`rounded-full px-2.5 py-1 ${
-                    episode.resolvedAt ? 'bg-ink-700' : 'border border-bolt-500/40 bg-bolt-500/10'
+                    episode.resolvedAt ? 'bg-ink-700' : 'border border-hairline bg-bolt-500/10'
                   }`}
                 >
                   <Text

@@ -16,7 +16,7 @@ type RoundButtonProps = {
 };
 
 const toneClass = {
-  primary: 'bg-bolt-500 active:bg-bolt-600',
+  primary: 'bg-bolt-500 active:opacity-85',
   dark: 'bg-ink-700 active:bg-ink-600',
   danger: 'bg-danger active:opacity-80',
 } as const;

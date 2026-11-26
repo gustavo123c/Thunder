@@ -17,7 +17,7 @@ function RetrospectiveButton() {
       accessibilityHint="Abre sua sequência de treinos e o desempenho por período"
       hitSlop={8}
       onPress={() => router.push('/retrospective')}
-      className="flex-row items-center gap-1.5 rounded-full border border-bolt-500/40 bg-bolt-500/10 px-3.5 py-2 active:opacity-70"
+      className="flex-row items-center gap-1.5 rounded-full border border-hairline bg-bolt-500/10 px-3.5 py-2 active:opacity-70"
     >
       <Ionicons name="stats-chart" size={14} color={theme.accent} />
       <Text className="text-sm font-bold text-accent">Retrospectiva</Text>

@@ -22,12 +22,9 @@ export function GroupsPanel({ header = null }: { header?: ReactElement | null })
       ListHeaderComponent={
         <View className="gap-4 pb-1">
           {header}
-          <View className="gap-1">
-            <Text className="text-3xl font-extrabold text-ink-50">Grupos</Text>
-            <Text className="text-sm text-ink-400">
-              Corra com amigos: ranking semanal e feed só do grupo.
-            </Text>
-          </View>
+          <Text className="text-sm text-ink-400">
+            Corra com amigos: ranking semanal e feed só do grupo.
+          </Text>
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Button label="Criar grupo" icon="add" onPress={() => router.push('/group/new')} />
@@ -70,7 +67,7 @@ export function GroupsPanel({ header = null }: { header?: ReactElement | null })
             <Ionicons name="people" size={22} color={theme.accent} />
           </View>
           <View className="flex-1 gap-0.5">
-            <Text className="text-base font-extrabold text-ink-50" numberOfLines={1}>
+            <Text className="text-base font-semibold text-ink-50" numberOfLines={1}>
               {item.name}
             </Text>
             <Text className="text-xs text-ink-400">

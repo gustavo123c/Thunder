@@ -18,7 +18,7 @@ export function CommentsPreview({ runId, viewerId }: { runId: string; viewerId: 
 
   return (
     <View className="gap-3">
-      <Text className="text-lg font-bold text-ink-50">
+      <Text className="text-lg font-semibold text-ink-50">
         Comentários{list.length > 0 ? ` (${list.length})` : ''}
       </Text>
 

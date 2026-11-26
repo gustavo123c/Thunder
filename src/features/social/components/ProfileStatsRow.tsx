@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 
-import { formatDistanceKm } from '@/lib/format';
+import { formatDecimal } from '@/lib/format';
 
 import { useProfileStats } from '../hooks/useSocial';
 import { FollowButton } from './FollowButton';
@@ -14,7 +14,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-1 items-center gap-0.5">
       <Text
-        className="text-xl font-extrabold text-ink-50"
+        className="text-[22px] font-extrabold text-ink-50"
         style={{ fontVariant: ['tabular-nums'] }}
         numberOfLines={1}
         adjustsFontSizeToFit
@@ -37,7 +37,7 @@ export function ProfileStatsRow({ userId, viewerId }: ProfileStatsRowProps) {
         <Stat label="Seguidores" value={stats ? String(stats.followersCount) : '–'} />
         <Stat label="Seguindo" value={stats ? String(stats.followingCount) : '–'} />
         <Stat label="Corridas" value={stats ? String(stats.runsCount) : '–'} />
-        <Stat label="Total" value={stats ? formatDistanceKm(stats.totalDistanceM) : '–'} />
+        <Stat label="Km totais" value={stats ? formatDecimal(stats.totalDistanceM / 1000) : '–'} />
       </View>
       {!isViewer && stats ? (
         <View className="items-center">

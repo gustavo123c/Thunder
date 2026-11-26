@@ -63,19 +63,19 @@ export function GoalProgressCard({
     <Card variant="highlight" className="gap-3">
       <View className="flex-row items-center gap-2">
         <Ionicons name="flag" size={14} color={theme.accent} />
-        <Text className="flex-1 text-[11px] font-bold uppercase tracking-[1.5px] text-accent">
+        <Text className="flex-1 text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
           Meta principal
         </Text>
         {percent !== null ? (
           <Text
-            className="text-[28px] font-extrabold leading-[32px] text-ink-50"
+            className="text-[32px] font-extrabold leading-[36px] text-ink-50"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {percent}%
           </Text>
         ) : null}
       </View>
-      <Text className="text-xl font-extrabold text-ink-50">{goalTitle}</Text>
+      <Text className="text-xl font-bold text-ink-50">{goalTitle}</Text>
       {progress ? (
         <>
           <View

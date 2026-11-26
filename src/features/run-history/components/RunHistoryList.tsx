@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { formatDistanceKm } from '@/lib/format';
 import { useThemeColors } from '@/theme/theme';
+import { ScreenTitle } from '@/components/ui/Typography';
 
 import { confirmDeleteRun } from '../confirm-delete';
 import { groupRunsByMonth } from '../group-by-month';
@@ -66,8 +67,9 @@ export function RunHistoryList({
       ListHeaderComponent={
         <View className="gap-4 pb-2">
           {isOwn ? (
-            <View className="flex-row items-center justify-between">
-              <Text className="text-3xl font-extrabold text-ink-50">Histórico</Text>
+            // The action sits under the title: the top-right corner stays free.
+            <View className="items-start gap-3">
+              <ScreenTitle>Histórico</ScreenTitle>
               {titleAction}
             </View>
           ) : null}
@@ -79,7 +81,7 @@ export function RunHistoryList({
           accessibilityRole="header"
           className="flex-row items-baseline justify-between pb-3 pt-5"
         >
-          <Text className="text-[13px] font-bold uppercase tracking-[1.5px] text-ink-200">
+          <Text className="text-[13px] font-semibold uppercase tracking-[1.5px] text-ink-200">
             {section.title}
           </Text>
           <Text
@@ -94,16 +96,17 @@ export function RunHistoryList({
       ListEmptyComponent={
         <EmptyState
           icon={isOwn ? 'walk-outline' : 'eye-off-outline'}
-          title={isOwn ? 'Nenhuma corrida ainda' : 'Nenhuma corrida visível'}
+          illustration={isOwn ? 'route' : undefined}
+          title={isOwn ? 'Sua primeira rota começa aqui' : 'Nenhuma corrida visível'}
           description={
             isOwn
-              ? 'Sua primeira corrida aparece aqui com mapa, splits e evolução.'
+              ? 'Grave uma corrida e ela aparece aqui com mapa, ritmo, parciais e sua evolução.'
               : 'Este atleta ainda não tem corridas que você possa ver.'
           }
           action={
             isOwn ? (
               <Button
-                label="Começar a correr"
+                label="Fazer minha primeira corrida"
                 icon="play"
                 onPress={() => router.navigate('/record')}
               />

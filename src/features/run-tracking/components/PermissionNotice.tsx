@@ -15,7 +15,7 @@ export function PermissionNotice({ permission, onRequest }: PermissionNoticeProp
 
   if (permission === 'foreground_only') {
     return (
-      <View className="gap-2 rounded-[20px] border border-bolt-500/30 bg-bolt-500/10 p-4">
+      <View className="gap-2 rounded-[20px] border border-hairline bg-ink-800 p-4">
         <Text className="text-sm font-semibold text-ink-50">
           {Platform.OS === 'android'
             ? 'Permita a localização "o tempo todo"'

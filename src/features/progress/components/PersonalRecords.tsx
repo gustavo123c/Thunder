@@ -44,12 +44,12 @@ function RecordCard({
         <Ionicons name={icon} size={22} color={runId ? theme.accent : theme.ink[400]} />
       </View>
       <View className="flex-1 gap-0.5">
-        <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400">
+        <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
           {label}
         </Text>
         <View className="flex-row items-baseline gap-1">
           <Text
-            className="text-[32px] font-extrabold leading-[38px] text-ink-50"
+            className="text-[32px] font-extrabold leading-[36px] text-ink-50"
             style={{ fontVariant: ['tabular-nums'] }}
           >
             {value}

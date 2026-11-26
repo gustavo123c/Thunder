@@ -10,7 +10,7 @@ const toneStyle = (
   theme: ThemeColors,
 ): Record<Insight['tone'], { circle: string; icon: string }> => ({
   record: { circle: 'bg-bolt-500', icon: colors.onBolt },
-  positive: { circle: 'border border-bolt-500/40 bg-bolt-500/10', icon: theme.accent },
+  positive: { circle: 'border border-hairline bg-bolt-500/10', icon: theme.accent },
   neutral: { circle: 'bg-ink-700', icon: theme.ink[300] },
 });
 
@@ -20,7 +20,7 @@ export function InsightsCard({ insights }: { insights: readonly Insight[] }) {
 
   return (
     <View className="gap-3">
-      <Text className="text-lg font-extrabold text-ink-50">Sua evolução</Text>
+      <Text className="text-lg font-semibold text-ink-50">Sua evolução</Text>
       {insights.map((insight) => (
         <View
           key={insight.text}

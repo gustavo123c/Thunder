@@ -42,7 +42,7 @@ export function WorkoutCheckIn({ userId, workoutId, runId, onAnswered }: Workout
 
   return (
     <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
-      <Text accessibilityRole="header" className="text-base font-extrabold text-ink-50">
+      <Text accessibilityRole="header" className="text-base font-semibold text-ink-50">
         Como você se sentiu com esse treino?
       </Text>
       <View accessibilityRole="radiogroup" className="gap-2">

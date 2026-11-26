@@ -53,7 +53,7 @@ describe.each([
     {
       card: 'rgba(255, 255, 255, 1)',
       text: 'rgba(11, 18, 32, 1)',
-      accent: 'rgba(161, 98, 7, 1)',
+      accent: 'rgba(11, 18, 32, 1)',
       hairline: 'rgba(11, 18, 32, 0.09)',
     },
   ],

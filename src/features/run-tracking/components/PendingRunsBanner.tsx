@@ -22,7 +22,7 @@ export function PendingRunsBanner({ userId }: { userId: string }) {
       : `${pending.length} corridas aguardando envio`;
 
   return (
-    <View className="gap-3 rounded-[20px] border border-bolt-500/40 bg-ink-800 p-4">
+    <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
       <View className="gap-1">
         <View className="flex-row items-center gap-2">
           <Ionicons name="cloud-upload-outline" size={18} color={theme.accent} />

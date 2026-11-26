@@ -21,7 +21,7 @@ export function SplitsList({ splits }: { splits: readonly Split[] }) {
 
   return (
     <View className="gap-3">
-      <Text className="text-lg font-bold text-ink-50">Parciais</Text>
+      <Text className="text-lg font-semibold text-ink-50">Parciais</Text>
       <View className="flex-row px-1">
         <Text className="w-12 text-xs font-semibold text-ink-400">KM</Text>
         <Text className="w-16 text-xs font-semibold text-ink-400">PACE</Text>

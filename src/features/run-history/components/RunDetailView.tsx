@@ -169,7 +169,7 @@ export function RunDetailView({ runId, viewerId, renderSocial, renderMedia }: Ru
           <Text className="text-sm text-ink-400">
             {isOwner ? 'Você' : authorName} · {formatRunDate(detail.startedAt)}
           </Text>
-          <Text className="text-3xl font-black text-ink-50">{detail.title}</Text>
+          <Text className="text-[28px] font-bold text-ink-50">{detail.title}</Text>
         </View>
 
         <View className="flex-row justify-around rounded-[20px] border border-hairline bg-ink-800 py-5">

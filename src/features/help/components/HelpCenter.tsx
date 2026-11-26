@@ -36,7 +36,7 @@ function Article({
           {article.steps.map((step, index) => (
             <View key={step} className="flex-row gap-3">
               <View className="h-6 w-6 items-center justify-center rounded-full bg-bolt-500/15">
-                <Text className="text-xs font-extrabold text-accent">{index + 1}</Text>
+                <Text className="text-xs font-semibold text-accent">{index + 1}</Text>
               </View>
               <Text className="flex-1 text-sm leading-5 text-ink-300">{step}</Text>
             </View>
@@ -105,7 +105,7 @@ export function HelpCenter() {
               </View>
               <Text
                 accessibilityRole="header"
-                className="flex-1 text-base font-extrabold text-ink-50"
+                className="flex-1 text-base font-semibold text-ink-50"
               >
                 {category.title}
               </Text>

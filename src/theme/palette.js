@@ -6,18 +6,9 @@
  * role in both modes (surface / primary text) and resolve through CSS variables set at the
  * app root (see `src/theme/theme.ts`). The dark scale is the canonical design.
  */
-const bolt = {
-  50: '#FEFCE8',
-  100: '#FEF9C3',
-  200: '#FEF08A',
-  300: '#FDE047',
-  400: '#FDE047',
-  500: '#FACC15',
-  600: '#EAB308',
-  700: '#CA8A04',
-  800: '#854D0E',
-  900: '#422006',
-};
+/** The one brand amber (#FACC15): primary buttons, active states, key numbers, the bolt. */
+const BRAND = '#FACC15';
+const bolt = { 500: BRAND };
 
 /** Role per step: 900 app background · 800 card · 700 raised · 600 strong border ·
  *  500 faint · 400 muted text · 300 secondary text · 100–50 primary text. */
@@ -51,9 +42,7 @@ module.exports = {
   bolt,
   inkDark,
   inkLight,
-  /** Amber used as text/icon color on surfaces (darker in light mode for contrast). */
-  accentDark: '#FACC15',
-  accentLight: '#A16207',
+  brand: BRAND,
   hairlineDark: 'rgba(255, 255, 255, 0.08)',
   hairlineLight: 'rgba(11, 18, 32, 0.09)',
   /** Text/icons on amber backgrounds — the same in both modes. */

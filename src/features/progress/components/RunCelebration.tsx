@@ -122,7 +122,7 @@ export function RunCelebration({
                 <Ionicons name="trophy" size={38} color={colors.onBolt} />
               </View>
             </Animated.View>
-            <Text accessibilityRole="header" className="text-3xl font-extrabold text-ink-50">
+            <Text accessibilityRole="header" className="text-[28px] font-bold text-ink-50">
               Corrida concluída!
             </Text>
             <Text className="text-center text-sm text-ink-400">
@@ -163,19 +163,19 @@ export function RunCelebration({
 
           {medals.length > 0 ? (
             <View className="gap-3">
-              <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-accent">
+              <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
                 {medals.length === 1 ? 'Nova medalha' : 'Novas medalhas'}
               </Text>
               {medals.map((id) => (
                 <View
                   key={id}
-                  className="flex-row items-center gap-3 rounded-[20px] border border-bolt-500/40 bg-bolt-500/10 p-4"
+                  className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-bolt-500/10 p-4"
                 >
                   <View className="h-12 w-12 items-center justify-center rounded-full bg-bolt-500">
                     <Ionicons name={ACHIEVEMENT_COPY[id].icon} size={24} color={colors.onBolt} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-base font-extrabold text-ink-50">
+                    <Text className="text-base font-semibold text-ink-50">
                       {ACHIEVEMENT_COPY[id].title}
                     </Text>
                     <Text className="text-xs text-ink-300">{ACHIEVEMENT_COPY[id].description}</Text>

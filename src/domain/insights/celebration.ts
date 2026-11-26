@@ -3,6 +3,7 @@
  * ("8% mais rápido que a média da semana", "faltam 2 km para a medalha de 10 km").
  * Returns data only; the wording lives in features/progress.
  */
+import { hasRecordedDistance } from '../metrics/recorded-distance';
 import { type ActivityEntry, periodRange } from './activity';
 import {
   type Achievement,
@@ -58,8 +59,8 @@ export function celebrationHighlights(
   limit = 2,
 ): Highlight[] {
   const run = entries.find((e) => e.id === runId);
-  if (!run) return [];
-  const others = entries.filter((e) => e.id !== runId);
+  if (!run || !hasRecordedDistance(run.distanceM)) return [];
+  const others = entries.filter((e) => e.id !== runId && hasRecordedDistance(e.distanceM));
   const highlights: Highlight[] = [];
 
   const pace = paceOf(run);

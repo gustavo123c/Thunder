@@ -36,7 +36,7 @@ export function WinStreakCard({ userId }: { userId: string }) {
       >
         <View
           className={`h-16 w-16 items-center justify-center rounded-full ${
-            onFire ? 'bg-bolt-500' : 'border border-bolt-500/40 bg-bolt-500/10'
+            onFire ? 'bg-bolt-500' : 'border border-hairline bg-bolt-500/10'
           }`}
         >
           <Ionicons name={icon} size={28} color={onFire ? colors.onBolt : theme.accent} />
@@ -44,12 +44,12 @@ export function WinStreakCard({ userId }: { userId: string }) {
         <View className="flex-1 gap-1">
           <View className="flex-row items-baseline gap-2">
             <Text
-              className="text-[36px] font-extrabold leading-[40px] text-ink-50"
+              className="text-[32px] font-extrabold leading-[36px] text-ink-50"
               style={{ fontVariant: ['tabular-nums'] }}
             >
               {streak.weekStreak}
             </Text>
-            <Text className="text-xs font-bold uppercase tracking-[1.5px] text-accent">
+            <Text className="text-xs font-medium uppercase tracking-[1.5px] text-accent">
               {streak.weekStreak === 1 ? 'semana ativa' : 'semanas seguidas'}
             </Text>
           </View>

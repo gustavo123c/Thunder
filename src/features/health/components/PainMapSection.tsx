@@ -46,7 +46,7 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
     <View className="gap-4">
       <View className="gap-1">
         <View className="flex-row items-center justify-between gap-3">
-          <Text accessibilityRole="header" className="flex-1 text-2xl font-extrabold text-ink-50">
+          <Text accessibilityRole="header" className="flex-1 text-2xl font-bold text-ink-50">
             Como está seu corpo hoje?
           </Text>
           <Pressable

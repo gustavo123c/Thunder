@@ -6,7 +6,7 @@ import { WinStreakCard } from './WinStreakCard';
 function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <View className="gap-0.5 px-1">
-      <Text accessibilityRole="header" className="text-lg font-extrabold text-ink-50">
+      <Text accessibilityRole="header" className="text-lg font-semibold text-ink-50">
         {title}
       </Text>
       <Text className="text-sm text-ink-400">{subtitle}</Text>

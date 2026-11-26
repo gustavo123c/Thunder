@@ -70,11 +70,11 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
         <View className="gap-1">
           <View className="flex-row items-center gap-1.5">
             <Ionicons name="document-text" size={13} color={theme.accent} />
-            <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-accent">
+            <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-accent">
               Ficha de treino de corrida
             </Text>
           </View>
-          <Text accessibilityRole="header" className="text-2xl font-extrabold text-ink-50">
+          <Text accessibilityRole="header" className="text-2xl font-bold text-ink-50">
             {plan.title}
           </Text>
           <Text className="text-sm text-ink-300">{plan.summary}</Text>
@@ -111,7 +111,7 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
       </Card>
 
       {plan.adaptations.length > 0 ? (
-        <Card className="gap-2 border-bolt-500/30">
+        <Card className="gap-2 border-hairline">
           <View className="flex-row items-center gap-2">
             <Ionicons name="shield-checkmark-outline" size={16} color={theme.accent} />
             <Text className="text-sm font-bold text-ink-50">Adaptado para você</Text>
@@ -129,7 +129,7 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
         return (
           <Card
             key={block.phase}
-            className={`pb-1 ${block.phase === 'main' ? 'border-bolt-500/40' : ''}`}
+            className={`pb-1 ${block.phase === 'main' ? 'border-hairline' : ''}`}
           >
             <View className="flex-row items-center gap-3 pb-3">
               <View
@@ -138,10 +138,10 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
                 <Ionicons name={style.icon} size={18} color={style.iconColor} />
               </View>
               <View className="flex-1">
-                <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-ink-400">
+                <Text className="text-[11px] font-medium uppercase tracking-[1.5px] text-ink-400">
                   {PHASE_LABEL[block.phase]}
                 </Text>
-                <Text className="text-lg font-extrabold text-ink-50">{block.title}</Text>
+                <Text className="text-lg font-semibold text-ink-50">{block.title}</Text>
               </View>
               <View className="items-end">
                 <Text
@@ -150,7 +150,7 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
                 >
                   {block.minutes}
                 </Text>
-                <Text className="text-[11px] font-semibold uppercase text-ink-400">min</Text>
+                <Text className="text-[11px] font-medium uppercase text-ink-400">min</Text>
               </View>
             </View>
             {block.items.map((item) => (

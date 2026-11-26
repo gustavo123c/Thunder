@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 import { Card } from '@/components/ui/Card';
 import { StatBlock } from '@/components/ui/StatBlock';
 import type { WorkoutBlock, WorkoutItem, WorkoutPlan } from '@/domain/training/workout-generator';
+import { formatRest } from '@/lib/format';
 import { useThemeColors } from '@/theme/theme';
 import { colors, type ThemeColors } from '@/theme/tokens';
 
@@ -23,7 +24,7 @@ function itemMeta(item: WorkoutItem): string {
   if (item.sets && item.reps) parts.push(`${item.sets} × ${item.reps}`);
   else if (item.reps) parts.push(item.reps);
   if (item.durationMin) parts.push(`${item.durationMin} min`);
-  if (item.restS) parts.push(`descanso ${item.restS} s`);
+  if (item.restS) parts.push(`descanso ${formatRest(item.restS)}`);
   return parts.join(' · ');
 }
 
@@ -44,7 +45,7 @@ function Item({ item }: { item: WorkoutItem }) {
       {item.target ? (
         <View className="flex-row items-center gap-1.5">
           <Ionicons name="speedometer-outline" size={14} color={theme.ink[300]} />
-          <Text className="text-sm text-ink-100">Ritmo alvo: {item.target}</Text>
+          <Text className="text-sm text-ink-100">{item.target}</Text>
         </View>
       ) : null}
     </View>
@@ -57,15 +58,11 @@ const PHASE_LABEL: Record<WorkoutBlock['phase'], string> = {
   cooldown: 'Etapa final',
 };
 
-/** The block's intensity: the first target (pace or effort) among its items. */
-function blockIntensity(block: WorkoutBlock): string | null {
-  return block.items.find((item) => item.target)?.target ?? null;
-}
-
 /** Structured workout sheet: summary, warm-up, main set and cool-down cards, safety notes. */
 export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
   const theme = useThemeColors();
-  const exercises = plan.blocks.reduce((sum, block) => sum + block.items.length, 0);
+  const mainMinutes = plan.blocks.find((block) => block.phase === 'main')?.minutes ?? 0;
+  const reduction = plan.loadReductionPct ?? 0;
 
   return (
     <View className="gap-4">
@@ -74,7 +71,7 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
           <View className="flex-row items-center gap-1.5">
             <Ionicons name="document-text" size={13} color={theme.accent} />
             <Text className="text-[11px] font-bold uppercase tracking-[1.5px] text-accent">
-              Ficha de treino
+              Ficha de treino de corrida
             </Text>
           </View>
           <Text accessibilityRole="header" className="text-2xl font-extrabold text-ink-50">
@@ -96,12 +93,19 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
             <StatBlock
               size="medium"
               align="left"
-              label="Blocos"
-              value={String(plan.blocks.length)}
+              label="Principal"
+              value={String(mainMinutes)}
+              unit="min"
             />
           </View>
           <View className="flex-1">
-            <StatBlock size="medium" align="left" label="Exercícios" value={String(exercises)} />
+            <StatBlock
+              size="medium"
+              align="left"
+              label="Carga"
+              value={`${100 - reduction}%`}
+              accent={reduction === 0}
+            />
           </View>
         </View>
       </Card>
@@ -149,14 +153,6 @@ export function WorkoutPlanView({ plan }: { plan: WorkoutPlan }) {
                 <Text className="text-[11px] font-semibold uppercase text-ink-400">min</Text>
               </View>
             </View>
-            {blockIntensity(block) ? (
-              <View className="mb-1 flex-row items-center gap-1.5 self-start rounded-full bg-ink-900 px-3 py-1.5">
-                <Ionicons name="pulse" size={13} color={theme.accent} />
-                <Text className="text-xs font-semibold text-ink-100">
-                  Intensidade: {blockIntensity(block)}
-                </Text>
-              </View>
-            ) : null}
             {block.items.map((item) => (
               <Item key={`${block.phase}-${item.name}`} item={item} />
             ))}

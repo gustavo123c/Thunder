@@ -1,118 +1,141 @@
 import type { PainEntry } from '../../health/body-regions';
-import { EXERCISES } from '../exercises';
+import { adjustForPain } from '../pain-load';
 import {
   BASE_SAFETY_NOTES,
   generateWorkout,
+  RUN_WORKOUT_TYPES,
   WORKOUT_DURATIONS,
-  WORKOUT_GOALS,
   type WorkoutPlan,
   type WorkoutRequest,
 } from '../workout-generator';
 
 const base: WorkoutRequest = {
-  goal: 'pace',
+  type: 'intervals',
   level: 'intermediate',
   durationMin: 45,
   pains: [],
   recentPaceSPerKm: 330, // 5:30 /km
 };
 
-const allItemNames = (plan: WorkoutPlan) =>
-  plan.blocks.flatMap((block) => block.items.map((item) => item.name));
+const pain = (region: PainEntry['region'], intensity: number): PainEntry => ({
+  region,
+  side: 'left',
+  intensity,
+});
 
-const exerciseNamesLoading = (region: string) =>
-  EXERCISES.filter((e) => (e.loads as readonly string[]).includes(region)).map((e) => e.name);
+const main = (plan: WorkoutPlan) => plan.blocks.find((b) => b.phase === 'main')!;
 
 describe('generateWorkout', () => {
-  it.each(WORKOUT_GOALS.flatMap((goal) => WORKOUT_DURATIONS.map((d) => [goal, d] as const)))(
-    '%s / %i min: warm-up + main + cool-down add up to the requested time',
-    (goal, durationMin) => {
-      const plan = generateWorkout({ ...base, goal, durationMin });
+  it.each(
+    RUN_WORKOUT_TYPES.flatMap((type) =>
+      (['beginner', 'intermediate'] as const).flatMap((level) =>
+        WORKOUT_DURATIONS.map((d) => [type, level, d] as const),
+      ),
+    ),
+  )(
+    '%s / %s / %i min is a running session close to the requested time',
+    (type, level, durationMin) => {
+      const plan = generateWorkout({ ...base, type, level, durationMin });
       expect(plan.blocks.map((b) => b.phase)).toEqual(['warmup', 'main', 'cooldown']);
-      expect(plan.blocks.reduce((sum, b) => sum + b.minutes, 0)).toBe(durationMin);
-      expect(plan.blocks.every((b) => b.items.length > 0)).toBe(true);
+      expect(plan.totalMinutes).toBe(plan.blocks.reduce((sum, b) => sum + b.minutes, 0));
+      // Rep counts are whole numbers, so allow some slack around the requested time.
+      expect(plan.totalMinutes).toBeGreaterThanOrEqual(durationMin * 0.6);
+      expect(plan.totalMinutes).toBeLessThanOrEqual(durationMin * 1.3 + 5);
+      expect(main(plan).items.length).toBeGreaterThan(0);
+      expect(plan.safetyNotes).toEqual(expect.arrayContaining(BASE_SAFETY_NOTES));
     },
   );
 
-  it('always includes the professional-guidance safety notes', () => {
-    expect(generateWorkout(base).safetyNotes).toEqual(expect.arrayContaining(BASE_SAFETY_NOTES));
+  it('prescribes 200 m reps with 1:30 walking rest for beginners', () => {
+    const plan = generateWorkout({ ...base, level: 'beginner', durationMin: 30 });
+    const item = main(plan).items[0]!;
+    expect(plan.title).toBe('Tiros de 200 m');
+    expect(item).toMatchObject({ reps: '200 m', restS: 90 });
+    expect(item.sets).toBeGreaterThanOrEqual(4);
+    expect(item.detail).toMatch(/Recupere 1:30 caminhando/);
+    // 5:30 - 55 s = 4:35 /km → 200 m in ≈ 0:55
+    expect(item.target).toBe('4:35 /km · ≈ 0:55 por tiro (forte)');
   });
 
-  it('sets target paces from the recent average pace', () => {
-    const main = generateWorkout(base).blocks[1]!;
-    expect(main.items[0]?.target).toBe('5:05 /km (forte)'); // 5:30 - 25 s
-    const easy = generateWorkout({ ...base, goal: 'endurance' }).blocks[1]!;
-    expect(easy.items[0]?.target).toBe('6:15 /km (leve)'); // 5:30 + 45 s
+  it('uses 400 m reps for short intermediate sessions and 1 km reps for long ones', () => {
+    expect(generateWorkout({ ...base, durationMin: 45 }).title).toBe('Tiros de 400 m');
+    expect(generateWorkout({ ...base, durationMin: 60 }).title).toBe('Tiros de 1 km');
   });
 
-  it('uses perceived effort when there is no pace history', () => {
-    const plan = generateWorkout({ ...base, recentPaceSPerKm: null });
-    expect(plan.blocks[1]?.items[0]?.target).toMatch(/^Esforço forte/);
+  it('builds a fartlek with strong and easy stretches', () => {
+    const item = main(generateWorkout({ ...base, type: 'fartlek' })).items[0]!;
+    expect(item.reps).toBe('2 min forte + 1 min leve');
+    expect(item.target).toMatch(/^Forte: 5:00 \/km .* · leve: 6:10 \/km/);
   });
 
-  it('gives beginners run/walk intervals and no plyometrics or advanced lifts', () => {
-    const plan = generateWorkout({ ...base, level: 'beginner' });
-    expect(plan.blocks[1]?.items[0]?.name).toBe('Intervalado corrida/caminhada');
-    const strength = generateWorkout({ ...base, level: 'beginner', goal: 'strength' });
-    expect(allItemNames(strength)).not.toContain('Levantamento terra unilateral');
-    expect(allItemNames(strength)).not.toContain('Agachamento com salto');
+  it('turns a short long run into an easy run', () => {
+    expect(generateWorkout({ ...base, type: 'long', durationMin: 30 }).sessionType).toBe('easy');
+    expect(generateWorkout({ ...base, type: 'long', durationMin: 90 }).sessionType).toBe('long');
   });
 
-  it('suspends running and avoids loading a severely painful knee', () => {
-    const pains: PainEntry[] = [{ region: 'knee', side: 'left', intensity: 9 }];
-    const plan = generateWorkout({ ...base, pains });
+  it('uses perceived effort without recent runs', () => {
+    const plan = generateWorkout({ ...base, type: 'tempo', recentPaceSPerKm: null });
+    expect(main(plan).items[0]!.target).toMatch(/^Esforço confortavelmente forte/);
+    expect(plan.safetyNotes.join(' ')).toMatch(/esforço percebido/);
+  });
+});
 
-    expect(plan.title).toBe('Recuperação ativa');
-    const names = allItemNames(plan);
-    expect(names.some((n) => /corrida|Tiros|Trote/i.test(n))).toBe(false);
-    for (const loaded of exerciseNamesLoading('knee')) expect(names).not.toContain(loaded);
-    expect(plan.adaptations[0]).toMatch(/Corrida suspensa/);
-    expect(plan.adaptations.join(' ')).toMatch(/Joelho esquerdo/);
+describe('pain lowers the running load', () => {
+  it('mild calf pain swaps hills for a flat session and trims volume', () => {
+    const plan = generateWorkout({ ...base, type: 'hills', pains: [pain('calf', 3)] });
+    expect(plan.sessionType).not.toBe('hills');
+    expect(plan.loadReductionPct).toBe(15);
+    expect(plan.adaptations.join(' ')).toMatch(/terreno plano/);
+    expect(plan.adaptations.join(' ')).toMatch(/Panturrilha esquerda \(leve\)/);
+  });
+
+  it('mild hamstring pain removes sprints but keeps quality work', () => {
+    const load = adjustForPain('intervals', [pain('hamstring', 3)]);
+    expect(load.type).toBe('tempo');
+    expect(load.maxIntensity).toBe('threshold');
+  });
+
+  it('moderate knee pain allows only short, easy, flat running', () => {
+    const plan = generateWorkout({ ...base, type: 'intervals', pains: [pain('knee', 6)] });
+    expect(['easy', 'recovery']).toContain(plan.sessionType);
+    expect(plan.loadReductionPct).toBe(40);
+    expect(plan.adaptations.join(' ')).toMatch(/trocado por/);
+    expect(plan.blocks.flatMap((b) => b.items).some((i) => /forte/.test(i.target ?? ''))).toBe(
+      false,
+    );
+  });
+
+  it('fewer reps with pain than without', () => {
+    const healthy = main(generateWorkout({ ...base, type: 'tempo' })).items[0]!.sets!;
+    const sore = main(generateWorkout({ ...base, type: 'tempo', pains: [pain('knee', 2)] }))
+      .items[0]!.sets!;
+    expect(sore).toBeLessThan(healthy);
+  });
+
+  it('severe leg pain suspends running', () => {
+    const plan = generateWorkout({ ...base, pains: [pain('achilles', 9)] });
+    expect(plan.sessionType).toBe('rest');
+    expect(plan.title).toBe('Recuperação: sem corrida hoje');
     expect(plan.safetyNotes.join(' ')).toMatch(/médico ou fisioterapeuta/);
   });
 
-  it('swaps hard running for low-impact cardio with moderate leg pain', () => {
+  it('chest pain means no training at all', () => {
     const plan = generateWorkout({
       ...base,
-      pains: [{ region: 'achilles', side: 'right', intensity: 5 }],
+      pains: [{ region: 'chest', side: 'center', intensity: 6 }],
     });
-    const main = plan.blocks[1]!;
-    expect(main.title).toBe('Cardio de baixo impacto');
-    expect(main.items[0]?.name).not.toMatch(/corrida|tiros/i);
-    expect(allItemNames(plan)).not.toContain('Elevação de panturrilha');
+    expect(plan.title).toBe('Sem treino hoje');
+    expect(plan.blocks).toEqual([]);
+    expect(plan.adaptations[0]).toMatch(/atendimento médico/);
   });
 
-  it('keeps running with mild pain but adds a caution', () => {
-    const plan = generateWorkout({
-      ...base,
-      pains: [{ region: 'calf', side: 'left', intensity: 2 }],
-    });
-    expect(plan.blocks[1]?.title).toBe('Parte principal — velocidade');
-    expect(plan.adaptations.join(' ')).toMatch(/Desconforto leve/);
+  it('upper-body pain keeps the session', () => {
+    const load = adjustForPain('intervals', [pain('shoulder', 6)]);
+    expect(load).toMatchObject({ type: 'intervals', volumeFactor: 1 });
   });
 
-  it('removes upper-body exercises that load a painful shoulder', () => {
-    const plan = generateWorkout({
-      ...base,
-      goal: 'strength',
-      pains: [{ region: 'shoulder', side: 'right', intensity: 6 }],
-    });
-    const names = allItemNames(plan);
-    expect(names).not.toContain('Prancha');
-    expect(names).not.toContain('Flexão de braços');
-    expect(names).toContain('Dead bug');
-  });
-
-  it('reduces reps for exercises near a mildly painful region', () => {
-    const normal = generateWorkout({ ...base, goal: 'strength' });
-    const mild = generateWorkout({
-      ...base,
-      goal: 'strength',
-      pains: [{ region: 'glute', side: 'left', intensity: 2 }],
-    });
-    const bridge = (plan: WorkoutPlan) =>
-      plan.blocks[1]!.items.find((i) => i.name === 'Ponte de glúteo');
-    expect(Number(bridge(mild)?.reps)).toBeLessThan(Number(bridge(normal)?.reps));
-    expect(bridge(mild)?.detail).toMatch(/desconforto leve/);
+  it('severe upper-body pain caps the intensity', () => {
+    const load = adjustForPain('intervals', [pain('shoulder', 9)]);
+    expect(load.maxIntensity).toBe('moderate');
   });
 });

@@ -140,3 +140,10 @@ export function formatDecimal(value: number | null | undefined, decimals = 1): s
   if (value == null || !Number.isFinite(value)) return PLACEHOLDER;
   return value.toFixed(decimals).replace('.', ',');
 }
+
+/** Rest between reps: 45 → "45 s", 90 → "1:30", 120 → "2:00". */
+export function formatRest(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds <= 0) return PLACEHOLDER;
+  const s = Math.round(seconds);
+  return s < 60 ? `${s} s` : `${Math.floor(s / 60)}:${pad2(s % 60)}`;
+}

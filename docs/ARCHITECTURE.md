@@ -185,12 +185,21 @@ Migration `20261126010000_progress_media_health.sql` (testada em `supabase/tests
 | Galeria e player                           | `components/media` (URLs assinadas, `expo-video`)                                                                                                                                         |
 | Comentários no detalhe                     | `features/social/CommentsPreview` + botão de apagar o próprio comentário                                                                                                                  |
 | Mapa corporal                              | `domain/health/body-regions.ts` · `features/health` (SVG masc./fem., frente/costas, lista acessível) · tabela `pain_logs` (somente o dono)                                                |
-| Treino personalizado                       | `domain/training` (gerador por regras + biblioteca de exercícios com regiões sobrecarregadas) · `features/workouts` · tabela `generated_workouts`                                         |
+| Treino personalizado                       | `domain/training` (treinos de corrida por regras + `pain-load.ts`: dor → carga) · `features/workouts` · tabela `generated_workouts`                                                       |
 | Aviso de saúde                             | `components/ui/HealthDisclaimer` (aba Treino e após gerar o treino)                                                                                                                       |
 
-**Regras do gerador (dores):** dor forte em pernas/pés → corrida suspensa, recuperação ativa;
-moderada → cardio de baixo impacto; leve → mantém, com cautela e menos repetições; exercícios que
-sobrecarregam regiões com dor moderada/forte são removidos; sem pliometria com qualquer dor.
+**Treinos de corrida:** tiros (200 m / 400 m / 1 km), fartlek, limiar (600 m ou blocos),
+subidas, progressivo, rodagem, longão e regenerativo, com aquecimento (trote, educativos,
+acelerações) e desaquecimento. Ritmos a partir do pace médio recente (P): regenerativo P+75,
+rodagem P+40, longão P+50, limiar P−15, tiros de 1 km P−30, 400 m P−45, 200 m P−55; sem
+corridas recentes, por esforço percebido (0–10).
+
+**Dores reduzem a carga (`domain/training/pain-load.ts`):** cada região tem sessões que a
+sobrecarregam (ex.: panturrilha/Aquiles/pé → subidas e tiros; joelho → subidas e longão;
+posterior da coxa → velocidade máxima). Dor leve → volume −15% e troca da sessão contraindicada
+por uma mais segura; moderada → só corrida leve, plana e −40%; forte em pernas/quadril/lombar →
+sem corrida (caminhada leve se não doer); dor no peito → sem treino. Dor em membros superiores
+mantém a sessão (forte limita a intensidade a moderada).
 O formato `WorkoutPlan` é o mesmo que uma IA deverá devolver no futuro (`generator: 'ai'`).
 
 ## Próximos passos sugeridos
@@ -244,11 +253,11 @@ stored in AsyncStorage by `src/theme/AppThemeProvider.tsx`, which also calls Nat
 `colorScheme.set()` and defines the themed CSS variables at the root.
 
 - **Themed tokens:** `ink-*`, `accent` and `hairline` resolve through CSS variables
-  (`rgb(var(--ink-800) / <alpha-value>)`). Class names keep their *role* in both modes — write
+  (`rgb(var(--ink-800) / <alpha-value>)`). Class names keep their _role_ in both modes — write
   `bg-ink-900` (background), `bg-ink-800` (card), `bg-ink-700` (raised), `text-ink-50` (primary
   text), `text-ink-300/400` (secondary/muted). Never add `dark:` variants.
 - **Fixed colors:** `bolt-*` (amber backgrounds), `onbolt` (text/icons on amber), success,
-  danger, info. Amber *text/icons* on surfaces use `text-accent` / `theme.accent`, which is a
+  danger, info. Amber _text/icons_ on surfaces use `text-accent` / `theme.accent`, which is a
   darker amber in light mode for contrast.
 - **JS colors** (icons, SVG, navigation, Mapbox style): `useThemeColors()` from `@/theme/theme`.
 - `src/theme/__tests__/theme.test.tsx` runs the real NativeWind runtime to check both themes.

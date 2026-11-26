@@ -41,29 +41,30 @@ beforeEach(() => {
 afterEach(() => queryClient.clear());
 
 describe('WorkoutBuilder', () => {
-  it('generates a structured workout and saves it', async () => {
+  it('generates a structured running workout and saves it', async () => {
     const user = userEvent.setup();
     await renderWithQuery(
       <WorkoutBuilder userId="u1" defaultLevel="beginner" pains={[]} recentPaceSPerKm={390} />,
     );
 
     expect(screen.getByText('6:30 /km')).toBeOnTheScreen();
-    await user.press(screen.getByRole('radio', { name: 'Fortalecimento' }));
-    await user.press(screen.getByRole('radio', { name: '20 min' }));
+    await user.press(screen.getByRole('radio', { name: 'Tiros' }));
+    await user.press(screen.getByRole('radio', { name: '30 min' }));
     await user.press(screen.getByRole('button', { name: 'Gerar treino' }));
 
-    expect(await screen.findByText('Fortalecimento para corredores')).toBeOnTheScreen();
+    expect(await screen.findByText('Ficha de treino de corrida')).toBeOnTheScreen();
+    expect(screen.getAllByText('Tiros de 200 m').length).toBeGreaterThan(0);
     expect(screen.getByText('Aquecimento')).toBeOnTheScreen();
-    expect(screen.getByText('Circuito de força')).toBeOnTheScreen();
     expect(screen.getByText('Desaquecimento')).toBeOnTheScreen();
+    // 6:30 /km - 55 s = 5:35 /km → 200 m in ≈ 1:05
+    expect(screen.getByText(/5:35 \/km · ≈ 1:05 por tiro/)).toBeOnTheScreen();
     expect(screen.getAllByLabelText('Aviso importante sobre sua saúde').length).toBeGreaterThan(0);
     expect(saveWorkout).toHaveBeenCalledWith(
       'u1',
-      expect.objectContaining({ goal: 'strength', durationMin: 20, level: 'beginner' }),
-      expect.objectContaining({ title: 'Fortalecimento para corredores' }),
+      expect.objectContaining({ type: 'intervals', durationMin: 30, level: 'beginner' }),
+      expect.objectContaining({ title: 'Tiros de 200 m', sessionType: 'intervals' }),
     );
 
-    expect(screen.getByText('Ficha de treino')).toBeOnTheScreen();
     await user.press(screen.getByRole('button', { name: 'Iniciar este treino' }));
     expect(router.navigate).toHaveBeenCalledWith('/record');
 
@@ -71,7 +72,35 @@ describe('WorkoutBuilder', () => {
     expect(screen.getByRole('button', { name: 'Gerar treino' })).toBeOnTheScreen();
   });
 
-  it('adapts the workout to pain from the body map', async () => {
+  it('gives a long run enough time', async () => {
+    const user = userEvent.setup();
+    await renderWithQuery(
+      <WorkoutBuilder userId="u1" defaultLevel="intermediate" pains={[]} recentPaceSPerKm={360} />,
+    );
+    await user.press(screen.getByRole('radio', { name: 'Longão' }));
+    expect(screen.getByRole('radio', { name: '60 min' })).toBeChecked();
+  });
+
+  it('lowers the load for moderate pain', async () => {
+    await renderWithQuery(
+      <WorkoutBuilder
+        userId="u1"
+        defaultLevel="intermediate"
+        pains={[{ region: 'knee', side: 'left', intensity: 6 }]}
+        recentPaceSPerKm={360}
+      />,
+    );
+
+    expect(screen.getByText('Joelho esquerdo')).toBeOnTheScreen();
+    await userEvent.setup().press(screen.getByRole('button', { name: 'Gerar treino' }));
+
+    expect(await screen.findByText('Adaptado para você')).toBeOnTheScreen();
+    expect(screen.getByText(/Treino de tiros trocado por/)).toBeOnTheScreen();
+    expect(screen.getByText(/Volume da parte principal reduzido em 40%/)).toBeOnTheScreen();
+    expect(screen.getByText('60%')).toBeOnTheScreen(); // load stat
+  });
+
+  it('suspends running for severe leg pain', async () => {
     await renderWithQuery(
       <WorkoutBuilder
         userId="u1"
@@ -80,12 +109,10 @@ describe('WorkoutBuilder', () => {
         recentPaceSPerKm={null}
       />,
     );
-
-    expect(screen.getByText('Joelho esquerdo')).toBeOnTheScreen();
     await userEvent.setup().press(screen.getByRole('button', { name: 'Gerar treino' }));
 
-    expect(await screen.findByText('Adaptado para você')).toBeOnTheScreen();
-    expect(screen.getAllByText('Recuperação ativa').length).toBeGreaterThan(0);
+    expect(await screen.findByText('Recuperação: sem corrida hoje')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Iniciar este treino' })).not.toBeOnTheScreen();
     // The health notice is a collapsible banner: expand it to read the full text.
     await userEvent.setup().press(screen.getAllByLabelText('Aviso importante sobre sua saúde')[0]!);
     expect(screen.getByText(/especialmente agora que você relatou dor/)).toBeOnTheScreen();

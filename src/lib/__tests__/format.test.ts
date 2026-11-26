@@ -1,4 +1,5 @@
 import {
+  formatRest,
   formatDecimal,
   formatMonthYear,
   formatDistanceKm,
@@ -126,5 +127,13 @@ describe('formatMonthYear / formatDecimal', () => {
   it('formats decimals with a comma', () => {
     expect(formatDecimal(22.94)).toBe('22,9');
     expect(formatDecimal(null)).toBe('--');
+  });
+});
+
+describe('formatRest', () => {
+  it('formats rest like a running coach', () => {
+    expect(formatRest(45)).toBe('45 s');
+    expect(formatRest(90)).toBe('1:30');
+    expect(formatRest(120)).toBe('2:00');
   });
 });

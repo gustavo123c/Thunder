@@ -3,10 +3,11 @@ import '../../global.css';
 import '@/features/run-tracking';
 
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ErrorState } from '@/components/ui/ErrorState';
@@ -14,6 +15,7 @@ import { AuthProvider, useSignOut } from '@/features/auth';
 import { queryClient } from '@/lib/query-client';
 import { useAppGate } from '@/navigation/useAppGate';
 import { initMapbox } from '@/services/mapbox/init';
+import { colors } from '@/theme/tokens';
 
 void SplashScreen.preventAutoHideAsync();
 initMapbox();
@@ -84,15 +86,45 @@ function RootNavigator() {
   );
 }
 
+/** Navigation chrome (headers, tab bar, screen backgrounds) follows the app palette. */
+const navigationThemes = {
+  light: {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: colors.bolt[500],
+      background: colors.ink[50],
+      card: '#FFFFFF',
+      text: colors.ink[900],
+      border: colors.ink[100],
+    },
+  },
+  dark: {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      primary: colors.bolt[500],
+      background: colors.ink[900],
+      card: colors.ink[800],
+      text: colors.ink[50],
+      border: colors.ink[700],
+    },
+  },
+};
+
 export default function RootLayout() {
+  const scheme = useColorScheme();
+
   return (
     <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <StatusBar style="auto" />
-          <RootNavigator />
-        </AuthProvider>
-      </QueryClientProvider>
+      <ThemeProvider value={scheme === 'dark' ? navigationThemes.dark : navigationThemes.light}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <StatusBar style="auto" />
+            <RootNavigator />
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

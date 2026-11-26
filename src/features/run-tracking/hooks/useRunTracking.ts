@@ -42,9 +42,11 @@ export function useRunTrackingBootstrap(userId: string): void {
         await queryClient.invalidateQueries({ queryKey: RUNS_QUERY_KEY });
       }
     };
-    void sync();
+    const safeSync = () =>
+      sync().catch((error: unknown) => console.warn('[run-sync] pending upload failed', error));
+    void safeSync();
     const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') void sync();
+      if (state === 'active') void safeSync();
     });
     return () => subscription.remove();
   }, [userId, queryClient]);

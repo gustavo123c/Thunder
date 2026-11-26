@@ -1,13 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, userEvent } from '@testing-library/react-native';
-import { router } from 'expo-router';
 
 import type { Profile } from '@/domain/types/profile';
 
 import { isUsernameTaken, updateProfile } from '../api/profile.api';
 import { OnboardingFlow } from '../components/OnboardingFlow';
-
-jest.mock('expo-router', () => ({ router: { replace: jest.fn(), back: jest.fn() } }));
 
 jest.mock('../api/profile.api', () => {
   class UsernameTakenError extends Error {}
@@ -110,7 +107,6 @@ it('walks through the four steps and completes onboarding', async () => {
     },
     { completeOnboarding: true },
   );
-  expect(router.replace).toHaveBeenCalledWith('/feed');
 });
 
 it('blocks the first step when the username is taken', async () => {

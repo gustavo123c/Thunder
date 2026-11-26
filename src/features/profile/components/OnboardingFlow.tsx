@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { type ComponentType, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 
@@ -92,8 +91,9 @@ export function OnboardingFlow({ profile }: { profile: Profile }) {
       return;
     }
     try {
+      // Saving sets onboarded_at; the root guard (Stack.Protected) then swaps the
+      // onboarding route for the tabs. Navigating here too would race with it.
       await updateProfile.mutateAsync({ update: result.update, completeOnboarding: true });
-      router.replace('/feed');
     } catch (error) {
       const { fieldErrors, message } = describeSaveError(error);
       setErrors(fieldErrors);

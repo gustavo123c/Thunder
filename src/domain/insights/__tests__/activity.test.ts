@@ -4,6 +4,7 @@ import {
   comparePeriods,
   computeWinStreak,
   periodRange,
+  recentAveragePace,
 } from '../activity';
 
 // Wednesday 25 Nov 2026, 18:00 local time
@@ -132,5 +133,17 @@ describe('comparePeriods', () => {
       NOW,
     );
     expect(result.distanceChangePct).toBe(50);
+  });
+});
+
+describe('recentAveragePace', () => {
+  it('uses only the most recent runs, weighted by distance', () => {
+    const entries = [
+      run(2026, 0, 1, 7, 5, 600), // old, slow — ignored with count = 2
+      run(2026, 10, 20, 7, 10, 300),
+      run(2026, 10, 24, 7, 5, 360),
+    ];
+    expect(recentAveragePace(entries, 2)).toBe(320);
+    expect(recentAveragePace([], 5)).toBeNull();
   });
 });

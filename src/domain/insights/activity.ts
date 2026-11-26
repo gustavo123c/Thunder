@@ -177,3 +177,14 @@ export function comparePeriods(
 export function activityWindowStart(now: Date): Date {
   return periodRange('year', now, -1).start;
 }
+
+/**
+ * Distance-weighted average pace of the most recent `count` runs (s/km), used to
+ * set target paces for generated workouts. Null without enough data.
+ */
+export function recentAveragePace(entries: readonly ActivityEntry[], count = 5): number | null {
+  const recent = [...entries]
+    .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
+    .slice(0, count);
+  return totals(recent).avgPaceSPerKm;
+}

@@ -6,14 +6,15 @@ Arquitetura completa: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Status do MVP
 
-| Etapa | Módulo                                                  | Status |
-| ----- | ------------------------------------------------------- | ------ |
-| 0     | Setup do projeto, tooling, schema do banco              | ✅     |
-| 1     | Autenticação e perfil (onboarding)                      | ✅     |
-| 2     | Domínio de métricas (distância, pace, splits, calorias) | ✅     |
-| 3     | Rastreamento GPS ao vivo                                | ✅     |
-| 4     | Histórico e análise pós-treino                          | ✅     |
-| 5     | Feed social                                             | ✅     |
+| Etapa | Módulo                                                                           | Status |
+| ----- | -------------------------------------------------------------------------------- | ------ |
+| 0     | Setup do projeto, tooling, schema do banco                                       | ✅     |
+| 1     | Autenticação e perfil (onboarding)                                               | ✅     |
+| 2     | Domínio de métricas (distância, pace, splits, calorias)                          | ✅     |
+| 3     | Rastreamento GPS ao vivo                                                         | ✅     |
+| 4     | Histórico e análise pós-treino                                                   | ✅     |
+| 5     | Feed social                                                                      | ✅     |
+| v2    | Sequência, painel de evolução, fotos/vídeos, mapa corporal, treino personalizado | ✅     |
 
 ## Pré-requisitos
 

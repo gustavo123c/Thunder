@@ -171,6 +171,28 @@ corrida concorrente, tratando `unique_violation`).
 - GPS: `createForegroundLocationTracker` (`watchPositionAsync`) no lugar da task em segundo plano;
   a tela de corrida mantém o display ligado (`expo-keep-awake`) e mostra o aviso de modo de teste.
 
+## v2: progresso, mídia, mapa corporal e treino personalizado
+
+Migration `20261126010000_progress_media_health.sql` (testada em `supabase/tests/50_media_health.sql`).
+`runs` continua sendo "treino/corrida" e `comments` os comentários — nada foi duplicado.
+
+| Funcionalidade                             | Onde                                                                                                                                                                                      |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sequência (🔥) e painel Dia/Semana/Mês/Ano | `domain/insights/activity.ts` (calendário local, semanas de segunda) · `features/progress` · RPC `list_activity`                                                                          |
+| Excluir corrida (lista e detalhe)          | `features/run-history` (`confirm-delete.ts`) — apaga a linha, depois os arquivos; todas as queries `['runs']` recarregam                                                                  |
+| Foto de perfil                             | `features/media` (`AvatarEditor`) → bucket público `avatars`, pasta `{user_id}/`                                                                                                          |
+| Fotos/vídeos na corrida                    | `domain/media/media-rules.ts` (formatos, 10 MB foto / 50 MB vídeo / 2 min / 10 por corrida) · `features/media` · bucket privado `workout-media/{user_id}/{run_id}/…` · tabela `run_media` |
+| Galeria e player                           | `components/media` (URLs assinadas, `expo-video`)                                                                                                                                         |
+| Comentários no detalhe                     | `features/social/CommentsPreview` + botão de apagar o próprio comentário                                                                                                                  |
+| Mapa corporal                              | `domain/health/body-regions.ts` · `features/health` (SVG masc./fem., frente/costas, lista acessível) · tabela `pain_logs` (somente o dono)                                                |
+| Treino personalizado                       | `domain/training` (gerador por regras + biblioteca de exercícios com regiões sobrecarregadas) · `features/workouts` · tabela `generated_workouts`                                         |
+| Aviso de saúde                             | `components/ui/HealthDisclaimer` (aba Treino e após gerar o treino)                                                                                                                       |
+
+**Regras do gerador (dores):** dor forte em pernas/pés → corrida suspensa, recuperação ativa;
+moderada → cardio de baixo impacto; leve → mantém, com cautela e menos repetições; exercícios que
+sobrecarregam regiões com dor moderada/forte são removidos; sem pliometria com qualquer dor.
+O formato `WorkoutPlan` é o mesmo que uma IA deverá devolver no futuro (`generator: 'ai'`).
+
 ## Próximos passos sugeridos
 
 1. Confirmação de e-mail por deep link e recuperação de senha.

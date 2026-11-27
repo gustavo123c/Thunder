@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { HealthDisclaimer } from '@/components/ui/HealthDisclaimer';
@@ -18,7 +18,7 @@ import type { BodySex } from '@/domain/types/profile';
 import { useThemeColors } from '@/theme/theme';
 
 import { useOpenPains, usePainHistory, useResolvePain, useSetPain } from '../hooks/usePains';
-import { Body3D } from './body3d/Body3D';
+import { getBody3D, unavailableReason } from './body3d';
 import { BodyMap, PAIN_COLORS, PainLegend } from './BodyMap';
 import { PainSheet } from './PainSheet';
 
@@ -31,7 +31,13 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
   const history = usePainHistory(userId);
   const [target, setTarget] = useState<{ region: BodyRegion; side: BodySide } | null>(null);
   // 3D body by default; the 2D drawing takes over if the device can't render it.
-  const [use3D, setUse3D] = useState(true);
+  const [Body3D] = useState(getBody3D);
+  const [failure, setFailure] = useState<{ error: unknown } | null>(null);
+  const use3D = Body3D !== null && failure === null;
+  const onUnavailable = useCallback((error: unknown) => {
+    console.warn('[Body3D] falling back to the 2D map:', error);
+    setFailure({ error });
+  }, []);
   const [showList, setShowList] = useState(false);
 
   const list = pains.data ?? [];
@@ -74,14 +80,14 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
 
       {pains.isPending ? (
         <Skeleton height={380} radius={24} />
-      ) : use3D ? (
+      ) : use3D && Body3D ? (
         <View className="gap-3">
           <Body3D
             sex={sex}
             pains={list}
             selected={target}
             onSelect={setTarget}
-            onUnavailable={() => setUse3D(false)}
+            onUnavailable={onUnavailable}
           />
           {/* Every region (the upper body is only here) and the screen-reader path. */}
           <Pressable
@@ -124,7 +130,16 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
           <PainLegend />
         </View>
       ) : (
-        <BodyMap sex={sex} pains={list} onSelect={(region, side) => setTarget({ region, side })} />
+        <View className="gap-2">
+          <Text testID="body-3d-unavailable" className="text-xs leading-4 text-ink-400">
+            {unavailableReason(failure ? failure.error : null)}
+          </Text>
+          <BodyMap
+            sex={sex}
+            pains={list}
+            onSelect={(region, side) => setTarget({ region, side })}
+          />
+        </View>
       )}
 
       {list.length > 0 ? (

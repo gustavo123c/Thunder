@@ -1,8 +1,7 @@
 /* eslint-disable react/no-unknown-property -- three.js JSX elements (React Three Fiber) */
-import { Component, type ReactNode, Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { type GestureResponderEvent, Text, View } from 'react-native';
+import { Component, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, type GestureResponderEvent, Text, View } from 'react-native';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { painLevel } from '@/domain/health/body-regions';
 import {
@@ -19,8 +18,8 @@ import { colors } from '@/theme/tokens';
 
 import type { PainLog } from '../../api/pain.api';
 import { PAIN_COLORS, Toggle } from '../BodyMap';
-import { Canvas, useFrame, useLoader, useThree } from './fiber';
-import { modelSource } from './models';
+import { Canvas, useFrame, useThree } from './fiber';
+import { loadBodyModel } from './models';
 import { isTap, zoneFromHits } from './pick';
 
 // three's GLTFLoader decodes the .glb JSON chunk with TextDecoder.
@@ -44,24 +43,23 @@ function zoneColor(pains: readonly PainLog[], name: string): string | null {
 }
 
 function Model({
-  sex,
+  source,
   pains,
   selected,
   palette,
   rotation,
 }: {
-  sex: BodySex;
+  source: THREE.Group;
   pains: readonly PainLog[];
   selected: ZoneRef | null;
   palette: Palette;
   rotation: { current: number };
 }) {
-  const gltf = useLoader(GLTFLoader, modelSource(sex) as string);
   const group = useRef<THREE.Group>(null);
 
   // Own copy with one material per zone, so recoloring doesn't touch the cached model.
   const scene = useMemo(() => {
-    const copy = gltf.scene.clone(true);
+    const copy = source.clone(true);
     copy.traverse((node) => {
       if (!(node instanceof THREE.Mesh)) return;
       const source = node.material as THREE.Material;
@@ -72,7 +70,7 @@ function Model({
     const center = box.getCenter(new THREE.Vector3());
     copy.position.set(-center.x, -box.min.y, -center.z); // feet on the floor, spin in place
     return copy;
-  }, [gltf]);
+  }, [source]);
 
   useEffect(() => {
     const selectedName = selected ? zoneName(selected) : null;
@@ -122,13 +120,13 @@ function PickerBridge({ onReady }: { onReady: (picker: Picker | null) => void })
 }
 
 /** Any failure (no WebGL, model not loaded) hands the screen back to the 2D map. */
-class FailSafe extends Component<{ onError: () => void; children: ReactNode }> {
+class FailSafe extends Component<{ onError: (error: unknown) => void; children: ReactNode }> {
   override state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
   }
-  override componentDidCatch() {
-    this.props.onError();
+  override componentDidCatch(error: unknown) {
+    this.props.onError(error);
   }
   override render() {
     return this.state.failed ? null : this.props.children;
@@ -141,7 +139,7 @@ type Body3DProps = {
   selected: ZoneRef | null;
   onSelect: (zone: ZoneRef) => void;
   /** The 3D view can't run here: show the 2D map instead. */
-  onUnavailable: () => void;
+  onUnavailable: (error: unknown) => void;
   height?: number;
 };
 
@@ -161,7 +159,24 @@ export function Body3D({
   const [model, setModel] = useState<BodySex>(sex ?? 'male');
   const [facing, setFacing] = useState<'front' | 'back'>('front');
   const [size, setSize] = useState({ width: 0, height });
+  const [loaded, setLoaded] = useState<{ sex: BodySex; scene: THREE.Group } | null>(null);
   const rotation = useRef(0);
+
+  useEffect(() => {
+    let active = true;
+    loadBodyModel(model).then(
+      (scene) => {
+        if (active) setLoaded({ sex: model, scene });
+      },
+      (error: unknown) => {
+        if (active) onUnavailable(error);
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, [model, onUnavailable]);
+  const source = loaded?.sex === model ? loaded.scene : null;
   const picker = useRef<Picker | null>(null);
   const gesture = useRef({ start: 0, x: 0, y: 0, pageX: 0, pageY: 0, time: 0 });
 
@@ -249,18 +264,27 @@ export function Body3D({
             <hemisphereLight args={['#ffffff', '#3a3f4a', 1.1]} />
             <directionalLight position={[1.5, 2.5, 3]} intensity={1.6} />
             <directionalLight position={[-2, 1.5, -2.5]} intensity={0.6} />
-            <Suspense fallback={null}>
+            {source ? (
               <Model
-                sex={model}
+                source={source}
                 pains={pains}
                 selected={selected}
                 palette={palette}
                 rotation={rotation}
               />
-            </Suspense>
+            ) : null}
             <PickerBridge onReady={setPicker} />
           </Canvas>
         </FailSafe>
+        {source ? null : (
+          <View
+            pointerEvents="none"
+            className="absolute inset-0 items-center justify-center"
+            accessibilityLabel="Carregando o corpo 3D"
+          >
+            <ActivityIndicator color={theme.ink[300]} />
+          </View>
+        )}
       </View>
       <Text className="mt-2 px-4 text-center text-xs text-ink-400">
         Arraste para os lados para girar. Toque em uma região para marcar dor.

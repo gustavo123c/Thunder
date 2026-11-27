@@ -10,6 +10,8 @@ jest.mock('expo-crypto', () => ({
   randomUUID: () => require('node:crypto').randomUUID(),
 }));
 
+jest.mock('@/features/health/components/body3d/availability', () => ({ hasGL: () => true }));
+
 // The 3D body needs a GL context (expo-gl); tests get a stand-in with the same props.
 jest.mock('@/features/health/components/body3d/Body3D', () => {
   const { Pressable, Text } = require('react-native');

@@ -1,15 +1,17 @@
-import { useFocusEffect } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { BackHandler, KeyboardAvoidingView, ScrollView, View } from 'react-native';
+import { BackHandler, KeyboardAvoidingView, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { Screen } from '@/components/ui/Screen';
 import { recurringPains } from '@/domain/health/pain-history';
 import { recentAveragePace } from '@/domain/insights/activity';
 import { useUserId } from '@/features/auth';
-import { PainMapSection, useOpenPains, usePainHistory } from '@/features/health';
+import { PainMapSection, useAnamnese, useOpenPains, usePainHistory } from '@/features/health';
 import { useProfile } from '@/features/profile';
 import { useActivity } from '@/features/progress';
+import { useThemeColors } from '@/theme/theme';
 import { type TrainingStep, TrainingStepper, WorkoutBuilder } from '@/features/workouts';
 
 export default function TrainingScreen() {
@@ -18,6 +20,8 @@ export default function TrainingScreen() {
   const pains = useOpenPains(userId);
   const painHistory = usePainHistory(userId);
   const activity = useActivity(userId);
+  const anamnese = useAnamnese(userId);
+  const theme = useThemeColors();
   const [step, setStep] = useState<TrainingStep>('body');
 
   // Android back button / gesture: from the workout step, go back to the check-up first.
@@ -51,6 +55,18 @@ export default function TrainingScreen() {
       <View className="pb-2 pt-3">
         <TrainingStepper step={step} onChange={setStep} />
       </View>
+      {anamnese.data === null ? (
+        <Pressable
+          onPress={() => router.push('/anamnese')}
+          className="mx-4 mb-2 flex-row items-center gap-3 rounded-2xl border border-hairline bg-ink-800 px-4 py-3 active:opacity-80"
+        >
+          <Ionicons name="medical-outline" size={18} color={theme.ink[300]} />
+          <Text className="flex-1 text-sm text-ink-300">
+            Complete o questionário de saúde para personalizar seus treinos.
+          </Text>
+          <Ionicons name="chevron-forward" size={16} color={theme.ink[500]} />
+        </Pressable>
+      ) : null}
       <KeyboardAvoidingView className="flex-1">
         {/* Both steps stay mounted (hidden) so switching keeps the generated workout. */}
         <ScrollView

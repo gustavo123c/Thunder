@@ -344,6 +344,78 @@ export type Database = {
           },
         ];
       };
+      run_feedback: {
+        Row: {
+          id: string;
+          run_id: string;
+          user_id: string;
+          issues: string[];
+          pain_regions: Json | null;
+          other_text: string | null;
+          next_preference: 'lighter' | 'same' | null;
+          safety_alert: boolean;
+          generated_workout_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          run_id: string;
+          user_id: string;
+          issues?: string[];
+          pain_regions?: Json | null;
+          other_text?: string | null;
+          next_preference?: 'lighter' | 'same' | null;
+          safety_alert?: boolean;
+          generated_workout_id?: string | null;
+        };
+        Update: { [_ in never]: never };
+        Relationships: [];
+      };
+      health_anamnese: {
+        Row: {
+          id: string;
+          user_id: string;
+          running_experience: 'none' | 'beginner' | 'intermediate' | 'advanced' | null;
+          weekly_frequency: number | null;
+          current_injuries: string[] | null;
+          past_injuries: string[] | null;
+          surgeries: string | null;
+          health_conditions: string[] | null;
+          medications: string | null;
+          par_q: Json;
+          par_q_risk: boolean;
+          consented_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          running_experience?: 'none' | 'beginner' | 'intermediate' | 'advanced' | null;
+          weekly_frequency?: number | null;
+          current_injuries?: string[] | null;
+          past_injuries?: string[] | null;
+          surgeries?: string | null;
+          health_conditions?: string[] | null;
+          medications?: string | null;
+          par_q?: Json;
+          par_q_risk?: boolean;
+          consented_at?: string | null;
+        };
+        Update: {
+          running_experience?: 'none' | 'beginner' | 'intermediate' | 'advanced' | null;
+          weekly_frequency?: number | null;
+          current_injuries?: string[] | null;
+          past_injuries?: string[] | null;
+          surgeries?: string | null;
+          health_conditions?: string[] | null;
+          medications?: string | null;
+          par_q?: Json;
+          par_q_risk?: boolean;
+          consented_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {

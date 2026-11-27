@@ -114,6 +114,10 @@ function RootNavigator() {
           name="profile/edit"
           options={{ headerShown: true, title: 'Editar perfil', presentation: 'modal' }}
         />
+        <Stack.Screen
+          name="anamnese"
+          options={{ headerShown: true, title: 'Questionário de saúde', headerBackTitle: 'Voltar' }}
+        />
       </Stack.Protected>
     </Stack>
   );

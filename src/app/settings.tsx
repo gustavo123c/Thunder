@@ -111,6 +111,11 @@ export default function SettingsScreen() {
           label="Editar perfil"
           onPress={() => router.push('/profile/edit')}
         />
+        <Row
+          icon="medical-outline"
+          label="Questionário de saúde"
+          onPress={() => router.push('/anamnese')}
+        />
         <Row icon="log-out-outline" label="Sair" onPress={confirmSignOut} destructive />
       </Section>
 

@@ -2,9 +2,9 @@ name: Supabase keep-alive
 
 on:
   schedule:
-    # Every 3 days at 08:00 UTC (avoids Supabase pause after 7 days inactivity)
+    # Every 3 days at 08:00 UTC (free projects pause after 7 days without activity)
     - cron: '0 8 */3 * *'
-  workflow_dispatch: {}   # allow manual trigger
+  workflow_dispatch: {}
 
 jobs:
   ping:
@@ -13,13 +13,15 @@ jobs:
       - name: Ping Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          echo "URL length: ${#SUPABASE_URL}"
+          # Publishable keys (sb_publishable_...) go only in the apikey header, not as a Bearer token.
           STATUS=$(curl -s -o /tmp/body.txt -w "%{http_code}" \
-            "${SUPABASE_URL}/auth/v1/health")
+            "${SUPABASE_URL%/}/auth/v1/health" \
+            -H "apikey: ${SUPABASE_ANON_KEY}")
           echo "HTTP status: $STATUS"
-          cat /tmp/body.txt || true
           if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 300 ]; then
+            cat /tmp/body.txt
             echo "Ping failed" >&2
             exit 1
           fi

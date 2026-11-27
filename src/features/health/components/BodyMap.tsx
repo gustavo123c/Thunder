@@ -30,7 +30,7 @@ type BodyMapProps = {
   height?: number;
 };
 
-function Toggle<T extends string>({
+export function Toggle<T extends string>({
   options,
   value,
   onChange,
@@ -186,19 +186,23 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
         </View>
       ) : null}
 
-      <View className="flex-row justify-center gap-4">
-        {(['mild', 'moderate', 'severe'] as const).map((level) => (
-          <View key={level} className="flex-row items-center gap-1.5">
-            <View
-              className="h-3 w-3 rounded-full"
-              style={{ backgroundColor: PAIN_COLORS[level] }}
-            />
-            <Text className="text-xs text-ink-300">
-              {level === 'mild' ? 'Leve' : level === 'moderate' ? 'Moderada' : 'Forte'}
-            </Text>
-          </View>
-        ))}
-      </View>
+      <PainLegend />
+    </View>
+  );
+}
+
+/** Leve / Moderada / Forte color key. */
+export function PainLegend() {
+  return (
+    <View className="flex-row justify-center gap-4">
+      {(['mild', 'moderate', 'severe'] as const).map((level) => (
+        <View key={level} className="flex-row items-center gap-1.5">
+          <View className="h-3 w-3 rounded-full" style={{ backgroundColor: PAIN_COLORS[level] }} />
+          <Text className="text-xs text-ink-300">
+            {level === 'mild' ? 'Leve' : level === 'moderate' ? 'Moderada' : 'Forte'}
+          </Text>
+        </View>
+      ))}
     </View>
   );
 }

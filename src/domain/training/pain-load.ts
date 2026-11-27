@@ -95,6 +95,12 @@ const RULES: Partial<Record<BodyRegion, RegionRule>> = {
     flat: true,
     reason: 'exige estabilidade do quadril',
   },
+  it_band: {
+    avoid: ['hills', 'long'],
+    noSpeed: false,
+    flat: true,
+    reason: 'descidas e treinos longos irritam a banda iliotibial',
+  },
   hip: {
     avoid: ['hills', 'long'],
     noSpeed: true,

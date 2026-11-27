@@ -22,6 +22,7 @@ export const BODY_REGIONS = [
   'groin',
   'quadriceps',
   'hamstring',
+  'it_band',
   'knee',
   'shin',
   'calf',
@@ -72,6 +73,8 @@ export const REGION_INFO: Record<BodyRegion, RegionInfo> = {
   },
   quadriceps: { label: 'Coxa (frente)', bilateral: true, lowerLimb: true, views: ['front'] },
   hamstring: { label: 'Posterior da coxa', bilateral: true, lowerLimb: true, views: ['back'] },
+  // Outer thigh, hip to knee. Tappable on the 3D body; list-only on the 2D map.
+  it_band: { label: 'Banda iliotibial', bilateral: true, lowerLimb: true, views: [] },
   knee: { label: 'Joelho', bilateral: true, lowerLimb: true, views: ['front'] },
   shin: { label: 'Canela', bilateral: true, lowerLimb: true, views: ['front'] },
   calf: { label: 'Panturrilha', bilateral: true, lowerLimb: true, views: ['back'] },
@@ -102,7 +105,7 @@ export function describeRegion(region: BodyRegion, side: BodySide): string {
   const { label } = REGION_INFO[region];
   if (side === 'center') return label;
   // Feminine nouns take "esquerda/direita".
-  const feminine = ['Coxa (frente)', 'Panturrilha', 'Canela'].includes(label);
+  const feminine = ['Coxa (frente)', 'Panturrilha', 'Canela', 'Banda iliotibial'].includes(label);
   if (label === 'Punho e mão') return `Punho e mão ${side === 'left' ? 'esquerdos' : 'direitos'}`;
   const sideLabel =
     side === 'left' ? (feminine ? 'esquerda' : 'esquerdo') : feminine ? 'direita' : 'direito';

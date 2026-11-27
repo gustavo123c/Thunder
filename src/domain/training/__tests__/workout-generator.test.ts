@@ -210,3 +210,12 @@ describe('post-workout check-in feedback', () => {
     );
   });
 });
+
+describe('IT band pain', () => {
+  it('keeps runs flat and short', () => {
+    const load = adjustForPain('long', [pain('it_band', 3)]);
+    expect(load.type).toBe('easy');
+    expect(load.flatOnly).toBe(true);
+    expect(load.notes.join(' ')).toMatch(/Banda iliotibial esquerda \(leve\)/);
+  });
+});

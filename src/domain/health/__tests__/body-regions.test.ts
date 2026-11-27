@@ -5,6 +5,7 @@ it('labels regions with side and grammatical gender', () => {
   expect(describeRegion('calf', 'right')).toBe('Panturrilha direita');
   expect(describeRegion('quadriceps', 'left')).toBe('Coxa esquerda (frente)');
   expect(describeRegion('lower_back', 'center')).toBe('Lombar');
+  expect(describeRegion('it_band', 'right')).toBe('Banda iliotibial direita');
 });
 
 it('maps intensity to levels', () => {
@@ -13,9 +14,9 @@ it('maps intensity to levels', () => {
   expect(painLevel(9)).toBe('severe');
 });
 
-it('declares map views for regions (elbow and hip are list-only)', () => {
+it('declares map views for regions (elbow, hip and IT band are list-only on the 2D map)', () => {
   for (const region of BODY_REGIONS) {
-    if (region === 'elbow' || region === 'hip') continue;
+    if (region === 'elbow' || region === 'hip' || region === 'it_band') continue;
     expect(REGION_INFO[region].views.length).toBeGreaterThan(0);
   }
 });

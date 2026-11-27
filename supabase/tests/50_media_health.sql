@@ -135,3 +135,12 @@ select pg_temp.check(
   (select count(*) from public.pain_logs where region in ('forearm', 'trapezius')) = 2,
   'new anatomical regions are accepted');
 reset role;
+
+-- IT band region (20261128000000_it_band_region.sql)
+set role authenticated;
+select pg_temp.as_user('aaaaaaaa-0000-0000-0000-000000000001');
+insert into public.pain_logs (user_id, region, side, intensity)
+values ('aaaaaaaa-0000-0000-0000-000000000001', 'it_band', 'left', 4);
+select pg_temp.check(
+  exists (select 1 from public.pain_logs where region = 'it_band'),
+  'IT band is a valid pain region');

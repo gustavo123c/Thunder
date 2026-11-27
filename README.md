@@ -41,7 +41,8 @@ fazer a seguir**:
 
 ### 🩺 Treino e check-up corporal
 
-- **Mapa corporal** anatômico (frente/costas, masculino/feminino) para marcar dores leves,
+- **Corpo 3D** que gira com o dedo, com zonas de corredor (pé, tornozelo, canela, joelho, banda
+  iliotibial, quadril, lombar…) e lista com todas as regiões, para marcar dores leves,
   moderadas ou fortes.
 - **Histórico de dores**: mostra as dores dos últimos 90 dias e avisa quando uma dor volta.
 - **Treinos de corrida**: tiros, fartlek, limiar, subidas, progressivo, rodagem, longão e
@@ -169,3 +170,4 @@ supabase/
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — arquitetura, banco de dados e design system.
 - [`docs/BUILD.md`](docs/BUILD.md) — builds para Android e iPhone com o EAS.
+- [`docs/BODY_MODEL.md`](docs/BODY_MODEL.md) — corpo 3D do check-up: exportar do MakeHuman e dividir em zonas.

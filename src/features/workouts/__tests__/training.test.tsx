@@ -279,6 +279,27 @@ describe('PainMapSection', () => {
     await waitFor(() => expect(setPain).toHaveBeenCalledWith('u1', undefined, 'knee', 'left', 6));
   });
 
+  it('opens the pain sheet when a zone of the 3D body is tapped', async () => {
+    const user = userEvent.setup();
+    jest.mocked(fetchOpenPains).mockResolvedValue([]);
+    await renderWithQuery(<PainMapSection userId="u1" sex="male" />);
+
+    await user.press(await screen.findByTestId('body-3d'));
+    expect(
+      await screen.findByText('Como está a dor ou desconforto nesta região?'),
+    ).toBeOnTheScreen();
+  });
+
+  it('reaches the upper body and the IT band through the list', async () => {
+    const user = userEvent.setup();
+    jest.mocked(fetchOpenPains).mockResolvedValue([]);
+    await renderWithQuery(<PainMapSection userId="u1" sex="male" />);
+
+    await user.press(await screen.findByRole('button', { name: 'Escolher pela lista' }));
+    expect(screen.getByRole('button', { name: 'Ombro direito' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Banda iliotibial esquerda' })).toBeOnTheScreen();
+  });
+
   it('lists open pains and offers to clear them', async () => {
     const user = userEvent.setup();
     jest

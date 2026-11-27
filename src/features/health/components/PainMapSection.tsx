@@ -12,12 +12,14 @@ import {
   PAIN_PRESETS,
   painLevel,
 } from '@/domain/health/body-regions';
+import { allRegionTargets } from '@/domain/health/body-zones';
 import { returningPainCount } from '@/domain/health/pain-history';
 import type { BodySex } from '@/domain/types/profile';
 import { useThemeColors } from '@/theme/theme';
 
 import { useOpenPains, usePainHistory, useResolvePain, useSetPain } from '../hooks/usePains';
-import { BodyMap, PAIN_COLORS } from './BodyMap';
+import { Body3D } from './body3d/Body3D';
+import { BodyMap, PAIN_COLORS, PainLegend } from './BodyMap';
 import { PainSheet } from './PainSheet';
 
 /** "Como está seu corpo hoje?" — body map, active pains and the health notice. */
@@ -28,6 +30,9 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
   const resolve = useResolvePain(userId);
   const history = usePainHistory(userId);
   const [target, setTarget] = useState<{ region: BodyRegion; side: BodySide } | null>(null);
+  // 3D body by default; the 2D drawing takes over if the device can't render it.
+  const [use3D, setUse3D] = useState(true);
+  const [showList, setShowList] = useState(false);
 
   const list = pains.data ?? [];
   const existing = target
@@ -69,6 +74,55 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
 
       {pains.isPending ? (
         <Skeleton height={380} radius={24} />
+      ) : use3D ? (
+        <View className="gap-3">
+          <Body3D
+            sex={sex}
+            pains={list}
+            selected={target}
+            onSelect={setTarget}
+            onUnavailable={() => setUse3D(false)}
+          />
+          {/* Every region (the upper body is only here) and the screen-reader path. */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showList }}
+            onPress={() => setShowList((v) => !v)}
+            className="self-center"
+          >
+            <Text className="text-sm font-semibold text-accent">
+              {showList ? 'Ocultar lista de regiões' : 'Escolher pela lista'}
+            </Text>
+          </Pressable>
+          {showList ? (
+            <View testID="region-list" className="flex-row flex-wrap gap-2">
+              {allRegionTargets().map(({ region, side }) => {
+                const pain = list.find((p) => p.region === region && p.side === side);
+                const name = describeRegion(region, side);
+                return (
+                  <Pressable
+                    key={`${region}:${side}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={name}
+                    onPress={() => setTarget({ region, side })}
+                    className={`flex-row items-center gap-1.5 rounded-full border border-hairline px-3 py-1.5 ${
+                      pain ? 'bg-bolt-500/10' : 'bg-ink-800'
+                    }`}
+                  >
+                    {pain ? (
+                      <View
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: PAIN_COLORS[painLevel(pain.intensity)] }}
+                      />
+                    ) : null}
+                    <Text className="text-sm text-ink-100">{name}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ) : null}
+          <PainLegend />
+        </View>
       ) : (
         <BodyMap sex={sex} pains={list} onSelect={(region, side) => setTarget({ region, side })} />
       )}

@@ -89,7 +89,7 @@ export type PainLevel = 'mild' | 'moderate' | 'severe';
 export const PAIN_PRESETS: Record<PainLevel, { intensity: number; label: string }> = {
   mild: { intensity: 3, label: 'Leve' },
   moderate: { intensity: 6, label: 'Moderada' },
-  severe: { intensity: 9, label: 'Forte' },
+  severe: { intensity: 9, label: 'Intensa' },
 };
 
 export function painLevel(intensity: number): PainLevel {

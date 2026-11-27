@@ -191,7 +191,7 @@ export function BodyMap({ sex, pains, onSelect, height = 420 }: BodyMapProps) {
   );
 }
 
-/** Leve / Moderada / Forte color key. */
+/** Leve / Moderada / Intensa color key. */
 export function PainLegend() {
   return (
     <View className="flex-row justify-center gap-4">
@@ -199,7 +199,7 @@ export function PainLegend() {
         <View key={level} className="flex-row items-center gap-1.5">
           <View className="h-3 w-3 rounded-full" style={{ backgroundColor: PAIN_COLORS[level] }} />
           <Text className="text-xs text-ink-300">
-            {level === 'mild' ? 'Leve' : level === 'moderate' ? 'Moderada' : 'Forte'}
+            {level === 'mild' ? 'Leve' : level === 'moderate' ? 'Moderada' : 'Intensa'}
           </Text>
         </View>
       ))}

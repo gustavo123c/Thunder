@@ -14,9 +14,9 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
-          # Hit the health endpoint — no auth required, just proves the project is awake
+          # Supabase public health check — no auth required
           STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
-            "${SUPABASE_URL}/rest/v1/")
+            "${SUPABASE_URL}/auth/v1/health")
           echo "HTTP status: $STATUS"
           if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 300 ]; then
             echo "Ping failed with status $STATUS" >&2

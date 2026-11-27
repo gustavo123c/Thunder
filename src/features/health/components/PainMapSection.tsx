@@ -31,8 +31,10 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
   const history = usePainHistory(userId);
   const [target, setTarget] = useState<{ region: BodyRegion; side: BodySide } | null>(null);
   // 3D body by default; the 2D drawing takes over if the device can't render it.
-  const [Body3D] = useState(getBody3D);
-  const [failure, setFailure] = useState<{ error: unknown } | null>(null);
+  const [{ Body3D, error: importError }] = useState(getBody3D);
+  const [failure, setFailure] = useState<{ error: unknown } | null>(
+    importError ? { error: importError } : null,
+  );
   const use3D = Body3D !== null && failure === null;
   const onUnavailable = useCallback((error: unknown) => {
     console.warn('[Body3D] falling back to the 2D map:', error);

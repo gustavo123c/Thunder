@@ -6,6 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Thunder is a running app (Expo SDK 58 / React Native, Expo Router, NativeWind 4, TanStack Query, Zustand, Supabase + PostGIS). UI copy is pt-BR; code, comments and commits are English. Full architecture notes (in Portuguese): `docs/ARCHITECTURE.md`; build/EAS steps: `docs/BUILD.md`.
 
+## Release workflow (owner rule)
+
+"Ao terminar uma mudança que eu aprovar: 1) faça commit com uma mensagem clara; 2) publique no Expo rodando eas update --auto --platform android e eas update --auto --platform ios; 3) me diga o que foi publicado. Não publique sem eu aprovar a mudança antes."
+
+- Only after the owner approves the change: commit with a clear message, then run `npx eas-cli@latest update --auto --platform android` and `npx eas-cli@latest update --auto --platform ios`, then report what was published (branch/channel, message, update group IDs).
+- Never run `eas update` for a change the owner has not approved.
+
 ## Commands
 
 ```bash

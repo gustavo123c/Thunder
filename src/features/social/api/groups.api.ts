@@ -14,7 +14,7 @@ export type { LeaderboardRow, RunGroup };
 export const GROUP_NAME_MIN = 3;
 export const GROUP_NAME_MAX = 40;
 
-export type GroupErrorCode = 'not_found' | 'full' | 'invalid_name' | 'unknown';
+export type GroupErrorCode = 'not_found' | 'full' | 'invalid_name' | 'not_installed' | 'unknown';
 
 /** Maps Postgres errors raised by create_group / join_group to UI codes. */
 export function groupErrorCode(error: unknown): GroupErrorCode {
@@ -22,6 +22,11 @@ export function groupErrorCode(error: unknown): GroupErrorCode {
   if (code === 'P0002') return 'not_found';
   if (code === '54000') return 'full';
   if (code === '23514') return 'invalid_name';
+  // Function/table missing: the groups migration wasn't applied to this Supabase project
+  // (PGRST202 = function not in PostgREST's schema cache, 42883/42P01 = undefined in Postgres).
+  if (code === 'PGRST202' || code === 'PGRST205' || code === '42883' || code === '42P01') {
+    return 'not_installed';
+  }
   return 'unknown';
 }
 

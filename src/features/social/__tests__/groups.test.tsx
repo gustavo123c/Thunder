@@ -10,6 +10,7 @@ import {
   fetchMyGroups,
   joinGroup,
   leaveGroup,
+  groupErrorCode,
   normalizeInviteCode,
 } from '../api/groups.api';
 import { GroupDetailView, inviteMessage } from '../components/GroupDetailView';
@@ -68,6 +69,12 @@ beforeEach(() => {
 afterEach(() => queryClient?.clear());
 
 describe('groups', () => {
+  it('recognizes a server without the groups migration', () => {
+    expect(groupErrorCode({ code: 'PGRST202' })).toBe('not_installed');
+    expect(groupErrorCode({ code: '42883' })).toBe('not_installed');
+    expect(groupErrorCode({ code: 'XX000' })).toBe('unknown');
+  });
+
   it('normalizes invite codes', () => {
     expect(normalizeInviteCode(' 3fa9-c21b ')).toBe('3FA9C21B');
   });

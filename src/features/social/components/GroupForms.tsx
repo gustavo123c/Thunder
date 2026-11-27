@@ -19,8 +19,18 @@ const ERROR_COPY: Record<GroupErrorCode, string> = {
   not_found: 'Código não encontrado. Confira as letras e os números.',
   full: 'Este grupo já está cheio (máximo de 50 membros).',
   invalid_name: `O nome precisa ter de ${GROUP_NAME_MIN} a ${GROUP_NAME_MAX} caracteres.`,
+  not_installed:
+    'Os grupos ainda não estão ativados no servidor. Falta aplicar a atualização do banco de dados (migration de grupos) no Supabase.',
   unknown: 'Não foi possível concluir agora. Tente novamente.',
 };
+
+/** Message for the form; in development, the raw server error is appended to help debug. */
+function errorMessage(error: unknown): string {
+  const text = ERROR_COPY[groupErrorCode(error)];
+  if (!__DEV__) return text;
+  const detail = (error as { code?: string; message?: string } | null) ?? {};
+  return `${text}\n\n[dev] ${detail.code ?? ''} ${detail.message ?? String(error)}`.trim();
+}
 
 function FormScreen({ children }: { children: ReactNode }) {
   return (
@@ -58,7 +68,7 @@ export function CreateGroupForm() {
         autoFocus
         returnKeyType="done"
       />
-      <FormMessage message={create.isError ? ERROR_COPY[groupErrorCode(create.error)] : null} />
+      <FormMessage message={create.isError ? errorMessage(create.error) : null} />
       <Button
         label="Criar grupo"
         icon="add"
@@ -95,7 +105,7 @@ export function JoinGroupForm({ initialCode = '' }: { initialCode?: string }) {
         maxLength={16}
         returnKeyType="done"
       />
-      <FormMessage message={join.isError ? ERROR_COPY[groupErrorCode(join.error)] : null} />
+      <FormMessage message={join.isError ? errorMessage(join.error) : null} />
       <View>
         <Button
           label="Entrar no grupo"

@@ -1,4 +1,4 @@
-# Autorrevisão dos Termos de Uso — versão 2026-11-28
+# Autorrevisão dos Termos de Uso — versão 2026-12-01
 
 > RASCUNHO — pendente de revisão jurídica. Este documento não é parecer jurídico. É uma
 > revisão crítica feita durante o desenvolvimento, com o objetivo de adiantar o trabalho
@@ -38,15 +38,13 @@ app e transferência internacional não especificada.
    questionário de saúde e feedback pós-treino (o restante do app continua funcionando).
    Mudança de produto — depende da decisão do dono.
 
-3. **Menores de 12 anos (LGPD, art. 14, §1º e §5º; ECA).** A política aceita todas as
-   idades. Para crianças, o consentimento deve ser **específico e dado por um dos pais ou
-   responsável**, e o controlador deve fazer "todos os esforços razoáveis" para verificar
-   que foi dado por eles. Uma caixa marcada pela própria criança não comprova isso, e aqui
-   há dado sensível de saúde de criança.
-   **Recomendação (escolher uma):** (a) idade mínima de 12 anos, com concordância do
-   responsável entre 12 e 17; ou (b) pedir a data de nascimento no cadastro e, abaixo de 12,
-   um fluxo de consentimento parental verificável (ex.: e-mail do responsável com
-   confirmação).
+3. **Menores de 12 anos (LGPD, art. 14, §1º e §5º; ECA). — Resolvido (versão 2026-12-01).**
+   Decisão do dono: idade mínima de 12 anos. A tela de aceite pede a data de nascimento;
+   abaixo de 12 não é possível aceitar, e o banco também recusa (regra na tabela). Entre 12
+   e 17, são obrigatórios nome e e-mail do responsável e a declaração de que ele concordou;
+   ficam gravados com o aceite. **Para o advogado:** a declaração não é verificada; avaliar
+   se basta para adolescentes ou se convém confirmar por e-mail com o responsável. A data
+   de nascimento é informada pela própria pessoa (sem checagem de documento).
 
 4. **Exclusão de conta.** Só existe por e-mail. A LGPD aceita (art. 18, VI), mas a App Store
    (diretriz 5.1.1(v)) e o Google Play exigem exclusão de conta **dentro do app** para apps

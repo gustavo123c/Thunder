@@ -9,7 +9,7 @@
  */
 
 /** Bump to ask every user to accept again. */
-export const TERMS_VERSION = '2026-11-28';
+export const TERMS_VERSION = '2026-12-01';
 
 export type TermsSection = {
   title: string;
@@ -95,7 +95,7 @@ export const TERMS_SECTIONS: readonly TermsSection[] = [
   {
     title: '9. Privacidade e proteção de dados (LGPD)',
     paragraphs: [
-      'Dados que tratamos: e-mail e dados de acesso; perfil (nome, nome de usuário, foto, nível, objetivo, peso, altura, data de nascimento, sexo); corridas (trajeto GPS, distância, tempo, ritmo, parciais, fotos e vídeos); interações (seguidores, grupos, curtidas, comentários, medalhas); dados de saúde (descritos na seção 6); treinos gerados e avaliações; e o registro do seu aceite destes termos.',
+      'Dados que tratamos: e-mail e dados de acesso; data de nascimento e, para menores de 18 anos, nome e e-mail do responsável; perfil (nome, nome de usuário, foto, nível, objetivo, peso, altura, data de nascimento, sexo); corridas (trajeto GPS, distância, tempo, ritmo, parciais, fotos e vídeos); interações (seguidores, grupos, curtidas, comentários, medalhas); dados de saúde (descritos na seção 6); treinos gerados e avaliações; e o registro do seu aceite destes termos.',
       'Para que usamos: criar e manter sua conta; registrar e mostrar suas corridas; gerar e adaptar sugestões de treino; permitir a interação com outros corredores conforme a visibilidade que você escolher; manter a segurança do serviço; e cumprir obrigações legais. Não vendemos seus dados.',
       'Bases legais: execução do contrato de uso do app (LGPD, art. 7º, V), seu consentimento específico para dados de saúde (art. 11, I), cumprimento de obrigação legal (art. 7º, II) e exercício regular de direitos (art. 7º, VI).',
       'Com quem compartilhamos: com fornecedores que operam o serviço em nosso nome, apenas no necessário — Supabase (banco de dados, login e armazenamento de arquivos), Mapbox (exibição de mapas) e Expo (entrega de atualizações do app). Alguns desses fornecedores podem armazenar dados fora do Brasil [confirmar a região dos servidores], com as garantias exigidas pela LGPD. Também podemos compartilhar dados quando a lei ou uma autoridade competente exigir.',
@@ -106,11 +106,12 @@ export const TERMS_SECTIONS: readonly TermsSection[] = [
     ],
   },
   {
-    title: '10. Crianças e adolescentes',
+    title: '10. Idade mínima, crianças e adolescentes',
+    highlight: true,
     paragraphs: [
-      'O Thunder pode ser usado por pessoas de todas as idades, mas quem tem menos de 18 anos só deve usá-lo com o conhecimento e a concordância de pelo menos um dos pais ou responsável legal, que deve ler estes termos junto com a criança ou o adolescente.',
-      'Para menores de 12 anos, o consentimento para o tratamento de dados deve ser dado por um dos pais ou pelo responsável legal (LGPD, art. 14). Recomendamos que treinos de crianças e adolescentes sejam sempre orientados por um profissional de Educação Física.',
-      'Na tela de aceite, a pessoa declara ter 18 anos ou mais ou que o responsável legal leu e concordou com estes termos. Se soubermos que uma conta de menor foi criada sem essa concordância, poderemos suspendê-la e apagar os dados.',
+      'O Thunder pode ser usado a partir de 12 anos. Pedimos a data de nascimento na tela de aceite; abaixo de 12 anos, não é possível criar o acesso, porque a lei exige um consentimento dos pais que o app ainda não consegue verificar.',
+      'Entre 12 e 17 anos, o uso depende do conhecimento e da concordância de pelo menos um dos pais ou do responsável legal. Pedimos o nome e o e-mail dessa pessoa e a declaração de que ela leu e concordou com estes termos. Podemos entrar em contato com ela para confirmar.',
+      'Recomendamos que treinos de adolescentes sejam orientados por um profissional de Educação Física. Se soubermos que uma conta foi criada com informação de idade falsa ou sem a concordância do responsável, poderemos suspendê-la e apagar os dados.',
     ],
   },
   {
@@ -147,5 +148,5 @@ export const TERMS_CHECKS = {
   terms: 'Li e concordo com os Termos de Uso e a Política de Privacidade.',
   health:
     'Autorizo o uso dos meus dados de saúde (dores, questionário de saúde e avaliações após os treinos) para adaptar as sugestões de treino, como descrito na seção 6.',
-  age: 'Tenho 18 anos ou mais, ou meu pai, mãe ou responsável legal leu e concordou com estes termos.',
+  guardian: 'Meu pai, mãe ou responsável legal leu e concordou com estes Termos de Uso.',
 } as const;

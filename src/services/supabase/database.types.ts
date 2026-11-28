@@ -423,6 +423,9 @@ export type Database = {
           terms_version: string;
           health_data_consent: boolean;
           age_statement: boolean;
+          birth_date: string | null;
+          guardian_name: string | null;
+          guardian_email: string | null;
           accepted_at: string;
         };
         Insert: {
@@ -430,6 +433,9 @@ export type Database = {
           terms_version: string;
           health_data_consent: boolean;
           age_statement: boolean;
+          birth_date: string;
+          guardian_name?: string | null;
+          guardian_email?: string | null;
         };
         Update: { [_ in never]: never };
         Relationships: [];

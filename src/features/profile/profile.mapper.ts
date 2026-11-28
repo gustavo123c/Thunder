@@ -25,6 +25,7 @@ export function profileFromRow(row: ProfileRow): Profile {
     goalTargetPaceSPerKm: toNumber(row.goal_target_pace_s_per_km),
     onboardedAt: row.onboarded_at,
     sex: row.sex ?? null,
+    healthConsentAt: row.health_consent_at ?? null,
   };
 }
 

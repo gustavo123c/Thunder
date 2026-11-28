@@ -29,6 +29,7 @@ export type Database = {
           goal_target_pace_s_per_km: number | null;
           onboarded_at: Timestamp | null;
           sex: 'male' | 'female' | null;
+          health_consent_at: Timestamp | null;
           created_at: Timestamp;
           updated_at: Timestamp;
         };
@@ -45,6 +46,7 @@ export type Database = {
           goal_target_pace_s_per_km?: number | null;
           onboarded_at?: Timestamp | null;
           sex?: 'male' | 'female' | null;
+          health_consent_at?: Timestamp | null;
         };
         Relationships: [];
       };
@@ -449,6 +451,7 @@ export type Database = {
         Returns: boolean;
       };
       finish_run: { Args: { payload: Json }; Returns: string };
+      revoke_health_consent: { Args: Record<string, never>; Returns: undefined };
       list_user_runs: {
         Args: { p_user_id: string; p_before?: string; p_before_id?: string; p_limit?: number };
         Returns: Json;

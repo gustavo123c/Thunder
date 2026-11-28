@@ -72,7 +72,8 @@ export const TERMS_SECTIONS: readonly TermsSection[] = [
     highlight: true,
     paragraphs: [
       'Para adaptar as sugestões, você pode informar dados de saúde: dores e sua intensidade no mapa do corpo, respostas do questionário de saúde (anamnese), lesões, cirurgias, condições de saúde, medicamentos e como se sentiu após os treinos. Peso, altura, data de nascimento e sexo também ajudam nos cálculos.',
-      'Pela Lei Geral de Proteção de Dados (LGPD), dados de saúde são dados pessoais sensíveis. Só os tratamos com o seu consentimento específico, dado na tela de aceite e, para o questionário de saúde, também dentro dele.',
+      'Pela Lei Geral de Proteção de Dados (LGPD), dados de saúde são dados pessoais sensíveis. Só os tratamos com o seu consentimento específico e destacado, que é opcional: sem ele, você continua registrando corridas e recebendo sugestões de treino, mas o mapa de dores, o questionário de saúde e as avaliações após os treinos ficam desligados.',
+      'Você pode dar ou revogar esse consentimento a qualquer momento em Perfil > Configurações > Dados de saúde. Ao revogar, apagamos suas dores, o questionário de saúde e as avaliações após os treinos.',
       'A qualidade das sugestões depende do que você informa. Informações incompletas, desatualizadas ou incorretas podem gerar sugestões inadequadas. Mantenha-as atualizadas; a seção 9 explica como corrigir ou apagar cada uma.',
       'Seus dados de saúde não são exibidos para outros usuários e não são usados para publicidade.',
     ],
@@ -100,7 +101,7 @@ export const TERMS_SECTIONS: readonly TermsSection[] = [
       'Bases legais: execução do contrato de uso do app (LGPD, art. 7º, V), seu consentimento específico para dados de saúde (art. 11, I), cumprimento de obrigação legal (art. 7º, II) e exercício regular de direitos (art. 7º, VI).',
       'Com quem compartilhamos: com fornecedores que operam o serviço em nosso nome, apenas no necessário — Supabase (banco de dados, login e armazenamento de arquivos), Mapbox (exibição de mapas) e Expo (entrega de atualizações do app). Alguns desses fornecedores podem armazenar dados fora do Brasil [confirmar a região dos servidores], com as garantias exigidas pela LGPD. Também podemos compartilhar dados quando a lei ou uma autoridade competente exigir.',
       'Segurança e retenção: usamos controles de acesso para que cada pessoa veja apenas o que lhe é permitido. Mantemos seus dados enquanto sua conta existir. Dados que você apaga no app são removidos dos nossos sistemas ativos; o registro de aceite destes termos é mantido pelo prazo necessário para comprovar o aceite [definir prazo].',
-      'Seus direitos: você pode confirmar se tratamos seus dados, acessá-los, corrigi-los, pedir anonimização, bloqueio ou eliminação, pedir a portabilidade, saber com quem compartilhamos, revogar o consentimento e pedir a revisão de decisões automatizadas (LGPD, art. 18 e art. 20).',
+      'Seus direitos: você pode confirmar se tratamos seus dados, acessá-los, corrigi-los, pedir anonimização, bloqueio ou eliminação, pedir a portabilidade, saber com quem compartilhamos, revogar o consentimento (para dados de saúde, direto no app) e pedir a revisão de decisões automatizadas (LGPD, art. 18 e art. 20).',
       'Como exercer: no app, você pode editar seu perfil, apagar corridas, fotos, vídeos, comentários, treinos salvos e o questionário de saúde, e marcar dores como resolvidas. Para os demais pedidos, como apagar o histórico de dores e as avaliações após os treinos, receber uma cópia dos seus dados ou excluir a conta, escreva para [e-mail de contato]. Responderemos dentro dos prazos legais. Se a revogação do consentimento para dados de saúde impedir as sugestões adaptadas, avisaremos você.',
       'Você também pode apresentar reclamação à Autoridade Nacional de Proteção de Dados (ANPD).',
     ],
@@ -143,7 +144,7 @@ export const TERMS_SECTIONS: readonly TermsSection[] = [
   },
 ];
 
-/** Checkboxes on the acceptance screen; all are required to continue. */
+/** Checkboxes on the acceptance screen; `health` is optional, the others are required. */
 export const TERMS_CHECKS = {
   terms: 'Li e concordo com os Termos de Uso e a Política de Privacidade.',
   health:

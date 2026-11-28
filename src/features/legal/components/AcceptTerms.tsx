@@ -34,8 +34,7 @@ export function AcceptTerms({ userId, onSignOut }: { userId: string; onSignOut: 
   const minor = group === 'minor';
   const guardianOk =
     !minor || (guardianName.trim().length >= 3 && isValidEmail(guardianEmail) && checked.guardian);
-  const ready =
-    birthDate !== null && group !== 'too_young' && guardianOk && checked.terms && checked.health;
+  const ready = birthDate !== null && group !== 'too_young' && guardianOk && checked.terms;
 
   function toggle(key: keyof typeof checked) {
     setChecked((c) => ({ ...c, [key]: !c[key] }));
@@ -46,6 +45,7 @@ export function AcceptTerms({ userId, onSignOut }: { userId: string; onSignOut: 
     accept.mutate({
       birthDate,
       guardian: minor ? { name: guardianName, email: guardianEmail } : null,
+      healthConsent: checked.health,
     });
   }
 
@@ -117,11 +117,21 @@ export function AcceptTerms({ userId, onSignOut }: { userId: string; onSignOut: 
               checked={checked.terms}
               onToggle={() => toggle('terms')}
             />
-            <CheckRow
-              label={TERMS_CHECKS.health}
-              checked={checked.health}
-              onToggle={() => toggle('health')}
-            />
+            <View className="gap-1.5 border-t border-hairline pt-3">
+              <Text className="font-mono-medium text-[11px] uppercase tracking-[1.5px] text-ink-400">
+                Opcional
+              </Text>
+              <CheckRow
+                label={TERMS_CHECKS.health}
+                checked={checked.health}
+                onToggle={() => toggle('health')}
+              />
+              <Text className="pl-9 text-xs leading-4 text-ink-400">
+                Sem essa autorização, o app funciona normalmente, mas os treinos não se adaptam a
+                dores e o questionário de saúde fica desligado. Você pode mudar isso depois em
+                Configurações.
+              </Text>
+            </View>
           </>
         )}
       </View>

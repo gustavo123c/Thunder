@@ -17,7 +17,7 @@ import { recurringPains } from '@/domain/health/pain-history';
 import { recentAveragePace } from '@/domain/insights/activity';
 import { useUserId } from '@/features/auth';
 import { PainMapSection, useAnamnese, useOpenPains, usePainHistory } from '@/features/health';
-import { useProfile } from '@/features/profile';
+import { useHealthConsent, useProfile } from '@/features/profile';
 import { useActivity } from '@/features/progress';
 import { useThemeColors } from '@/theme/theme';
 import { type TrainingStep, TrainingStepper, WorkoutBuilder } from '@/features/workouts';
@@ -30,6 +30,7 @@ export default function TrainingScreen() {
   const activity = useActivity(userId);
   const anamnese = useAnamnese(userId);
   const theme = useThemeColors();
+  const consent = useHealthConsent(userId);
   const [step, setStep] = useState<TrainingStep>('body');
   const [anamneseDismissed, setAnamneseDismissed] = useState(false);
   const { height: windowHeight } = useWindowDimensions();
@@ -61,6 +62,49 @@ export default function TrainingScreen() {
   if (!profile) return null;
 
   const painCount = pains.data?.length ?? 0;
+
+  // Without health data consent there is no body check-up: straight to the workout.
+  if (!profile.healthConsentAt) {
+    return (
+      <Screen>
+        <ScrollView
+          className="flex-1"
+          contentContainerClassName="gap-6 pb-10 pt-4"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View className="flex-row items-center gap-3 rounded-2xl border border-hairline bg-ink-800 py-3 pl-4 pr-3">
+            <Ionicons name="body-outline" size={18} color={theme.ink[300]} />
+            <View className="flex-1">
+              <Text className="text-sm font-semibold text-ink-100">
+                Treinos adaptados a dores desligados
+              </Text>
+              <Text className="text-xs text-ink-400">
+                Autorize o uso de dados de saúde para marcar dores e ajustar a carga.
+              </Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Autorizar uso de dados de saúde"
+              disabled={consent.pending}
+              onPress={consent.askToGrant}
+              hitSlop={8}
+              className="rounded-full bg-bolt-500 px-3 py-1.5 active:opacity-80"
+            >
+              <Text className="text-xs font-bold text-onbolt">Ativar</Text>
+            </Pressable>
+          </View>
+          <WorkoutBuilder
+            userId={userId}
+            defaultLevel={profile.level ?? 'beginner'}
+            pains={[]}
+            recentPaceSPerKm={recentPace}
+            goal={profile.mainGoal}
+          />
+        </ScrollView>
+      </Screen>
+    );
+  }
 
   return (
     <Screen>

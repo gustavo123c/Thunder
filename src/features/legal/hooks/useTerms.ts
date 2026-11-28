@@ -17,6 +17,11 @@ export function useAcceptTerms(userId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: AcceptTermsInput) => acceptTerms(userId, input),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: termsKey(userId) }),
+    // The profile carries the health consent given here.
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['profile', userId] }),
+        queryClient.invalidateQueries({ queryKey: termsKey(userId) }),
+      ]),
   });
 }

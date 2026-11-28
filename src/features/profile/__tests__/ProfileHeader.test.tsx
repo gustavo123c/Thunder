@@ -19,6 +19,7 @@ const profile: Profile = {
   mainGoal: 'complete_5k',
   goalTargetPaceSPerKm: null,
   onboardedAt: '2026-11-01T00:00:00Z',
+  healthConsentAt: null,
   sex: null,
 };
 

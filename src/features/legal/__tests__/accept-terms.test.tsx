@@ -23,7 +23,7 @@ afterEach(() => queryClient.clear());
 
 const year = new Date().getFullYear();
 
-it('shows the terms and only accepts an adult after the required boxes', async () => {
+it('accepts an adult without health consent, which stays optional', async () => {
   const user = userEvent.setup();
   await renderWithQuery(<AcceptTerms userId="u1" onSignOut={jest.fn()} />);
 
@@ -33,15 +33,19 @@ it('shows the terms and only accepts an adult after the required boxes', async (
 
   await user.type(screen.getByLabelText('Data de nascimento'), '10051990');
   expect(screen.getByLabelText('Data de nascimento').props.value).toBe('10/05/1990');
-  await user.press(screen.getByRole('checkbox', { name: TERMS_CHECKS.terms }));
   expect(button).toBeDisabled();
-  await user.press(screen.getByRole('checkbox', { name: TERMS_CHECKS.health }));
-  expect(button).toBeEnabled();
+  await user.press(screen.getByRole('checkbox', { name: TERMS_CHECKS.terms }));
+  expect(screen.getByRole('checkbox', { name: TERMS_CHECKS.terms })).toBeChecked();
+  expect(screen.getByRole('button', { name: 'Aceitar e continuar' })).toBeEnabled();
   expect(screen.queryByLabelText('Nome do responsável')).not.toBeOnTheScreen();
 
   await user.press(button);
   await waitFor(() =>
-    expect(acceptTerms).toHaveBeenCalledWith('u1', { birthDate: '1990-05-10', guardian: null }),
+    expect(acceptTerms).toHaveBeenCalledWith('u1', {
+      birthDate: '1990-05-10',
+      guardian: null,
+      healthConsent: false,
+    }),
   );
 });
 
@@ -66,6 +70,7 @@ it('asks a teenager for the guardian before accepting', async () => {
     expect(acceptTerms).toHaveBeenCalledWith('u1', {
       birthDate: `${year - 15}-01-01`,
       guardian: { name: 'Maria Souza', email: 'maria@exemplo.com' },
+      healthConsent: true,
     }),
   );
 });

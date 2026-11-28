@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { HealthDisclaimer } from '@/components/ui/HealthDisclaimer';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { useAuth, useSignOut, useUserId } from '@/features/auth';
+import { useHealthConsent, useProfile } from '@/features/profile';
 import { useDeleteAllWorkouts, useRecentWorkouts } from '@/features/workouts';
 import { useThemePreference } from '@/theme/AppThemeProvider';
 import { type ThemePreference, useThemeColors } from '@/theme/theme';
@@ -90,6 +91,9 @@ export default function SettingsScreen() {
   const savedWorkouts = useRecentWorkouts(userId);
   const deleteAll = useDeleteAllWorkouts(userId);
   const savedCount = savedWorkouts.data?.length ?? 0;
+  const { data: profile } = useProfile(userId);
+  const consent = useHealthConsent(userId);
+  const healthAllowed = Boolean(profile?.healthConsentAt);
   const version = Constants.expoConfig?.version ?? '—';
 
   function confirmSignOut() {
@@ -136,12 +140,36 @@ export default function SettingsScreen() {
           label="Editar perfil"
           onPress={() => router.push('/profile/edit')}
         />
-        <Row
-          icon="medical-outline"
-          label="Questionário de saúde"
-          onPress={() => router.push('/anamnese')}
-        />
         <Row icon="log-out-outline" label="Sair" onPress={confirmSignOut} destructive />
+      </Section>
+
+      <Section title="Dados de saúde">
+        <Row
+          icon="shield-checkmark-outline"
+          label="Uso de dados de saúde"
+          detail={healthAllowed ? 'Autorizado' : 'Não autorizado'}
+        />
+        {healthAllowed ? (
+          <>
+            <Row
+              icon="medical-outline"
+              label="Questionário de saúde"
+              onPress={() => router.push('/anamnese')}
+            />
+            <Row
+              icon="close-circle-outline"
+              label="Revogar e apagar dados de saúde"
+              onPress={consent.pending ? undefined : consent.askToRevoke}
+              destructive
+            />
+          </>
+        ) : (
+          <Row
+            icon="checkmark-circle-outline"
+            label="Autorizar uso de dados de saúde"
+            onPress={consent.pending ? undefined : consent.askToGrant}
+          />
+        )}
       </Section>
 
       <Section title="Treinos">

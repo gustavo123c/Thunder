@@ -29,14 +29,15 @@ app e transferência internacional não especificada.
    (Resolução CD/ANPD nº 2/2022), mas precisam manter um canal de comunicação — o
    `[e-mail de contato]` cumpre esse papel se for preenchido.
 
-2. **Consentimento para dados de saúde condicionado ao uso do app (LGPD, art. 8º, §3º e
-   art. 9º, §3º; art. 11, I).** Hoje, a caixa "Autorizo o uso dos meus dados de saúde" é
-   obrigatória para usar qualquer parte do app, inclusive só registrar corridas. Consentimento
-   precisa ser livre; quando é condição para o serviço, a lei exige destaque (o que foi feito),
-   mas o vínculo é discutível porque o registro de corridas não depende de dados de saúde.
-   **Recomendação:** tornar essa caixa opcional e, sem ela, desativar mapa de dores,
-   questionário de saúde e feedback pós-treino (o restante do app continua funcionando).
-   Mudança de produto — depende da decisão do dono.
+2. **Consentimento para dados de saúde (LGPD, art. 8º, §3º; art. 9º, §3º; art. 11, I). —
+   Resolvido (versão 2026-12-01).** A caixa de dados de saúde passou a ser opcional, separada
+   e destacada na tela de aceite. Sem ela, o app funciona (corridas, histórico, sugestões),
+   mas mapa de dores, questionário de saúde e avaliações pós-treino ficam desligados. O
+   consentimento pode ser dado ou revogado em Configurações > Dados de saúde; ao revogar, as
+   dores, o questionário e as avaliações são apagados e as dores são retiradas dos treinos
+   salvos. A escolha no aceite fica registrada em `terms_acceptances` e o estado atual em
+   `profiles.health_consent_at`. **Para o advogado:** o registro de quando o consentimento foi
+   revogado não é guardado (só o estado atual); avaliar se é necessário manter histórico.
 
 3. **Menores de 12 anos (LGPD, art. 14, §1º e §5º; ECA). — Resolvido (versão 2026-12-01).**
    Decisão do dono: idade mínima de 12 anos. A tela de aceite pede a data de nascimento;

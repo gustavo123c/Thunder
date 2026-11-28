@@ -27,6 +27,8 @@ export type Profile = {
   onboardedAt: string | null; // ISO timestamp
   /** Used to pick the body-map model; optional. */
   sex: BodySex | null;
+  /** When the user allowed health data use (pains, questionnaire, feedback); null = not allowed. */
+  healthConsentAt: string | null;
 };
 
 /** Fields the user can edit (onboarding and profile edit). */

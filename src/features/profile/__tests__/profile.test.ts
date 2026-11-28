@@ -99,6 +99,7 @@ describe('formValuesFromProfile', () => {
       mainGoal: 'improve_pace',
       goalTargetPaceSPerKm: 375,
       onboardedAt: '2026-11-25T10:00:00Z',
+      healthConsentAt: null,
       sex: 'female',
     };
     expect(formValuesFromProfile(profile)).toEqual({
@@ -128,6 +129,7 @@ describe('profile mapper', () => {
       main_goal: 'complete_10k',
       goal_target_pace_s_per_km: null,
       onboarded_at: null,
+      health_consent_at: null,
       sex: null,
       created_at: '2026-11-25T10:00:00Z',
       updated_at: '2026-11-25T10:00:00Z',

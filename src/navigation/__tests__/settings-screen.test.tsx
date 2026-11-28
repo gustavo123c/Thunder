@@ -5,6 +5,8 @@ import { colorScheme } from 'nativewind';
 import { Alert, type AlertButton } from 'react-native';
 
 import SettingsScreen from '@/app/settings';
+import { revokeHealthConsent } from '@/features/profile/api/health-consent.api';
+import { fetchProfile } from '@/features/profile/api/profile.api';
 import { deleteAllWorkouts, fetchRecentWorkouts } from '@/features/workouts/api/workouts.api';
 import { AppThemeProvider } from '@/theme/AppThemeProvider';
 
@@ -19,6 +21,11 @@ jest.mock('@/features/auth', () => ({
   useUserId: () => 'u1',
 }));
 jest.mock('@/services/supabase/client', () => ({ supabase: {} }));
+jest.mock('@/features/profile/api/profile.api', () => ({ fetchProfile: jest.fn() }));
+jest.mock('@/features/profile/api/health-consent.api', () => ({
+  grantHealthConsent: jest.fn(),
+  revokeHealthConsent: jest.fn(),
+}));
 jest.mock('@/features/workouts/api/workouts.api', () => ({
   fetchRecentWorkouts: jest.fn(),
   deleteAllWorkouts: jest.fn(),
@@ -43,7 +50,27 @@ beforeEach(async () => {
   jest.spyOn(colorScheme, 'set').mockImplementation(() => undefined);
   jest.mocked(fetchRecentWorkouts).mockResolvedValue([]);
   jest.mocked(deleteAllWorkouts).mockResolvedValue(undefined);
+  jest.mocked(fetchProfile).mockResolvedValue(profileWith(null));
+  jest.mocked(revokeHealthConsent).mockResolvedValue(undefined);
 });
+
+function profileWith(healthConsentAt: string | null) {
+  return {
+    id: 'u1',
+    username: 'corredor',
+    fullName: null,
+    avatarUrl: null,
+    level: null,
+    weightKg: null,
+    heightCm: null,
+    birthDate: null,
+    mainGoal: null,
+    goalTargetPaceSPerKm: null,
+    onboardedAt: '2026-11-25T10:00:00Z',
+    sex: null,
+    healthConsentAt,
+  };
+}
 afterEach(() => queryClient.clear());
 
 it('keeps content below the iOS header and switches the appearance', async () => {
@@ -91,4 +118,26 @@ it('disables delete-all when there is nothing saved', async () => {
   expect(
     screen.queryByRole('button', { name: 'Apagar todos os treinos salvos' }),
   ).not.toBeOnTheScreen();
+});
+
+it('hides health features until consent and revokes after confirming', async () => {
+  const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+  await renderSettings();
+  expect(
+    await screen.findByRole('button', { name: 'Autorizar uso de dados de saúde' }),
+  ).toBeOnTheScreen();
+  expect(screen.queryByRole('button', { name: 'Questionário de saúde' })).not.toBeOnTheScreen();
+
+  queryClient.clear();
+  jest.mocked(fetchProfile).mockResolvedValue(profileWith('2026-12-01T10:00:00Z'));
+  await renderSettings();
+  await userEvent
+    .setup()
+    .press(await screen.findByRole('button', { name: 'Revogar e apagar dados de saúde' }));
+  const [title, , buttons] = alert.mock.calls.at(-1) ?? [];
+  expect(title).toBe('Revogar o uso de dados de saúde?');
+  expect(revokeHealthConsent).not.toHaveBeenCalled();
+  (buttons as AlertButton[]).find((b) => b.text === 'Revogar e apagar')?.onPress?.();
+  await waitFor(() => expect(revokeHealthConsent).toHaveBeenCalled());
+  alert.mockRestore();
 });

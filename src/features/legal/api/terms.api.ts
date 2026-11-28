@@ -21,13 +21,15 @@ export type AcceptTermsInput = {
   birthDate: string;
   /** Required between 12 and 17. */
   guardian: { name: string; email: string } | null;
+  /** Optional consent to use health data; also stored on the profile. */
+  healthConsent: boolean;
 };
 
 export async function acceptTerms(userId: string, input: AcceptTermsInput): Promise<void> {
   const { error } = await supabase.from('terms_acceptances').insert({
     user_id: userId,
     terms_version: TERMS_VERSION,
-    health_data_consent: true,
+    health_data_consent: input.healthConsent,
     age_statement: true,
     birth_date: input.birthDate,
     guardian_name: input.guardian?.name.trim() ?? null,
@@ -35,4 +37,10 @@ export async function acceptTerms(userId: string, input: AcceptTermsInput): Prom
   });
   // Already accepted (e.g. a retry after a lost response): nothing left to do.
   if (error && error.code !== '23505') throw error;
+  if (!input.healthConsent) return;
+  const { error: consentError } = await supabase
+    .from('profiles')
+    .update({ health_consent_at: new Date().toISOString() })
+    .eq('id', userId);
+  if (consentError) throw consentError;
 }

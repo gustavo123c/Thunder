@@ -44,6 +44,7 @@ EXPO_OFFLINE=1 npx expo install <pkg>   # api.expo.dev is blocked in some sandbo
 
 - Migrations are idempotent (`create … if not exists`, `drop policy if exists`, `create or replace`) because the owner pastes them into the hosted SQL editor, which has no transaction. Every table has RLS + explicit grants (column-level for updates).
 - RPCs are `SECURITY INVOKER` so RLS applies; the `SECURITY DEFINER` exceptions are small helpers (`can_view_run_row`, `is_group_member`, `owns_group`, `shares_group_with`, `owns_run`) and `join_group` (only ever adds the caller). Run visibility: own, `public`, or `followers` when you follow the author **or share a group**; `private` never appears in groups.
+- Health data (pains, `health_anamnese`, `run_feedback`) needs the optional consent in `profiles.health_consent_at`; without it the app hides the pain map, questionnaire and post-run feedback. `revoke_health_consent()` deletes that data. Minimum age is 12 (checked in `terms_acceptances`).
 - `src/services/supabase/database.types.ts` is hand-written — update it with schema changes. RPC JSON is parsed defensively in `services/supabase/*-json.ts`.
 - Query keys: run-related queries live under the `['runs']` prefix (feed, activity, details) so invalidating `['runs']` after upload/delete refreshes streaks, dashboard and feed; group queries under `['groups']`, pains under `['pains', userId]`.
 

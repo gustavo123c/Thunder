@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useUserId } from '@/features/auth';
+import { useProfile } from '@/features/profile';
 import { RunMediaSection } from '@/features/media';
 import { RunCelebration } from '@/features/progress';
 import { RunDetailView } from '@/features/run-history';
@@ -20,6 +21,9 @@ export default function RunDetailScreen() {
   const activeWorkout = currentActiveWorkout(useActiveWorkoutStore((s) => s.active));
   const clearWorkout = useActiveWorkoutStore((s) => s.clear);
   const [showFeedback, setShowFeedback] = useState(false);
+  const { data: profile } = useProfile(userId);
+  // Post-run feedback and the pain check-in are health data: only with consent.
+  const healthConsent = Boolean(profile?.healthConsentAt);
 
   // Shown once, right after finishing a run (RecordView navigates with ?celebrate=1).
   const celebrating = celebrate === '1';
@@ -51,13 +55,13 @@ export default function RunDetailScreen() {
       />
       {celebrating ? (
         <RunCelebration userId={userId} runId={id} visible onClose={closeCelebration}>
-          {activeWorkout?.forPain ? (
+          {activeWorkout?.forPain && healthConsent ? (
             <WorkoutCheckIn userId={userId} workoutId={activeWorkout.id} runId={id} />
           ) : null}
         </RunCelebration>
       ) : null}
       <PostWorkoutFeedback
-        visible={showFeedback}
+        visible={showFeedback && healthConsent}
         runId={id}
         userId={userId}
         recentPaceSPerKm={null}

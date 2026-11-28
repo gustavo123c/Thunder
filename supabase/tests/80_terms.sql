@@ -18,10 +18,9 @@ select pg_temp.expect_error(
     values ('aaaaaaaa-0000-0000-0000-000000000001', '2026-11-28', true, true, '1990-05-10')$$, '23505');
 select pg_temp.check(true, 'one acceptance per user and version');
 
-select pg_temp.expect_error(
-  $$insert into public.terms_acceptances (user_id, terms_version, health_data_consent, age_statement, birth_date)
-    values ('aaaaaaaa-0000-0000-0000-000000000001', '2027-01-01', false, true, '1990-05-10')$$, '23514');
-select pg_temp.check(true, 'health data consent must be given');
+insert into public.terms_acceptances (user_id, terms_version, health_data_consent, age_statement, birth_date)
+values ('aaaaaaaa-0000-0000-0000-000000000001', '2027-01-01', false, true, '1990-05-10');
+select pg_temp.check(true, 'terms can be accepted without health data consent');
 
 select pg_temp.expect_error(
   $$insert into public.terms_acceptances (user_id, terms_version, health_data_consent, age_statement)

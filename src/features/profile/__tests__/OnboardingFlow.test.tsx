@@ -31,6 +31,7 @@ const newProfile: Profile = {
   mainGoal: null,
   goalTargetPaceSPerKm: null,
   onboardedAt: null,
+  healthConsentAt: null,
   sex: null,
 };
 
@@ -66,6 +67,7 @@ it('walks through the four steps and completes onboarding', async () => {
     ...newProfile,
     ...update,
     onboardedAt: '2026-11-25T10:00:00Z',
+    healthConsentAt: null,
   }));
   await renderFlow();
 

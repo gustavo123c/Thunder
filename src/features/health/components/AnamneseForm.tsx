@@ -1,13 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import {
   type AnamneseDraft,
@@ -126,7 +119,10 @@ export function AnamneseForm({ initial, onSave, onDelete, onSkip }: AnamneseForm
     setDraft((prev) => ({ ...prev, [key]: value }));
   }
 
-  function toggleStringArray(key: 'currentInjuries' | 'pastInjuries' | 'healthConditions', val: string) {
+  function toggleStringArray(
+    key: 'currentInjuries' | 'pastInjuries' | 'healthConditions',
+    val: string,
+  ) {
     setDraft((prev) => {
       const arr = prev[key];
       return {
@@ -180,7 +176,10 @@ export function AnamneseForm({ initial, onSave, onDelete, onSkip }: AnamneseForm
       <View className="gap-3">
         <SectionTitle>Experiência com corrida</SectionTitle>
         <ChipRow
-          options={EXPERIENCE_OPTIONS.map((e) => ({ value: e, label: RUNNING_EXPERIENCE_LABELS[e] }))}
+          options={EXPERIENCE_OPTIONS.map((e) => ({
+            value: e,
+            label: RUNNING_EXPERIENCE_LABELS[e],
+          }))}
           selected={draft.runningExperience ? [draft.runningExperience] : []}
           onToggle={(val) => set('runningExperience', val as RunningExperience)}
           multi={false}
@@ -301,9 +300,7 @@ export function AnamneseForm({ initial, onSave, onDelete, onSkip }: AnamneseForm
         </Text>
       </Pressable>
 
-      {error ? (
-        <Text className="text-sm text-danger">{error}</Text>
-      ) : null}
+      {error ? <Text className="text-sm text-danger">{error}</Text> : null}
 
       {/* Save */}
       <Pressable
@@ -314,7 +311,9 @@ export function AnamneseForm({ initial, onSave, onDelete, onSkip }: AnamneseForm
         {saving ? (
           <ActivityIndicator color="#000" />
         ) : (
-          <Text className={`font-mono-medium text-sm uppercase tracking-wider ${canSave ? 'text-onbolt' : 'text-ink-400'}`}>
+          <Text
+            className={`font-mono-medium text-sm uppercase tracking-wider ${canSave ? 'text-onbolt' : 'text-ink-400'}`}
+          >
             Salvar
           </Text>
         )}
@@ -327,11 +326,7 @@ export function AnamneseForm({ initial, onSave, onDelete, onSkip }: AnamneseForm
       ) : null}
 
       {onDelete ? (
-        <Pressable
-          onPress={handleDelete}
-          disabled={deleting}
-          className="items-center py-2"
-        >
+        <Pressable onPress={handleDelete} disabled={deleting} className="items-center py-2">
           {deleting ? (
             <ActivityIndicator size="small" color={colors.danger} />
           ) : (

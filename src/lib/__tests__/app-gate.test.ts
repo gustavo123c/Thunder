@@ -5,6 +5,8 @@ const base = {
   hasSession: true,
   profileStatus: 'success' as const,
   profile: { onboardedAt: '2026-11-25T10:00:00Z' },
+  termsStatus: 'success' as const,
+  termsAccepted: true as boolean | undefined,
 };
 
 describe('resolveAppGate', () => {
@@ -30,5 +32,21 @@ describe('resolveAppGate', () => {
   it('reports an error only when there is no cached profile', () => {
     expect(resolveAppGate({ ...base, profileStatus: 'error', profile: undefined })).toBe('error');
     expect(resolveAppGate({ ...base, profileStatus: 'error' })).toBe('ready');
+  });
+
+  it('asks for the current terms before onboarding or the app', () => {
+    expect(resolveAppGate({ ...base, termsAccepted: false })).toBe('terms');
+    expect(resolveAppGate({ ...base, termsAccepted: false, profile: { onboardedAt: null } })).toBe(
+      'terms',
+    );
+  });
+
+  it('waits for the terms check and reports when it fails', () => {
+    expect(resolveAppGate({ ...base, termsStatus: 'pending', termsAccepted: undefined })).toBe(
+      'loading',
+    );
+    expect(resolveAppGate({ ...base, termsStatus: 'error', termsAccepted: undefined })).toBe(
+      'error',
+    );
   });
 });

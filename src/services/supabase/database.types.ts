@@ -416,6 +416,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      terms_acceptances: {
+        Row: {
+          id: string;
+          user_id: string;
+          terms_version: string;
+          health_data_consent: boolean;
+          age_statement: boolean;
+          accepted_at: string;
+        };
+        Insert: {
+          user_id: string;
+          terms_version: string;
+          health_data_consent: boolean;
+          age_statement: boolean;
+        };
+        Update: { [_ in never]: never };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {

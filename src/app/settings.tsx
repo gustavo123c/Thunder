@@ -175,6 +175,11 @@ export default function SettingsScreen() {
 
       <Section title="Sobre">
         <Row icon="flash-outline" label="Thunder" detail={`versão ${version}`} />
+        <Row
+          icon="document-text-outline"
+          label="Termos de Uso"
+          onPress={() => router.push('/terms')}
+        />
         <View className="gap-2 px-3 py-2">
           <Text className="font-mono-medium text-xs uppercase tracking-wider text-ink-400">
             Créditos e licenças

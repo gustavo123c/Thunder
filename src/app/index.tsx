@@ -9,6 +9,8 @@ export default function Index() {
   switch (gate) {
     case 'signed_out':
       return <Redirect href="/sign-in" />;
+    case 'terms':
+      return <Redirect href="/accept-terms" />;
     case 'onboarding':
       return <Redirect href="/onboarding" />;
     case 'ready':

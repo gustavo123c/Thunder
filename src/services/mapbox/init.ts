@@ -12,5 +12,8 @@ export function initMapbox(): void {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const Mapbox = (require('@rnmapbox/maps') as typeof import('@rnmapbox/maps')).default;
   void Mapbox.setAccessToken(env.mapboxAccessToken);
+  // The Terms of Use promise no location collection outside a run; Mapbox telemetry
+  // would send location and usage events to Mapbox on its own.
+  Mapbox.setTelemetryEnabled(false);
   initialized = true;
 }

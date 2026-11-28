@@ -22,7 +22,7 @@ void SplashScreen.preventAutoHideAsync();
 initMapbox();
 
 function RootNavigator() {
-  const { gate, profileQuery } = useAppGate();
+  const { gate, profileQuery, termsQuery } = useAppGate();
   const signOut = useSignOut();
 
   useEffect(() => {
@@ -42,8 +42,11 @@ function RootNavigator() {
         }
         primaryAction={{
           label: 'Tentar novamente',
-          onPress: () => void profileQuery.refetch(),
-          loading: profileQuery.isFetching,
+          onPress: () => {
+            void profileQuery.refetch();
+            void termsQuery.refetch();
+          },
+          loading: profileQuery.isFetching || termsQuery.isFetching,
         }}
         secondaryAction={{ label: 'Sair', onPress: () => signOut.mutate() }}
       />
@@ -54,6 +57,10 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={gate === 'signed_out'}>
         <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={gate === 'terms'}>
+        <Stack.Screen name="accept-terms" options={{ gestureEnabled: false }} />
       </Stack.Protected>
 
       <Stack.Protected guard={gate === 'onboarding'}>
@@ -101,6 +108,10 @@ function RootNavigator() {
         <Stack.Screen
           name="sources"
           options={{ headerShown: true, title: 'Base científica', headerBackTitle: 'Voltar' }}
+        />
+        <Stack.Screen
+          name="terms"
+          options={{ headerShown: true, title: 'Termos de Uso', headerBackTitle: 'Voltar' }}
         />
         <Stack.Screen
           name="settings"

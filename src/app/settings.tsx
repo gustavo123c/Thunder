@@ -7,7 +7,8 @@ import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { Card } from '@/components/ui/Card';
 import { HealthDisclaimer } from '@/components/ui/HealthDisclaimer';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
-import { useAuth, useSignOut } from '@/features/auth';
+import { useAuth, useSignOut, useUserId } from '@/features/auth';
+import { useDeleteAllWorkouts, useRecentWorkouts } from '@/features/workouts';
 import { useThemePreference } from '@/theme/AppThemeProvider';
 import { type ThemePreference, useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
@@ -40,6 +41,7 @@ function Row({
   return (
     <Pressable
       accessibilityRole={onPress ? 'button' : undefined}
+      accessibilityLabel={label}
       disabled={!onPress}
       onPress={onPress}
       className="flex-row items-center gap-3 rounded-xl px-3 py-3 active:bg-ink-700"
@@ -84,6 +86,10 @@ function AppearancePicker() {
 export default function SettingsScreen() {
   const { session } = useAuth();
   const signOut = useSignOut();
+  const userId = useUserId();
+  const savedWorkouts = useRecentWorkouts(userId);
+  const deleteAll = useDeleteAllWorkouts(userId);
+  const savedCount = savedWorkouts.data?.length ?? 0;
   const version = Constants.expoConfig?.version ?? '—';
 
   function confirmSignOut() {
@@ -91,6 +97,25 @@ export default function SettingsScreen() {
       { text: 'Cancelar', style: 'cancel' },
       { text: 'Sair', style: 'destructive', onPress: () => signOut.mutate() },
     ]);
+  }
+
+  function confirmDeleteAll() {
+    Alert.alert(
+      'Apagar todos os treinos salvos?',
+      'Os treinos montados na aba Treino e os check-ins deles serão apagados. Suas corridas continuam no Histórico. Essa ação não pode ser desfeita.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Apagar todos',
+          style: 'destructive',
+          onPress: () =>
+            deleteAll.mutate(undefined, {
+              onError: () =>
+                Alert.alert('Não foi possível apagar', 'Verifique sua conexão e tente de novo.'),
+            }),
+        },
+      ],
+    );
   }
 
   return (
@@ -117,6 +142,16 @@ export default function SettingsScreen() {
           onPress={() => router.push('/anamnese')}
         />
         <Row icon="log-out-outline" label="Sair" onPress={confirmSignOut} destructive />
+      </Section>
+
+      <Section title="Treinos">
+        <Row
+          icon="trash-outline"
+          label="Apagar todos os treinos salvos"
+          detail={savedCount === 0 ? 'Nenhum treino salvo' : undefined}
+          onPress={savedCount > 0 && !deleteAll.isPending ? confirmDeleteAll : undefined}
+          destructive={savedCount > 0}
+        />
       </Section>
 
       <Section title="Ajuda">

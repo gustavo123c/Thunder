@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
+import { Alert, type AlertButton } from 'react-native';
 
 import { PainHistoryView, PainMapSection } from '@/features/health';
 import {
@@ -16,6 +17,7 @@ import {
   saveWorkout,
   saveWorkoutFeedback,
   type SavedWorkout,
+  deleteWorkout,
 } from '../api/workouts.api';
 import { WorkoutBuilder } from '../components/WorkoutBuilder';
 import { WorkoutCheckIn } from '../components/WorkoutCheckIn';
@@ -118,6 +120,38 @@ describe('WorkoutBuilder', () => {
       expect.objectContaining({ sessionType: 'tempo' }),
       'w-new',
     );
+  });
+
+  it('deletes a saved workout only after confirming', async () => {
+    const user = userEvent.setup();
+    jest.mocked(fetchRecentWorkouts).mockResolvedValue([
+      {
+        id: 'w-old',
+        createdAt: '2026-11-20T10:00:00Z',
+        generator: 'rules',
+        plan: { title: 'Rodagem leve', totalMinutes: 30, blocks: [] } as never,
+        painRegions: [],
+        feedback: null,
+      },
+    ]);
+    jest.mocked(deleteWorkout).mockResolvedValue(undefined);
+    useActiveWorkoutStore.getState().start({ id: 'w-old', title: 'Rodagem leve', forPain: false });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    await renderWithQuery(
+      <WorkoutBuilder userId="u1" defaultLevel="beginner" pains={[]} recentPaceSPerKm={null} />,
+    );
+
+    await user.press(await screen.findByRole('button', { name: /Treinos salvos · 1/ }));
+    await user.press(screen.getByRole('button', { name: 'Apagar treino Rodagem leve' }));
+    const [title, message, buttons] = alert.mock.calls[0] ?? [];
+    expect(title).toBe('Apagar este treino?');
+    expect(message).toBe('Essa ação não pode ser desfeita.');
+    expect(deleteWorkout).not.toHaveBeenCalled();
+
+    (buttons as AlertButton[]).find((b) => b.text === 'Apagar')?.onPress?.();
+    await waitFor(() => expect(deleteWorkout).toHaveBeenCalledWith('w-old', expect.anything()));
+    await waitFor(() => expect(useActiveWorkoutStore.getState().active).toBeNull());
+    alert.mockRestore();
   });
 
   it('gives a long run enough time', async () => {

@@ -91,3 +91,9 @@ export async function deleteWorkout(id: string): Promise<void> {
   const { error } = await supabase.from('generated_workouts').delete().eq('id', id);
   if (error) throw error;
 }
+
+/** Removes every saved workout of the user (RLS limits it to their own rows anyway). */
+export async function deleteAllWorkouts(userId: string): Promise<void> {
+  const { error } = await supabase.from('generated_workouts').delete().eq('user_id', userId);
+  if (error) throw error;
+}

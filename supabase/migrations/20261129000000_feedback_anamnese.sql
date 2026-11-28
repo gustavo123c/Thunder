@@ -62,6 +62,7 @@ create policy anamnese_delete_own on public.health_anamnese
 
 grant select, insert, update, delete on public.health_anamnese to authenticated;
 
+drop trigger if exists anamnese_set_updated_at on public.health_anamnese;
 create trigger anamnese_set_updated_at
   before update on public.health_anamnese
   for each row execute function public.set_updated_at();

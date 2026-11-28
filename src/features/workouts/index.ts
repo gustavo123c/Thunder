@@ -7,3 +7,4 @@ export { type TrainingStep, TrainingStepper } from './components/TrainingStepper
 export { PostWorkoutFeedback } from './components/PostWorkoutFeedback';
 export { WorkoutBuilder } from './components/WorkoutBuilder';
 export { WorkoutCheckIn } from './components/WorkoutCheckIn';
+export { useDeleteAllWorkouts, useRecentWorkouts } from './hooks/useWorkouts';

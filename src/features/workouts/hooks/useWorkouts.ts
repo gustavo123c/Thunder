@@ -6,7 +6,9 @@ import {
   type WorkoutRequest,
 } from '@/domain/training/workout-generator';
 
+import { useActiveWorkoutStore } from '../active-workout.store';
 import {
+  deleteAllWorkouts,
   deleteWorkout,
   fetchRecentWorkouts,
   newWorkoutId,
@@ -46,6 +48,20 @@ export function useDeleteWorkout(userId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteWorkout,
+    onSuccess: (_, id) => {
+      // A deleted workout can't be the one the next run checks in against.
+      const { active, clear } = useActiveWorkoutStore.getState();
+      if (active?.id === id) clear();
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: workoutKeys.recent(userId) }),
+  });
+}
+
+export function useDeleteAllWorkouts(userId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => deleteAllWorkouts(userId),
+    onSuccess: () => useActiveWorkoutStore.getState().clear(),
     onSettled: () => queryClient.invalidateQueries({ queryKey: workoutKeys.recent(userId) }),
   });
 }

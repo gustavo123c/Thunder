@@ -427,7 +427,7 @@ export function WorkoutBuilder({
 
       {saved.length > 0 ? (
         <DisclosureRow
-          label={`Treinos salvos · ${Math.min(saved.length, 5)}`}
+          label={`Treinos salvos · ${saved.length}`}
           icon="document-text-outline"
           open={savedOpen}
           onPress={() => setSavedOpen((v) => !v)}
@@ -435,34 +435,48 @@ export function WorkoutBuilder({
       ) : null}
       {saved.length > 0 && savedOpen ? (
         <View className="-mt-3 gap-2.5">
-          {saved.slice(0, 5).map((workout) => (
-            <Pressable
+          {saved.map((workout) => (
+            <View
               key={workout.id}
-              accessibilityRole="button"
-              accessibilityHint="Toque para abrir, segure para apagar"
-              onPress={() => setCurrent({ id: workout.id, plan: workout.plan })}
-              onLongPress={() =>
-                Alert.alert('Apagar treino salvo?', undefined, [
-                  { text: 'Cancelar', style: 'cancel' },
-                  {
-                    text: 'Apagar',
-                    style: 'destructive',
-                    onPress: () => remove.mutate(workout.id),
-                  },
-                ])
-              }
-              className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4 active:opacity-80"
+              className="flex-row items-center gap-1 rounded-[20px] border border-hairline bg-ink-800 py-2 pl-4 pr-2"
             >
-              <RecentIcon />
-              <View className="flex-1 gap-0.5">
-                <Text className="font-bold text-ink-50">{workout.plan.title}</Text>
-                <Text className="text-xs text-ink-400">
-                  {workout.plan.totalMinutes} min · {formatRunDate(workout.createdAt)}
-                  {workout.feedback ? ` · ${FEEDBACK_LABEL[workout.feedback]}` : ''}
-                </Text>
-              </View>
-              <ChevronIcon />
-            </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Abrir treino ${workout.plan.title}`}
+                onPress={() => setCurrent({ id: workout.id, plan: workout.plan })}
+                className="flex-1 flex-row items-center gap-3 py-2 active:opacity-70"
+              >
+                <RecentIcon />
+                <View className="flex-1 gap-0.5">
+                  <Text className="font-bold text-ink-50">{workout.plan.title}</Text>
+                  <Text className="text-xs text-ink-400">
+                    {workout.plan.totalMinutes} min · {formatRunDate(workout.createdAt)}
+                    {workout.feedback ? ` · ${FEEDBACK_LABEL[workout.feedback]}` : ''}
+                  </Text>
+                </View>
+              </Pressable>
+              <TrashButton
+                label={`Apagar treino ${workout.plan.title}`}
+                disabled={remove.isPending}
+                onPress={() =>
+                  Alert.alert('Apagar este treino?', 'Essa ação não pode ser desfeita.', [
+                    { text: 'Cancelar', style: 'cancel' },
+                    {
+                      text: 'Apagar',
+                      style: 'destructive',
+                      onPress: () =>
+                        remove.mutate(workout.id, {
+                          onError: () =>
+                            Alert.alert(
+                              'Não foi possível apagar',
+                              'Verifique sua conexão e tente de novo.',
+                            ),
+                        }),
+                    },
+                  ])
+                }
+              />
+            </View>
           ))}
         </View>
       ) : null}
@@ -512,6 +526,30 @@ function RecentIcon() {
     <View className="h-10 w-10 items-center justify-center rounded-full bg-ink-700">
       <Ionicons name="document-text-outline" size={18} color={theme.ink[200]} />
     </View>
+  );
+}
+
+function TrashButton({
+  label,
+  disabled,
+  onPress,
+}: {
+  label: string;
+  disabled: boolean;
+  onPress: () => void;
+}) {
+  const theme = useThemeColors();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      hitSlop={10}
+      disabled={disabled}
+      onPress={onPress}
+      className="h-9 w-9 items-center justify-center rounded-full active:bg-ink-700"
+    >
+      <Ionicons name="trash-outline" size={18} color={theme.ink[400]} />
+    </Pressable>
   );
 }
 

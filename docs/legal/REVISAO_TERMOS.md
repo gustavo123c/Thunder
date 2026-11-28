@@ -47,9 +47,12 @@ app e transferência internacional não especificada.
    se basta para adolescentes ou se convém confirmar por e-mail com o responsável. A data
    de nascimento é informada pela própria pessoa (sem checagem de documento).
 
-4. **Exclusão de conta.** Só existe por e-mail. A LGPD aceita (art. 18, VI), mas a App Store
-   (diretriz 5.1.1(v)) e o Google Play exigem exclusão de conta **dentro do app** para apps
-   com cadastro. Sem isso, o app pode ser recusado nas lojas.
+4. **Exclusão de conta. — Resolvido (versão 2026-12-01).** Perfil > Configurações >
+   Excluir conta, com dupla confirmação. O app apaga fotos, vídeos e avatar pelo Storage e
+   depois o usuário; todas as tabelas apagam em cascata (testado em
+   `supabase/tests/95_delete_account.sql`). **Para o advogado:** o registro de aceite dos
+   termos também é apagado junto com a conta. Se quiser guardá-lo como prova após a exclusão
+   (ver ponto 6), é preciso mudar a regra e informar isso no texto.
 
 ## Pontos importantes
 
@@ -58,13 +61,14 @@ app e transferência internacional não especificada.
    confirmar a região do projeto Supabase (há opção em São Paulo) e indicar o mecanismo
    (cláusulas-padrão contratuais dos fornecedores). Se tudo ficar no Brasil, simplificar.
 
-6. **Prazo de guarda do registro de aceite.** Está como `[definir prazo]`. Sugestão para o
-   advogado avaliar: enquanto a conta existir e por 5 anos após o encerramento (prazo do
-   CDC, art. 27), apenas para defesa em processo.
+6. **Prazo de guarda do registro de aceite.** Hoje o registro existe enquanto a conta
+   existir e é apagado com ela (o texto diz isso). Avaliar se convém mantê-lo por 5 anos após
+   a exclusão (CDC, art. 27), apenas para defesa em processo; nesse caso, ajustar a regra no
+   banco e o texto.
 
-7. **Dados que não podem ser apagados no app.** Histórico de dores e avaliações pós-treino
-   só saem por e-mail. O texto foi ajustado para não prometer o contrário, mas o ideal é ter
-   a opção no app, junto com o questionário de saúde.
+7. **Dados apagáveis no app.** Resolvido: revogar o consentimento apaga dores, questionário
+   e avaliações pós-treino, e a exclusão de conta apaga tudo. Continua por e-mail apenas a
+   cópia dos dados (portabilidade).
 
 8. **Prova do texto aceito.** O banco guarda a versão, não o texto. É preciso arquivar cada
    versão publicada (por exemplo, em `docs/legal/versoes/`) para provar o que foi aceito.

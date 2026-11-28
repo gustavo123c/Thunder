@@ -7,7 +7,7 @@ import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { Card } from '@/components/ui/Card';
 import { HealthDisclaimer } from '@/components/ui/HealthDisclaimer';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
-import { useAuth, useSignOut, useUserId } from '@/features/auth';
+import { useAuth, useDeleteAccount, useSignOut, useUserId } from '@/features/auth';
 import { useHealthConsent, useProfile } from '@/features/profile';
 import { useDeleteAllWorkouts, useRecentWorkouts } from '@/features/workouts';
 import { useThemePreference } from '@/theme/AppThemeProvider';
@@ -88,6 +88,7 @@ export default function SettingsScreen() {
   const { session } = useAuth();
   const signOut = useSignOut();
   const userId = useUserId();
+  const deleteAccount = useDeleteAccount(userId);
   const savedWorkouts = useRecentWorkouts(userId);
   const deleteAll = useDeleteAllWorkouts(userId);
   const savedCount = savedWorkouts.data?.length ?? 0;
@@ -101,6 +102,36 @@ export default function SettingsScreen() {
       { text: 'Cancelar', style: 'cancel' },
       { text: 'Sair', style: 'destructive', onPress: () => signOut.mutate() },
     ]);
+  }
+
+  function confirmDeleteAccount() {
+    Alert.alert(
+      'Excluir sua conta?',
+      'Vamos apagar seu perfil, corridas, fotos e vídeos, dores, questionário de saúde, treinos, grupos que você criou, comentários e curtidas. Essa ação não pode ser desfeita.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Continuar',
+          style: 'destructive',
+          onPress: () =>
+            Alert.alert('Excluir definitivamente?', 'Você será desconectado em seguida.', [
+              { text: 'Cancelar', style: 'cancel' },
+              {
+                text: 'Excluir conta',
+                style: 'destructive',
+                onPress: () =>
+                  deleteAccount.mutate(undefined, {
+                    onError: () =>
+                      Alert.alert(
+                        'Não foi possível excluir a conta',
+                        'Verifique sua conexão e tente de novo. Se o problema continuar, fale com a gente pelo e-mail de contato dos Termos de Uso.',
+                      ),
+                  }),
+              },
+            ]),
+        },
+      ],
+    );
   }
 
   function confirmDeleteAll() {
@@ -141,6 +172,12 @@ export default function SettingsScreen() {
           onPress={() => router.push('/profile/edit')}
         />
         <Row icon="log-out-outline" label="Sair" onPress={confirmSignOut} destructive />
+        <Row
+          icon="person-remove-outline"
+          label={deleteAccount.isPending ? 'Excluindo conta…' : 'Excluir conta'}
+          onPress={deleteAccount.isPending ? undefined : confirmDeleteAccount}
+          destructive
+        />
       </Section>
 
       <Section title="Dados de saúde">

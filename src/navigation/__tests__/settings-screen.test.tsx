@@ -19,7 +19,9 @@ jest.mock('@/features/auth', () => ({
   useAuth: () => ({ session: { user: { email: 'corredor@example.com' } } }),
   useSignOut: () => ({ mutate: jest.fn() }),
   useUserId: () => 'u1',
+  useDeleteAccount: () => mockDeleteAccount,
 }));
+const mockDeleteAccount = { mutate: jest.fn(), isPending: false };
 jest.mock('@/services/supabase/client', () => ({ supabase: {} }));
 jest.mock('@/features/profile/api/profile.api', () => ({ fetchProfile: jest.fn() }));
 jest.mock('@/features/profile/api/health-consent.api', () => ({
@@ -139,5 +141,22 @@ it('hides health features until consent and revokes after confirming', async () 
   expect(revokeHealthConsent).not.toHaveBeenCalled();
   (buttons as AlertButton[]).find((b) => b.text === 'Revogar e apagar')?.onPress?.();
   await waitFor(() => expect(revokeHealthConsent).toHaveBeenCalled());
+  alert.mockRestore();
+});
+
+it('deletes the account only after two confirmations', async () => {
+  const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+  await renderSettings();
+  await userEvent.setup().press(await screen.findByRole('button', { name: 'Excluir conta' }));
+
+  const [title, , first] = alert.mock.calls.at(-1) ?? [];
+  expect(title).toBe('Excluir sua conta?');
+  (first as AlertButton[]).find((b) => b.text === 'Continuar')?.onPress?.();
+  expect(mockDeleteAccount.mutate).not.toHaveBeenCalled();
+
+  const [secondTitle, , second] = alert.mock.calls.at(-1) ?? [];
+  expect(secondTitle).toBe('Excluir definitivamente?');
+  (second as AlertButton[]).find((b) => b.text === 'Excluir conta')?.onPress?.();
+  expect(mockDeleteAccount.mutate).toHaveBeenCalled();
   alert.mockRestore();
 });

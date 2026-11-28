@@ -32,6 +32,28 @@ export async function removeFiles(bucket: Bucket, paths: string[]): Promise<void
   if (error) throw error;
 }
 
+/** Every file under `{userId}/` in both buckets (avatars: one level; run media: two). */
+export async function listUserFiles(userId: string): Promise<Record<Bucket, string[]>> {
+  const list = async (bucket: Bucket, folder: string) => {
+    const { data, error } = await supabase.storage.from(bucket).list(folder, { limit: 1000 });
+    if (error) throw error;
+    return data ?? [];
+  };
+  // Folders come back with a null id.
+  const avatars = (await list(BUCKETS.avatars, userId))
+    .filter((item) => item.id !== null)
+    .map((item) => `${userId}/${item.name}`);
+  const media: string[] = [];
+  for (const runFolder of await list(BUCKETS.workoutMedia, userId)) {
+    if (runFolder.id !== null) continue;
+    const prefix = `${userId}/${runFolder.name}`;
+    for (const file of await list(BUCKETS.workoutMedia, prefix)) {
+      if (file.id !== null) media.push(`${prefix}/${file.name}`);
+    }
+  }
+  return { [BUCKETS.avatars]: avatars, [BUCKETS.workoutMedia]: media };
+}
+
 export function publicUrl(bucket: Bucket, path: string): string {
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }

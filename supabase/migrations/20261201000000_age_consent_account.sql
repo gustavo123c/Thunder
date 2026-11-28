@@ -68,3 +68,30 @@ $$;
 
 revoke execute on function public.revoke_health_consent() from public, anon;
 grant execute on function public.revoke_health_consent() to authenticated;
+
+-- -----------------------------------------------------------------------------
+-- In-app account deletion (LGPD art. 18, VI; App Store 5.1.1(v); Google Play).
+-- Deletes the caller's auth user; every table cascades from it. Storage files
+-- (avatar, run photos/videos) are removed by the app through the Storage API
+-- before calling this, because Supabase blocks deleting storage rows in SQL.
+-- SECURITY DEFINER because auth.users is not writable by `authenticated`; it
+-- only ever deletes the caller.
+-- -----------------------------------------------------------------------------
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  uid uuid := (select auth.uid());
+begin
+  if uid is null then
+    raise exception 'not authenticated' using errcode = '42501';
+  end if;
+  delete from auth.users where id = uid;
+end;
+$$;
+
+revoke execute on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;

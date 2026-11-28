@@ -452,6 +452,7 @@ export type Database = {
       };
       finish_run: { Args: { payload: Json }; Returns: string };
       revoke_health_consent: { Args: Record<string, never>; Returns: undefined };
+      delete_my_account: { Args: Record<string, never>; Returns: undefined };
       list_user_runs: {
         Args: { p_user_id: string; p_before?: string; p_before_id?: string; p_limit?: number };
         Returns: Json;

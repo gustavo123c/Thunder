@@ -100,9 +100,9 @@ export const TERMS_SECTIONS: readonly TermsSection[] = [
       'Para que usamos: criar e manter sua conta; registrar e mostrar suas corridas; gerar e adaptar sugestões de treino; permitir a interação com outros corredores conforme a visibilidade que você escolher; manter a segurança do serviço; e cumprir obrigações legais. Não vendemos seus dados.',
       'Bases legais: execução do contrato de uso do app (LGPD, art. 7º, V), seu consentimento específico para dados de saúde (art. 11, I), cumprimento de obrigação legal (art. 7º, II) e exercício regular de direitos (art. 7º, VI).',
       'Com quem compartilhamos: com fornecedores que operam o serviço em nosso nome, apenas no necessário — Supabase (banco de dados, login e armazenamento de arquivos), Mapbox (exibição de mapas) e Expo (entrega de atualizações do app). Alguns desses fornecedores podem armazenar dados fora do Brasil [confirmar a região dos servidores], com as garantias exigidas pela LGPD. Também podemos compartilhar dados quando a lei ou uma autoridade competente exigir.',
-      'Segurança e retenção: usamos controles de acesso para que cada pessoa veja apenas o que lhe é permitido. Mantemos seus dados enquanto sua conta existir. Dados que você apaga no app são removidos dos nossos sistemas ativos; o registro de aceite destes termos é mantido pelo prazo necessário para comprovar o aceite [definir prazo].',
+      'Segurança e retenção: usamos controles de acesso para que cada pessoa veja apenas o que lhe é permitido. Mantemos seus dados enquanto sua conta existir. Dados que você apaga no app são removidos dos nossos sistemas ativos; o registro de aceite destes termos é mantido enquanto a conta existir.',
       'Seus direitos: você pode confirmar se tratamos seus dados, acessá-los, corrigi-los, pedir anonimização, bloqueio ou eliminação, pedir a portabilidade, saber com quem compartilhamos, revogar o consentimento (para dados de saúde, direto no app) e pedir a revisão de decisões automatizadas (LGPD, art. 18 e art. 20).',
-      'Como exercer: no app, você pode editar seu perfil, apagar corridas, fotos, vídeos, comentários, treinos salvos e o questionário de saúde, e marcar dores como resolvidas. Para os demais pedidos, como apagar o histórico de dores e as avaliações após os treinos, receber uma cópia dos seus dados ou excluir a conta, escreva para [e-mail de contato]. Responderemos dentro dos prazos legais. Se a revogação do consentimento para dados de saúde impedir as sugestões adaptadas, avisaremos você.',
+      'Como exercer: no app, você pode editar seu perfil, apagar corridas, fotos, vídeos, comentários e treinos salvos, revogar o uso de dados de saúde (o que apaga dores, questionário e avaliações após os treinos) e excluir a conta, em Perfil > Configurações. Para os demais pedidos, como receber uma cópia dos seus dados, escreva para [e-mail de contato]. Responderemos dentro dos prazos legais.',
       'Você também pode apresentar reclamação à Autoridade Nacional de Proteção de Dados (ANPD).',
     ],
   },
@@ -132,7 +132,7 @@ export const TERMS_SECTIONS: readonly TermsSection[] = [
   {
     title: '13. Encerramento',
     paragraphs: [
-      'Você pode parar de usar o Thunder e pedir a exclusão da conta a qualquer momento pelo [e-mail de contato]. Com a exclusão, apagamos seus dados, exceto o que a lei nos obrigar a guardar.',
+      'Você pode parar de usar o Thunder e excluir sua conta a qualquer momento em Perfil > Configurações > Excluir conta. A exclusão apaga seu perfil, corridas, fotos e vídeos, dados de saúde, treinos, grupos que você criou, comentários e curtidas, e não pode ser desfeita. Se não conseguir excluir pelo app, escreva para [e-mail de contato].',
     ],
   },
   {

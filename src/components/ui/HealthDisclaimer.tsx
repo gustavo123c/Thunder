@@ -7,8 +7,8 @@ import { useThemeColors } from '@/theme/theme';
 type HealthDisclaimerProps = {
   /** Extra emphasis when the user reported pain. */
   withPain?: boolean;
-  /** Collapsible one-line banner (default) or the full text (settings). */
-  variant?: 'banner' | 'full';
+  /** Collapsible banner (default), quiet one-line footnote, or the full text (settings). */
+  variant?: 'banner' | 'footnote' | 'full';
 };
 
 const BODY =
@@ -31,6 +31,31 @@ export function HealthDisclaimer({ withPain = false, variant = 'banner' }: Healt
         <Text className="text-sm text-ink-300">{BODY}</Text>
         <Text className="text-sm font-semibold text-ink-100">{recommendation(withPain)}</Text>
       </View>
+    );
+  }
+
+  if (variant === 'footnote') {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Aviso importante sobre sua saúde"
+        accessibilityState={{ expanded }}
+        accessibilityHint={expanded ? 'Toque para recolher' : 'Toque para ler o aviso completo'}
+        onPress={() => setExpanded((v) => !v)}
+        className="gap-1.5 px-2"
+      >
+        <View className="flex-row items-center justify-center gap-1.5">
+          <Ionicons name="information-circle-outline" size={14} color={theme.ink[400]} />
+          <Text className="text-xs text-ink-400">
+            Sugestões automáticas · não substituem um profissional
+          </Text>
+        </View>
+        {expanded ? (
+          <Text className="text-center text-xs leading-5 text-ink-300">
+            {BODY} {recommendation(withPain)}
+          </Text>
+        ) : null}
+      </Pressable>
     );
   }
 

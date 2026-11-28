@@ -1,7 +1,15 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { BackHandler, KeyboardAvoidingView, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  BackHandler,
+  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { Screen } from '@/components/ui/Screen';
@@ -23,6 +31,10 @@ export default function TrainingScreen() {
   const anamnese = useAnamnese(userId);
   const theme = useThemeColors();
   const [step, setStep] = useState<TrainingStep>('body');
+  const [anamneseDismissed, setAnamneseDismissed] = useState(false);
+  const { height: windowHeight } = useWindowDimensions();
+  // Leaves room for the stepper, title, tab bar and the "continue" button on one screen.
+  const bodyHeight = Math.round(Math.min(420, Math.max(280, windowHeight * 0.46)));
 
   // Android back button / gesture: from the workout step, go back to the check-up first.
   useFocusEffect(
@@ -55,18 +67,6 @@ export default function TrainingScreen() {
       <View className="pb-2 pt-3">
         <TrainingStepper step={step} onChange={setStep} />
       </View>
-      {anamnese.data === null ? (
-        <Pressable
-          onPress={() => router.push('/anamnese')}
-          className="mx-4 mb-2 flex-row items-center gap-3 rounded-2xl border border-hairline bg-ink-800 px-4 py-3 active:opacity-80"
-        >
-          <Ionicons name="medical-outline" size={18} color={theme.ink[300]} />
-          <Text className="flex-1 text-sm text-ink-300">
-            Complete o questionário de saúde para personalizar seus treinos.
-          </Text>
-          <Ionicons name="chevron-forward" size={16} color={theme.ink[500]} />
-        </Pressable>
-      ) : null}
       <KeyboardAvoidingView className="flex-1">
         {/* Both steps stay mounted (hidden) so switching keeps the generated workout. */}
         <ScrollView
@@ -74,7 +74,7 @@ export default function TrainingScreen() {
           contentContainerClassName="gap-6 pb-10 pt-4"
           showsVerticalScrollIndicator={false}
         >
-          <PainMapSection userId={userId} sex={profile.sex} />
+          <PainMapSection userId={userId} sex={profile.sex} bodyHeight={bodyHeight} />
           <Button
             label={painCount > 0 ? 'Continuar para o treino' : 'Estou sem dores · continuar'}
             icon="arrow-forward"
@@ -87,6 +87,30 @@ export default function TrainingScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          {anamnese.data === null && !anamneseDismissed ? (
+            <View className="flex-row items-center gap-3 rounded-2xl border border-hairline bg-ink-800 py-3 pl-4 pr-2">
+              <Ionicons name="medical-outline" size={18} color={theme.ink[300]} />
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push('/anamnese')}
+                className="flex-1 active:opacity-70"
+              >
+                <Text className="text-sm font-semibold text-ink-100">Questionário de saúde</Text>
+                <Text className="text-xs text-ink-400">
+                  Deixa os treinos mais seguros para você.
+                </Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Agora não"
+                hitSlop={8}
+                onPress={() => setAnamneseDismissed(true)}
+                className="h-8 w-8 items-center justify-center rounded-full active:bg-ink-700"
+              >
+                <Ionicons name="close" size={16} color={theme.ink[400]} />
+              </Pressable>
+            </View>
+          ) : null}
           <WorkoutBuilder
             userId={userId}
             defaultLevel={profile.level ?? 'beginner'}

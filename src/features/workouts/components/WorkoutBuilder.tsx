@@ -115,16 +115,29 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function ContextRow({ icon, label, value }: { icon: IconName; label: string; value: string }) {
+function DisclosureRow({
+  label,
+  icon,
+  open,
+  onPress,
+}: {
+  label: string;
+  icon: IconName;
+  open: boolean;
+  onPress: () => void;
+}) {
   const theme = useThemeColors();
   return (
-    <View className="flex-row items-center gap-3">
-      <Ionicons name={icon} size={16} color={theme.ink[300]} />
-      <Text className="text-sm text-ink-400">{label}</Text>
-      <Text className="flex-1 text-right text-sm font-semibold text-ink-100" numberOfLines={2}>
-        {value}
-      </Text>
-    </View>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ expanded: open }}
+      onPress={onPress}
+      className="flex-row items-center gap-3 rounded-[20px] px-1 py-2 active:opacity-70"
+    >
+      <Ionicons name={icon} size={18} color={theme.ink[300]} />
+      <Text className="flex-1 text-sm font-semibold text-ink-200">{label}</Text>
+      <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={16} color={theme.ink[400]} />
+    </Pressable>
   );
 }
 
@@ -198,6 +211,8 @@ export function WorkoutBuilder({
   const [level, setLevel] = useState<TrainingLevel>(defaultLevel);
   const [duration, setDuration] = useState<WorkoutDuration>(30);
   const [current, setCurrent] = useState<CurrentWorkout | null>(null);
+  const [customOpen, setCustomOpen] = useState(false);
+  const [savedOpen, setSavedOpen] = useState(false);
   const generate = useGenerateWorkout(userId);
   const recent = useRecentWorkouts(userId);
   const remove = useDeleteWorkout(userId);
@@ -264,19 +279,42 @@ export function WorkoutBuilder({
           variant="ghost"
           onPress={() => router.push('/sources')}
         />
-        <HealthDisclaimer withPain={pains.length > 0} />
+        <HealthDisclaimer variant="footnote" withPain={pains.length > 0} />
       </View>
     );
   }
 
+  const hasSuggestions = suggestions.length > 0;
+  const showCustom = !hasSuggestions || customOpen;
+  const context = [
+    recentPaceSPerKm
+      ? `Ritmo de referência ${formatPace(recentPaceSPerKm)}`
+      : 'Ritmos por esforço percebido',
+    pains.length > 0
+      ? `poupando ${pains.map((p) => describeRegion(p.region, p.side).toLowerCase()).join(', ')}`
+      : null,
+    discomfortRegions.length > 0 ? 'desconforto no último treino, carga menor' : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
     <View className="gap-6">
-      <View className="gap-1">
+      <View className="gap-1.5">
         <Text accessibilityRole="header" className="font-display text-[22px] text-ink-50">
-          Monte seu treino de corrida
+          {hasSuggestions ? 'Treinos para você' : 'Monte seu treino de corrida'}
         </Text>
-        <Text className="text-sm text-ink-400">
-          Os ritmos vêm das suas últimas corridas, e as dores marcadas reduzem a carga.
+        <Text className="text-sm leading-5 text-ink-400">
+          {context}
+          {onEditPains ? (
+            <Text
+              accessibilityRole="button"
+              onPress={onEditPains}
+              className="font-semibold text-accent"
+            >
+              {'  '}Revisar dores
+            </Text>
+          ) : null}
         </Text>
       </View>
 
@@ -288,8 +326,8 @@ export function WorkoutBuilder({
         />
       ) : null}
 
-      {suggestions.length > 0 ? (
-        <Section title="Sugestões para seu objetivo">
+      {hasSuggestions ? (
+        <View className="gap-2.5">
           {suggestions.map((suggestion) => (
             <SuggestionCard
               key={suggestion.type}
@@ -298,121 +336,105 @@ export function WorkoutBuilder({
               onPress={() => handleSuggestion(suggestion)}
             />
           ))}
-        </Section>
+          <DisclosureRow
+            label="Montar do meu jeito"
+            icon="options-outline"
+            open={customOpen}
+            onPress={() => setCustomOpen((v) => !v)}
+          />
+        </View>
       ) : null}
 
-      <Section title={suggestions.length > 0 ? 'Ou monte o seu' : 'Tipo de treino'}>
-        <View
-          accessibilityRole="radiogroup"
-          className="flex-row flex-wrap justify-between gap-y-2.5"
-        >
-          {SESSION_CHOICES.map((t) => (
-            <SessionCard
-              key={t}
-              type={t}
-              selected={t === type}
-              onPress={() => {
-                setType(t);
-                if (t === 'long' && duration < LONG_RUN_MIN) setDuration(LONG_RUN_MIN);
-              }}
+      {showCustom ? (
+        <View className="gap-6">
+          <Section title="Tipo de treino">
+            <View
+              accessibilityRole="radiogroup"
+              className="flex-row flex-wrap justify-between gap-y-2.5"
+            >
+              {SESSION_CHOICES.map((t) => (
+                <SessionCard
+                  key={t}
+                  type={t}
+                  selected={t === type}
+                  onPress={() => {
+                    setType(t);
+                    if (t === 'long' && duration < LONG_RUN_MIN) setDuration(LONG_RUN_MIN);
+                  }}
+                />
+              ))}
+            </View>
+            {type === 'custom' ? (
+              <View className="gap-1.5">
+                <TextField
+                  label="O que você busca?"
+                  value={customGoal}
+                  onChangeText={setCustomGoal}
+                  placeholder="Ex.: preparação para 10 km em 45 min"
+                  maxLength={CUSTOM_GOAL_MAX_LENGTH}
+                  returnKeyType="done"
+                />
+                <Text className="text-xs leading-4 text-ink-400">
+                  Entendemos palavras como tiros, fartlek, limiar, subida, longão, regenerativo e
+                  metas como “5 km em 25 min”.
+                </Text>
+              </View>
+            ) : null}
+          </Section>
+
+          <Section title="Nível">
+            <SegmentedControl
+              accessibilityLabel="Nível"
+              options={LEVEL_OPTIONS}
+              value={level}
+              onChange={setLevel}
             />
-          ))}
-        </View>
-        {type === 'custom' ? (
-          <View className="gap-1.5">
-            <TextField
-              label="O que você busca?"
-              value={customGoal}
-              onChangeText={setCustomGoal}
-              placeholder="Ex.: preparação para 10 km em 45 min"
-              maxLength={CUSTOM_GOAL_MAX_LENGTH}
-              returnKeyType="done"
+            {level === 'advanced' ? (
+              <Text className="text-xs leading-4 text-ink-400">
+                Inclui tiros de VO2máx, tempo run e zonas de frequência cardíaca (Z1–Z5).
+              </Text>
+            ) : null}
+          </Section>
+
+          <Section title="Tempo disponível">
+            <SegmentedControl
+              accessibilityLabel="Tempo disponível"
+              options={DURATION_OPTIONS}
+              value={duration}
+              onChange={setDuration}
             />
-            <Text className="text-xs leading-4 text-ink-400">
-              Entendemos palavras como tiros, fartlek, limiar, subida, longão, regenerativo e metas
-              como “5 km em 25 min”.
-            </Text>
-          </View>
-        ) : null}
-      </Section>
+            {type === 'long' && duration < 45 ? (
+              <Text className="text-xs text-ink-400">
+                Com menos de 45 min, o longão vira uma rodagem leve.
+              </Text>
+            ) : null}
+          </Section>
 
-      <Section title="Nível">
-        <SegmentedControl
-          accessibilityLabel="Nível"
-          options={LEVEL_OPTIONS}
-          value={level}
-          onChange={setLevel}
-        />
-        {level === 'advanced' ? (
-          <Text className="text-xs leading-4 text-ink-400">
-            Inclui tiros de VO2máx, tempo run e zonas de frequência cardíaca (Z1–Z5).
-          </Text>
-        ) : null}
-      </Section>
-
-      <Section title="Tempo disponível">
-        <SegmentedControl
-          accessibilityLabel="Tempo disponível"
-          options={DURATION_OPTIONS}
-          value={duration}
-          onChange={setDuration}
-        />
-        {type === 'long' && duration < 45 ? (
-          <Text className="text-xs text-ink-400">
-            Com menos de 45 min, o longão vira uma rodagem leve.
-          </Text>
-        ) : null}
-      </Section>
-
-      <View className="gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4">
-        <ContextRow
-          icon="body-outline"
-          label="Dores"
-          value={
-            pains.length > 0
-              ? pains.map((p) => describeRegion(p.region, p.side)).join(', ')
-              : 'Nenhuma'
-          }
-        />
-        <ContextRow
-          icon="speedometer-outline"
-          label="Pace de referência"
-          value={recentPaceSPerKm ? formatPace(recentPaceSPerKm) : 'Esforço percebido'}
-        />
-        {discomfortRegions.length > 0 ? (
-          <ContextRow
-            icon="chatbubble-ellipses-outline"
-            label="Último check-in"
-            value="Desconforto — carga menor"
+          <Button
+            label="Gerar treino"
+            icon="flash"
+            onPress={() => handleGenerate()}
+            loading={generate.isPending}
+            disabled={customMissing}
           />
-        ) : null}
-        {onEditPains ? (
-          <Pressable
-            accessibilityRole="button"
-            onPress={onEditPains}
-            hitSlop={8}
-            className="self-start"
-          >
-            <Text className="text-sm font-semibold text-accent">Revisar check-up corporal</Text>
-          </Pressable>
-        ) : null}
-      </View>
-
-      <Button
-        label="Gerar treino"
-        icon="flash"
-        onPress={() => handleGenerate()}
-        loading={generate.isPending}
-        disabled={customMissing}
-      />
-      {customMissing ? (
-        <Text className="-mt-4 text-center text-xs text-ink-400">
-          Descreva seu objetivo para gerar o treino.
-        </Text>
+          {customMissing ? (
+            <Text className="-mt-4 text-center text-xs text-ink-400">
+              Descreva seu objetivo para gerar o treino.
+            </Text>
+          ) : null}
+        </View>
       ) : null}
 
       {saved.length > 0 ? (
-        <Section title="Treinos recentes">
+        <DisclosureRow
+          label={`Treinos salvos · ${Math.min(saved.length, 5)}`}
+          icon="document-text-outline"
+          open={savedOpen}
+          onPress={() => setSavedOpen((v) => !v)}
+        />
+      ) : null}
+      {saved.length > 0 && savedOpen ? (
+        <View className="-mt-3 gap-2.5">
           {saved.slice(0, 5).map((workout) => (
             <Pressable
               key={workout.id}
@@ -442,7 +464,7 @@ export function WorkoutBuilder({
               <ChevronIcon />
             </Pressable>
           ))}
-        </Section>
+        </View>
       ) : null}
     </View>
   );

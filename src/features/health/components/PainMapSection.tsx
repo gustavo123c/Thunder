@@ -22,8 +22,17 @@ import { getBody3D, unavailableReason } from './body3d';
 import { BodyMap, PAIN_COLORS, PainLegend } from './BodyMap';
 import { PainSheet } from './PainSheet';
 
-/** "Como está seu corpo hoje?" — body map, active pains and the health notice. */
-export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex | null }) {
+/** "Como está seu corpo hoje?" — body map and active pains. */
+export function PainMapSection({
+  userId,
+  sex,
+  bodyHeight,
+}: {
+  userId: string;
+  sex: BodySex | null;
+  /** Height of the 3D view; the screen sizes it so the next button stays visible. */
+  bodyHeight?: number;
+}) {
   const theme = useThemeColors();
   const pains = useOpenPains(userId);
   const setPain = useSetPain(userId);
@@ -73,15 +82,10 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
             <Text className="text-xs font-semibold text-ink-200">Histórico</Text>
           </Pressable>
         </View>
-        <Text className="text-sm leading-5 text-ink-400">
-          Toque onde sente dor. O treino vai poupar essas regiões.
-        </Text>
       </View>
 
-      <HealthDisclaimer withPain={list.length > 0} />
-
       {pains.isPending ? (
-        <Skeleton height={380} radius={24} />
+        <Skeleton height={bodyHeight ?? 380} radius={24} />
       ) : use3D && Body3D ? (
         <View className="gap-3">
           <Body3D
@@ -90,14 +94,18 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
             selected={target}
             onSelect={setTarget}
             onUnavailable={onUnavailable}
+            height={bodyHeight}
           />
           {/* Every region (the upper body is only here) and the screen-reader path. */}
           <Pressable
             accessibilityRole="button"
             accessibilityState={{ expanded: showList }}
+            accessibilityLabel={showList ? 'Ocultar lista de regiões' : 'Escolher pela lista'}
             onPress={() => setShowList((v) => !v)}
-            className="self-center"
+            hitSlop={8}
+            className="flex-row items-center gap-1.5 self-center"
           >
+            <Ionicons name="list" size={14} color={theme.accent} />
             <Text className="text-sm font-semibold text-accent">
               {showList ? 'Ocultar lista de regiões' : 'Escolher pela lista'}
             </Text>
@@ -129,7 +137,6 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
               })}
             </View>
           ) : null}
-          <PainLegend />
         </View>
       ) : (
         <View className="gap-2">
@@ -145,47 +152,50 @@ export function PainMapSection({ userId, sex }: { userId: string; sex: BodySex |
       )}
 
       {list.length > 0 ? (
-        <View className="flex-row flex-wrap gap-2">
-          {list.map((pain) => {
-            const name = describeRegion(pain.region, pain.side);
-            const level = painLevel(pain.intensity);
-            return (
-              <View
-                key={pain.id}
-                className="flex-row items-center rounded-full border border-hairline bg-ink-800"
-              >
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={`Editar dor: ${name}`}
-                  onPress={() => setTarget({ region: pain.region, side: pain.side })}
-                  className="flex-row items-center gap-2 py-2 pl-3 pr-1 active:opacity-70"
+        <View className="gap-2">
+          <PainLegend />
+          <View className="flex-row flex-wrap gap-2">
+            {list.map((pain) => {
+              const name = describeRegion(pain.region, pain.side);
+              const level = painLevel(pain.intensity);
+              return (
+                <View
+                  key={pain.id}
+                  className="flex-row items-center rounded-full border border-hairline bg-ink-800"
                 >
-                  <View
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: PAIN_COLORS[level] }}
-                  />
-                  <Text className="text-sm font-semibold text-ink-100">{name}</Text>
-                  <Text className="text-sm text-ink-400">
-                    {PAIN_PRESETS[level].label.toLowerCase()}
-                  </Text>
-                </Pressable>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={`Remover dor: ${name}`}
-                  hitSlop={6}
-                  disabled={saving}
-                  onPress={() => resolve.mutate(pain.id)}
-                  className="h-8 w-8 items-center justify-center rounded-full active:bg-ink-700"
-                >
-                  <Ionicons name="close" size={16} color={theme.ink[400]} />
-                </Pressable>
-              </View>
-            );
-          })}
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Editar dor: ${name}`}
+                    onPress={() => setTarget({ region: pain.region, side: pain.side })}
+                    className="flex-row items-center gap-2 py-2 pl-3 pr-1 active:opacity-70"
+                  >
+                    <View
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: PAIN_COLORS[level] }}
+                    />
+                    <Text className="text-sm font-semibold text-ink-100">{name}</Text>
+                    <Text className="text-sm text-ink-400">
+                      {PAIN_PRESETS[level].label.toLowerCase()}
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remover dor: ${name}`}
+                    hitSlop={6}
+                    disabled={saving}
+                    onPress={() => resolve.mutate(pain.id)}
+                    className="h-8 w-8 items-center justify-center rounded-full active:bg-ink-700"
+                  >
+                    <Ionicons name="close" size={16} color={theme.ink[400]} />
+                  </Pressable>
+                </View>
+              );
+            })}
+          </View>
         </View>
-      ) : pains.isSuccess ? (
-        <Text className="text-center text-sm text-ink-400">Nenhuma dor registrada.</Text>
       ) : null}
+
+      <HealthDisclaimer variant="footnote" withPain={list.length > 0} />
 
       <PainSheet
         target={target}

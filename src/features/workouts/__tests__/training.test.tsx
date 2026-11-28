@@ -63,7 +63,7 @@ describe('WorkoutBuilder', () => {
       <WorkoutBuilder userId="u1" defaultLevel="beginner" pains={[]} recentPaceSPerKm={390} />,
     );
 
-    expect(screen.getByText('6:30 /km')).toBeOnTheScreen();
+    expect(screen.getByText(/Ritmo de referência 6:30 \/km/)).toBeOnTheScreen();
     await user.press(screen.getByRole('radio', { name: 'Tiros' }));
     await user.press(screen.getByRole('radio', { name: '30 min' }));
     await user.press(screen.getByRole('button', { name: 'Gerar treino' }));
@@ -106,7 +106,7 @@ describe('WorkoutBuilder', () => {
       />,
     );
 
-    expect(screen.getByText('Sugestões para seu objetivo')).toBeOnTheScreen();
+    expect(screen.getByText('Treinos para você')).toBeOnTheScreen();
     expect(screen.getByTestId('suggestion-intervals')).toBeOnTheScreen();
     expect(screen.getByTestId('suggestion-hills')).toBeOnTheScreen();
 
@@ -139,7 +139,7 @@ describe('WorkoutBuilder', () => {
       />,
     );
 
-    expect(screen.getByText('Joelho esquerdo')).toBeOnTheScreen();
+    expect(screen.getByText(/poupando joelho esquerdo/)).toBeOnTheScreen();
     await userEvent.setup().press(screen.getByRole('button', { name: 'Gerar treino' }));
 
     expect(await screen.findByText('Adaptado para você')).toBeOnTheScreen();
@@ -265,7 +265,7 @@ describe('WorkoutBuilder — new options', () => {
         recentPaceSPerKm={360}
       />,
     );
-    expect(await screen.findByText('Desconforto — carga menor')).toBeOnTheScreen();
+    expect(await screen.findByText(/desconforto no último treino/)).toBeOnTheScreen();
     await user.press(screen.getByRole('button', { name: 'Gerar treino' }));
     expect(await screen.findByText(/desconforto após o último treino/)).toBeOnTheScreen();
   });
@@ -294,7 +294,6 @@ describe('PainMapSection', () => {
     jest.mocked(setPain).mockResolvedValue(undefined);
     await renderWithQuery(<PainMapSection userId="u1" sex="female" />);
 
-    expect(await screen.findByText('Nenhuma dor registrada.')).toBeOnTheScreen();
     await user.press(await screen.findByRole('button', { name: 'Escolher pela lista' }));
     await user.press(screen.getByRole('button', { name: 'Joelho esquerdo' }));
     expect(

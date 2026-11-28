@@ -46,9 +46,7 @@ type PainPickerProps = {
 };
 
 function PainPicker({ painRegions, onAdd, onRemove }: PainPickerProps) {
-  const [pickRegion, setPickRegion] = useState<{ region: BodyRegion; side: BodySide } | null>(
-    null,
-  );
+  const [pickRegion, setPickRegion] = useState<{ region: BodyRegion; side: BodySide } | null>(null);
 
   const regions: { region: BodyRegion; side: BodySide; label: string }[] = [
     { region: 'chest', side: 'center', label: 'Peito' },
@@ -123,7 +121,11 @@ function PainPicker({ painRegions, onAdd, onRemove }: PainPickerProps) {
                 accessibilityRole="button"
                 onPress={() => {
                   if (pickRegion) {
-                    onAdd({ region: pickRegion.region, side: pickRegion.side, intensity: PAIN_PRESETS[level].intensity });
+                    onAdd({
+                      region: pickRegion.region,
+                      side: pickRegion.side,
+                      intensity: PAIN_PRESETS[level].intensity,
+                    });
                     setPickRegion(null);
                   }
                 }}
@@ -243,11 +245,7 @@ export function PostWorkoutFeedback({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <ThemeScope>
-        <Pressable
-          className="flex-1 bg-black/40"
-          onPress={onClose}
-          accessibilityLabel="Fechar"
-        />
+        <Pressable className="flex-1 bg-black/40" onPress={onClose} accessibilityLabel="Fechar" />
         <SafeAreaView
           edges={['bottom']}
           className="max-h-[85%] rounded-t-[28px] border-t border-hairline bg-ink-900"
@@ -313,8 +311,8 @@ export function PostWorkoutFeedback({
               <View className="flex-row gap-3 rounded-2xl border border-danger/40 bg-danger/10 p-4">
                 <Ionicons name="warning-outline" size={20} color={colors.danger} />
                 <Text className="flex-1 text-sm leading-5 text-ink-100">
-                  Se você sentiu dor no peito, tontura, desmaio ou falta de ar intensa,
-                  interrompa os treinos e procure avaliação médica antes de continuar.
+                  Se você sentiu dor no peito, tontura, desmaio ou falta de ar intensa, interrompa
+                  os treinos e procure avaliação médica antes de continuar.
                 </Text>
               </View>
             ) : null}
@@ -339,9 +337,7 @@ export function PostWorkoutFeedback({
                       <View
                         className={`h-5 w-5 items-center justify-center rounded-full border-2 ${sel ? 'border-bolt-500' : 'border-ink-500'}`}
                       >
-                        {sel ? (
-                          <View className="h-2.5 w-2.5 rounded-full bg-bolt-500" />
-                        ) : null}
+                        {sel ? <View className="h-2.5 w-2.5 rounded-full bg-bolt-500" /> : null}
                       </View>
                       <Text className="text-base text-ink-50">{label}</Text>
                     </Pressable>
@@ -359,7 +355,9 @@ export function PostWorkoutFeedback({
               {saving ? (
                 <ActivityIndicator color="#000" />
               ) : (
-                <Text className={`font-mono-medium text-sm uppercase tracking-wider ${issues.length === 0 ? 'text-ink-400' : 'text-onbolt'}`}>
+                <Text
+                  className={`font-mono-medium text-sm uppercase tracking-wider ${issues.length === 0 ? 'text-ink-400' : 'text-onbolt'}`}
+                >
                   Salvar
                 </Text>
               )}

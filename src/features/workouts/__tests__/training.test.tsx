@@ -94,6 +94,32 @@ describe('WorkoutBuilder', () => {
     expect(screen.getByRole('button', { name: 'Gerar treino' })).toBeOnTheScreen();
   });
 
+  it('suggests sessions for the profile goal and generates one on tap', async () => {
+    const user = userEvent.setup();
+    await renderWithQuery(
+      <WorkoutBuilder
+        userId="u1"
+        defaultLevel="intermediate"
+        goal="improve_pace"
+        pains={[]}
+        recentPaceSPerKm={330}
+      />,
+    );
+
+    expect(screen.getByText('Sugestões para seu objetivo')).toBeOnTheScreen();
+    expect(screen.getByTestId('suggestion-intervals')).toBeOnTheScreen();
+    expect(screen.getByTestId('suggestion-hills')).toBeOnTheScreen();
+
+    await user.press(screen.getByTestId('suggestion-tempo'));
+    expect(await screen.findByText('Ficha de treino de corrida')).toBeOnTheScreen();
+    expect(saveWorkout).toHaveBeenCalledWith(
+      'u1',
+      expect.objectContaining({ type: 'tempo', durationMin: 45, level: 'intermediate' }),
+      expect.objectContaining({ sessionType: 'tempo' }),
+      'w-new',
+    );
+  });
+
   it('gives a long run enough time', async () => {
     const user = userEvent.setup();
     await renderWithQuery(

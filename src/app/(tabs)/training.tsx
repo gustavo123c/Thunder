@@ -92,6 +92,7 @@ export default function TrainingScreen() {
             defaultLevel={profile.level ?? 'beginner'}
             pains={pains.data ?? []}
             recentPaceSPerKm={recentPace}
+            goal={profile.mainGoal}
             recurring={recurring}
             onEditPains={() => setStep('body')}
           />

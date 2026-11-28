@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/Typography';
 import { describeRegion, type PainEntry } from '@/domain/health/body-regions';
 import type { Recurrence } from '@/domain/health/pain-history';
 import { CUSTOM_GOAL_MAX_LENGTH } from '@/domain/training/custom-goal';
+import { type GoalSuggestion, suggestionsForGoal } from '@/domain/training/goal-suggestions';
 import {
   RUN_WORKOUT_TYPES,
   type RunWorkoutType,
@@ -19,6 +20,7 @@ import {
   type WorkoutDuration,
   type WorkoutPlan,
 } from '@/domain/training/workout-generator';
+import type { RunnerGoal } from '@/domain/types/profile';
 import { formatPace, formatRunDate } from '@/lib/format';
 import { useThemeColors } from '@/theme/theme';
 import { colors } from '@/theme/tokens';
@@ -173,6 +175,8 @@ type WorkoutBuilderProps = {
   defaultLevel: TrainingLevel;
   pains: readonly PainEntry[];
   recentPaceSPerKm: number | null;
+  /** Profile goal; drives the suggested sessions. */
+  goal?: RunnerGoal | null;
   /** Pains reported repeatedly in the last 30 days (from the pain history). */
   recurring?: readonly Recurrence[];
   /** Goes back to the body check-up step. */
@@ -185,6 +189,7 @@ export function WorkoutBuilder({
   defaultLevel,
   pains,
   recentPaceSPerKm,
+  goal = null,
   recurring = [],
   onEditPains,
 }: WorkoutBuilderProps) {
@@ -209,15 +214,24 @@ export function WorkoutBuilder({
     [pains, recurring, saved],
   );
 
+  const suggestions = useMemo(() => (goal ? suggestionsForGoal(goal, level) : []), [goal, level]);
+
   const customMissing = type === 'custom' && customGoal.trim().length < 3;
 
-  function handleGenerate() {
+  function handleSuggestion(suggestion: GoalSuggestion) {
+    setType(suggestion.type);
+    setDuration(suggestion.durationMin);
+    handleGenerate(suggestion);
+  }
+
+  function handleGenerate(suggestion?: GoalSuggestion) {
+    const sessionType = suggestion?.type ?? type;
     generate.mutate(
       {
-        type,
-        customGoal: type === 'custom' ? customGoal.trim() : undefined,
+        type: sessionType,
+        customGoal: sessionType === 'custom' ? customGoal.trim() : undefined,
         level,
-        durationMin: duration,
+        durationMin: suggestion?.durationMin ?? duration,
         pains,
         recentPaceSPerKm,
         discomfortRegions,
@@ -274,7 +288,20 @@ export function WorkoutBuilder({
         />
       ) : null}
 
-      <Section title="Tipo de treino">
+      {suggestions.length > 0 ? (
+        <Section title="Sugestões para seu objetivo">
+          {suggestions.map((suggestion) => (
+            <SuggestionCard
+              key={suggestion.type}
+              suggestion={suggestion}
+              disabled={generate.isPending}
+              onPress={() => handleSuggestion(suggestion)}
+            />
+          ))}
+        </Section>
+      ) : null}
+
+      <Section title={suggestions.length > 0 ? 'Ou monte o seu' : 'Tipo de treino'}>
         <View
           accessibilityRole="radiogroup"
           className="flex-row flex-wrap justify-between gap-y-2.5"
@@ -374,7 +401,7 @@ export function WorkoutBuilder({
       <Button
         label="Gerar treino"
         icon="flash"
-        onPress={handleGenerate}
+        onPress={() => handleGenerate()}
         loading={generate.isPending}
         disabled={customMissing}
       />
@@ -418,6 +445,42 @@ export function WorkoutBuilder({
         </Section>
       ) : null}
     </View>
+  );
+}
+
+function SuggestionCard({
+  suggestion,
+  disabled,
+  onPress,
+}: {
+  suggestion: GoalSuggestion;
+  disabled: boolean;
+  onPress: () => void;
+}) {
+  const theme = useThemeColors();
+  const session = SESSIONS[suggestion.type];
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${session.label}, ${suggestion.durationMin} minutos. ${suggestion.reason}`}
+      accessibilityHint="Gera este treino"
+      disabled={disabled}
+      onPress={onPress}
+      testID={`suggestion-${suggestion.type}`}
+      className="flex-row items-center gap-3 rounded-[20px] border border-hairline bg-ink-800 p-4 active:opacity-80"
+    >
+      <View className="h-10 w-10 items-center justify-center rounded-full bg-ink-700">
+        <Ionicons name={session.icon} size={18} color={theme.accent} />
+      </View>
+      <View className="flex-1 gap-0.5">
+        <Text className="font-bold text-ink-50">
+          {session.label}
+          <Text className="font-mono text-xs text-ink-300"> · {suggestion.durationMin} min</Text>
+        </Text>
+        <Text className="text-xs leading-4 text-ink-400">{suggestion.reason}</Text>
+      </View>
+      <ChevronIcon />
+    </Pressable>
   );
 }
 

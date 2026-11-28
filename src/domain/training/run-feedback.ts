@@ -1,14 +1,7 @@
 import type { BodyRegion, PainEntry } from '../health/body-regions';
 
 export type FeedbackIssue =
-  | 'breath'
-  | 'pain'
-  | 'pace_hard'
-  | 'pace_easy'
-  | 'short_time'
-  | 'motivation'
-  | 'nothing'
-  | 'other';
+  'breath' | 'pain' | 'pace_hard' | 'pace_easy' | 'short_time' | 'motivation' | 'nothing' | 'other';
 
 export type NextPreference = 'lighter' | 'same';
 
